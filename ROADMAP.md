@@ -6,7 +6,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 
 ## Principles
 
-- **Ship only what exists.** A section appears when what it documents is real. No "coming soon" pages; `/roadmap` says honestly what is planned.
+- **Ship only what exists.** No page appears before what it documents is real. Planned parts of the ecosystem may be listed, disabled, and point to `/roadmap`, which says honestly what is planned.
 - **Generate, do not copy.** Anything derived from the core (token tables, colour swatches, contrast pairs) is generated at build time from the core package, never written by hand.
 - **The core owns the design.** The site consumes tokens; it never defines colours, contrast or token names of its own. A missing token is requested in the core, not patched here.
 - **Small, reviewable steps.** Each phase lands as one pull request made of small Conventional Commits.
