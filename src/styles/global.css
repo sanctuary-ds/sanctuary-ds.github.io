@@ -1,0 +1,16 @@
+/* The core defines tokens only and styles no elements. These are the few
+   site-wide element rules, and they read core tokens exclusively. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--san-surface);
+  color: var(--san-text);
+  font: var(--san-type-body-md);
+  letter-spacing: var(--san-type-body-md-tracking);
+}

@@ -166,6 +166,9 @@ importers:
 
   .:
     dependencies:
+      '@sanctuary-ds/tokens':
+        specifier: github:sanctuary-ds/sanctuary#0ee099db3070198e224b062e82b3f5fc51f75219
+        version: https://codeload.github.com/sanctuary-ds/sanctuary/tar.gz/0ee099db3070198e224b062e82b3f5fc51f75219
       astro:
         specifier: 7.3.5
         version: 7.3.5
@@ -789,6 +792,11 @@ packages:
 
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
+
+  '@sanctuary-ds/tokens@https://codeload.github.com/sanctuary-ds/sanctuary/tar.gz/0ee099db3070198e224b062e82b3f5fc51f75219':
+    resolution: {gitHosted: true, integrity: sha512-OV+GPloDj4yrztwlfa2AGn5pU6j1Q+9nbp3sO9mp9rF4BHmewrBcsrXxd9+x/R+0t45mwNrqPPGYAIPgWhlbzw==, tarball: https://codeload.github.com/sanctuary-ds/sanctuary/tar.gz/0ee099db3070198e224b062e82b3f5fc51f75219}
+    version: 0.1.0
+    engines: {node: '>=22'}
 
   '@shikijs/core@4.5.0':
     resolution: {integrity: sha512-6CIgwq+bt2JZ3OSjb/nBkkwEf/CfpHcbam+Mg5Pllco7HAGRQ2/EFhZrrJtbyNTgKwknfVS+llsXGygiDGwJWw==}
@@ -2097,6 +2105,8 @@ snapshots:
     optional: true
 
   '@rolldown/pluginutils@1.0.1': {}
+
+  '@sanctuary-ds/tokens@https://codeload.github.com/sanctuary-ds/sanctuary/tar.gz/0ee099db3070198e224b062e82b3f5fc51f75219': {}
 
   '@shikijs/core@4.5.0':
     dependencies:
