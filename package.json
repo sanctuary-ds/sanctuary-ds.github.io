@@ -1,0 +1,27 @@
+{
+  "name": "sanctuary-ds.github.io",
+  "version": "0.0.0",
+  "private": true,
+  "description": "The public site of Sanctuary, a design system of stone, glass and light.",
+  "license": "MIT",
+  "type": "module",
+  "packageManager": "pnpm@12.8.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "^24.0.0",
+      "onFail": "download"
+    }
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "7.3.5"
+  }
+}
