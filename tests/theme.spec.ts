@@ -315,6 +315,16 @@ test.describe('keyboard shortcuts and theme events', () => {
     expect(await theme(page)).toBe(before);
   });
 
+  test('holding a key steps once, not once per auto-repeat', async ({ page }) => {
+    await page.goto('/');
+    const expected = await next(page, 'flavor');
+    // Pressing a key that is already down sends keydown with `repeat` set, as
+    // the browser does while a key is held.
+    for (let i = 0; i < 3; i++) await page.keyboard.down('f');
+    await page.keyboard.up('f');
+    await expect(page.locator('html')).toHaveAttribute('data-san-flavor', expected);
+  });
+
   test('every change is announced with its axis and value', async ({ page }) => {
     await page.goto('/');
     await page.evaluate(() => {

@@ -95,7 +95,8 @@ export function initLectern(): void {
   };
 
   // A key steps to the next value of its axis, in the order the lectern lists
-  // them. Ignored with modifier keys and while the visitor is typing.
+  // them. One step per press: a held key's auto-repeat is ignored, as are
+  // modifier keys and keys typed into a field.
   // The visitor can turn them off with the lectern's switch (WCAG 2.1.4), and the
   // choice is kept like the theme. The values come from the lectern's own buttons,
   // the one place that lists every value of every axis, in order.
@@ -107,20 +108,20 @@ export function initLectern(): void {
   } catch {
     // Storage is unavailable: the shortcuts stay on for this visit.
   }
-  const showShortcuts = () => keysSwitch?.setAttribute('aria-checked', String(shortcutsOn));
+  const reflectShortcuts = () => keysSwitch?.setAttribute('aria-checked', String(shortcutsOn));
   keysSwitch?.addEventListener('click', () => {
     shortcutsOn = !shortcutsOn;
-    showShortcuts();
+    reflectShortcuts();
     try {
       localStorage.setItem(SHORTCUTS_KEY, shortcutsOn ? 'on' : 'off');
     } catch {
       // Best effort, like the theme.
     }
   });
-  showShortcuts();
+  reflectShortcuts();
 
   document.addEventListener('keydown', (event) => {
-    if (!shortcutsOn) return;
+    if (!shortcutsOn || event.repeat) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const target = event.target as HTMLElement;
     if (target.closest('input, select, textarea, [contenteditable=""], [contenteditable="true"]')) return;
