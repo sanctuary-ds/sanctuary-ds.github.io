@@ -1,22 +1,41 @@
 ---
-// The home page: the facade, then (as they land) the nave and the chapels.
+// The home page: the facade, the nave and the chapels.
 import Base from '../layouts/Base.astro';
 import Button from '../components/Button.astro';
 import Chapels from '../components/Chapels.astro';
 import Facade from '../components/Facade.astro';
+import Nave from '../components/Nave.astro';
 ---
 
 <Base title="Sanctuary" description="Sanctuary, a design system of stone, glass and light.">
   <main>
     <Facade>
       <div class="actions" slot="actions">
+        <Button href="#nave" size="lg">Enter the nave</Button>
         <Button href="#chapels" variant="outline" size="lg">Visit the chapels</Button>
       </div>
+      <a class="scroll" href="#nave" slot="after">Scroll into the nave ↓</a>
     </Facade>
+    <Nave />
     <Chapels />
   </main>
 </Base>
 
 <style>
   .actions { display: flex; flex-wrap: wrap; gap: var(--san-space-3); }
+  .scroll {
+    position: absolute;
+    left: 50%;
+    bottom: var(--san-space-6);
+    translate: -50% 0;
+    font: var(--san-type-label-sm);
+    letter-spacing: var(--san-type-label-sm-tracking);
+    text-transform: uppercase;
+    color: var(--san-text-subtle);
+    text-decoration: none;
+  }
+  .scroll:hover { color: var(--san-accent-ink); }
+  @media (max-width: 64rem) {
+    .scroll { display: none; }
+  }
 </style>

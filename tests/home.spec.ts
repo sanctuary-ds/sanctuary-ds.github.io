@@ -123,3 +123,106 @@ test.describe('chapels', () => {
     await expect(page.locator('#chapels')).toHaveCount(1);
   });
 });
+
+test.describe('nave', () => {
+  test('four numbered steps, led to from the facade', async ({ page }) => {
+    await page.goto('/');
+    await expect(page.locator('.facade').getByRole('link', { name: 'Enter the nave' })).toHaveAttribute('href', '#nave');
+    const steps = page.locator('#nave .step');
+    await expect(steps).toHaveCount(4);
+    for (let index = 0; index < 4; index += 1) {
+      await expect(steps.nth(index).locator('.inscription').first()).toHaveText(new RegExp(`^${toRoman(index + 1)} · `));
+    }
+  });
+
+  test('no step links to the playground before it exists', async ({ page }) => {
+    await page.goto('/');
+    const playground = chapels.find((chapel) => chapel.name === 'Playground')!;
+    await expect(page.locator('.step__more')).toHaveCount(playground.available ? 4 : 0);
+  });
+
+  test('each flavor card shows its hour and themes the page when picked', async ({ page }) => {
+    await page.goto('/');
+    const flavors = Object.entries(palette.flavors as Record<string, { name: string; hour: string; blurb: string }>);
+    const cards = page.locator('.flavors .flavor');
+    await expect(cards).toHaveCount(flavors.length);
+    for (const [index, [id, flavor]] of flavors.entries()) {
+      const card = cards.nth(index);
+      await expect(card).toHaveAttribute('data-san-flavor', id);
+      await expect(card.locator('.inscription')).toHaveText(flavor.hour);
+      await expect(card.locator('.flavor__name')).toHaveText(flavor.name);
+      await expect(card.locator('.flavor__blurb')).toHaveText(flavor.blurb);
+    }
+    const [lastId] = flavors.at(-1)!;
+    await cards.last().click();
+    await expect(page.locator('html')).toHaveAttribute('data-san-flavor', lastId);
+    await expect(cards.last()).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator(`.lectern [data-set="flavor:${lastId}"]`)).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('on a desktop the flavor cards sit two by two, with no orphan', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/');
+    const tops = await page.locator('.flavors .flavor').evaluateAll((cards) => cards.map((card) => Math.round(card.getBoundingClientRect().top)));
+    const rows = new Map<number, number>();
+    for (const top of tops) rows.set(top, (rows.get(top) ?? 0) + 1);
+    expect([...rows.values()]).toEqual([2, 2]);
+  });
+
+  test('each glazing has its own stage and a button that applies it', async ({ page }) => {
+    await page.goto('/');
+    const glazings = Object.entries(palette.glazings as Record<string, { name: string; note: string }>);
+    const items = page.locator('.glazings .glazing');
+    await expect(items).toHaveCount(glazings.length);
+    for (const [index, [id, glazing]] of glazings.entries()) {
+      const item = items.nth(index);
+      await expect(item).toHaveAttribute('data-san-glazing', id);
+      await expect(item.locator('p')).toHaveText(glazing.note);
+      await expect(item.locator('.glazing__stage')).toHaveAttribute('aria-hidden', 'true');
+    }
+    const [lastId, last] = glazings.at(-1)!;
+    await page.getByRole('button', { name: `Use ${last.name}` }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-san-glazing', lastId);
+  });
+
+  test('each window mode previews itself and can be picked', async ({ page }) => {
+    await page.goto('/');
+    const modes = Object.entries(palette.windowModes as Record<string, { name: string; source: string; note: string }>);
+    const buttons = page.locator('.windows .window');
+    await expect(buttons).toHaveCount(modes.length);
+    for (const [index, [id, mode]] of modes.entries()) {
+      const button = buttons.nth(index);
+      await expect(button).toHaveAttribute('data-san-window', id);
+      await expect(button.locator('b')).toHaveText(mode.name);
+      await expect(button.locator('.window__source')).toHaveText(mode.source);
+      await expect(button.locator('small')).toHaveText(mode.note);
+    }
+    const [lastId] = modes.at(-1)!;
+    await buttons.last().click();
+    await expect(page.locator('html')).toHaveAttribute('data-san-window', lastId);
+  });
+
+  test('on a phone the desktop bar keeps everything inside it', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto('/');
+    const fits = await page.locator('.desktop .bar').evaluate((bar) => {
+      const box = bar.getBoundingClientRect();
+      return [...bar.querySelectorAll('*')]
+        .filter((el) => getComputedStyle(el).display !== 'none')
+        .every((el) => {
+          const r = el.getBoundingClientRect();
+          return r.left >= box.left - 1 && r.right <= box.right + 1;
+        });
+    });
+    expect(fits).toBe(true);
+  });
+
+  test('the desktop clock names the current flavor and follows it', async ({ page }) => {
+    await page.goto('/');
+    const clock = page.locator('[data-clock]');
+    await expect(clock).toHaveText(palette.flavors[palette.defaultFlavor].name);
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
+    await expect(clock).toHaveText(palette.flavors.lauds.name);
+    await expect(page.locator('.desktop')).toHaveAttribute('aria-hidden', 'true');
+  });
+});

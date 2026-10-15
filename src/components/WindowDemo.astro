@@ -1,0 +1,57 @@
+---
+// One lancet per window mode, each scoped to its own mode so it previews it.
+// Clicking one makes it the page's window (data-set, handled by the lectern).
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import { defaultTheme } from '../data/theme';
+import Lancet from './Lancet.astro';
+
+const modes = Object.entries(palette.windowModes);
+---
+
+<div class="windows">
+  {
+    modes.map(([id, mode]) => (
+      <button class="window" type="button" data-set={`window:${id}`} data-san-window={id} aria-pressed={String(defaultTheme.window === id)}>
+        <span class="window__lead">
+          <Lancet />
+        </span>
+        <b>{mode.name}</b>
+        <span class="window__source">{mode.source}</span>
+        <small>{mode.note}</small>
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  /* Carried over from the showcase's window cards. */
+  .windows { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: var(--san-space-6); }
+
+  .window {
+    display: grid;
+    gap: var(--san-space-1);
+    justify-items: center;
+    padding: var(--san-space-4) var(--san-space-2);
+    text-align: center;
+    font: inherit;
+    color: var(--san-text);
+    background: none;
+    border: var(--san-border-width-hairline) solid transparent;
+    border-radius: var(--san-radius-md);
+    cursor: pointer;
+    transition: background-color var(--san-duration-base), translate var(--san-duration-base) var(--san-ease-enter);
+  }
+  .window:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .window[aria-pressed='true'] { background: var(--san-surface-raised-1); border-color: var(--san-lead); }
+
+  /* A lead frame around the glass: the lancet inside, inset by the came. */
+  .window__lead { display: block; width: 100%; max-width: 8rem; aspect-ratio: 5 / 9; padding: 5px; margin-bottom: var(--san-space-3); clip-path: var(--san-shape-lancet); background: var(--san-lead-came); }
+
+  b { font: var(--san-type-headline-sm); }
+  .window__source { font: var(--san-type-label-md); color: var(--san-accent-ink); }
+  small { font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .window:hover { translate: 0 -4px; }
+  }
+</style>

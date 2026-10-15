@@ -1,5 +1,6 @@
-// Wires the lectern: theme buttons set the core attributes on <html> and keep
-// the choice, and on phones the "Light" button folds the controls in and out.
+// Wires the theme controls: any [data-set] button on the page (the lectern's,
+// and the home page's live demos) sets a core attribute on <html> and keeps the
+// choice; on phones the lectern's "Light" button folds its controls in and out.
 import { STORAGE_KEY } from '../data/theme-storage';
 
 // How long the light takes to move across the page after a change: the core's
@@ -20,9 +21,19 @@ export function initLectern(): void {
   let shiftTimer: number | undefined;
 
   const sync = () => {
-    for (const button of lectern.querySelectorAll<HTMLElement>('[data-set]')) {
+    for (const button of document.querySelectorAll<HTMLElement>('[data-set]')) {
       const [axis, value] = button.dataset.set!.split(':');
       button.setAttribute('aria-pressed', String(root.getAttribute(`data-san-${axis}`) === value));
+    }
+    // Clocks name the current flavor; each carries the names it may show.
+    for (const clock of document.querySelectorAll<HTMLElement>('[data-clock]')) {
+      try {
+        const names: Record<string, string> = JSON.parse(clock.dataset.clock ?? '{}');
+        const flavor = root.getAttribute('data-san-flavor') ?? '';
+        if (names[flavor]) clock.textContent = names[flavor];
+      } catch {
+        // A malformed list leaves the clock as rendered.
+      }
     }
   };
 
@@ -79,7 +90,8 @@ export function initLectern(): void {
     dropPreview(axis);
   };
 
-  lectern.addEventListener('click', (event) => {
+  // One listener for the whole page: a theme button may sit anywhere.
+  document.addEventListener('click', (event) => {
     const target = event.target as Element;
     const setter = target.closest<HTMLElement>('[data-set]');
     if (setter) {

@@ -1,0 +1,92 @@
+---
+// One stage per glazing, each scoped to its own glazing, so the same accent is
+// shown held three ways. The stages are pictures, not controls; the "Use"
+// buttons are the real ones (data-set, handled by the lectern script).
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import { defaultTheme } from '../data/theme';
+
+const glazings = Object.entries(palette.glazings);
+---
+
+<div class="glazings">
+  {
+    glazings.map(([id, glazing]) => (
+      <article class="glazing" data-san-glazing={id}>
+        <div class="glazing__stage" aria-hidden="true">
+          <span class="demo-button">Glazed button</span>
+          <span class="demo-chip">Chip</span>
+          <span class="demo-switch" />
+          <span class="glazing__pane">A pane of {glazing.name.toLowerCase()}</span>
+        </div>
+        <h3>{glazing.name}</h3>
+        <p>{glazing.note}</p>
+        <button class="use" type="button" data-set={`glazing:${id}`} aria-pressed={String(defaultTheme.glazing === id)}>
+          Use {glazing.name}
+        </button>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  /* Carried over from the showcase's glazing section. */
+  .glazings { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(14rem, 100%), 1fr)); gap: var(--san-space-6); }
+  .glazing { display: grid; gap: var(--san-space-3); justify-items: start; align-content: start; }
+  h3 { margin: 0; font: var(--san-type-headline-sm); }
+  p { margin: 0; color: var(--san-text-muted); font: var(--san-type-body-sm); }
+
+  .glazing__stage {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--san-space-4);
+    width: 100%;
+    padding: var(--san-space-8) var(--san-space-5);
+    margin-bottom: var(--san-space-2);
+    border: var(--san-border-width-came) solid var(--san-lead-came);
+    border-radius: var(--san-radius-md);
+    background:
+      radial-gradient(circle at 18% 28%, color-mix(in oklch, var(--san-window-b) 55%, transparent), transparent 42%),
+      radial-gradient(circle at 84% 78%, color-mix(in oklch, var(--san-window-c) 40%, transparent), transparent 46%),
+      var(--san-surface-sunken);
+  }
+
+  /* Every filled shape reads the glazing tokens, so one attribute restyles them all. */
+  .demo-button,
+  .demo-chip,
+  .glazing__pane {
+    background: var(--san-glaze-sheen), var(--san-glaze-bg);
+    color: var(--san-glaze-fg);
+    border: var(--san-border-width-hairline) solid var(--san-glaze-border);
+    box-shadow: var(--san-glaze-glow);
+    backdrop-filter: var(--san-glaze-blur);
+  }
+  .demo-button { display: inline-flex; align-items: center; height: var(--san-size-control-md); padding: 0 var(--san-space-5); border-radius: var(--san-radius-sm); font: var(--san-type-label-lg); }
+  .demo-chip { display: inline-flex; align-items: center; height: 1.75rem; padding: 0 var(--san-space-3); border-radius: var(--san-radius-full); font: var(--san-type-label-md); }
+  .demo-switch {
+    position: relative;
+    width: 2.5rem;
+    height: 1.375rem;
+    border: var(--san-border-width-hairline) solid var(--san-glaze-border);
+    border-radius: var(--san-radius-full);
+    background: var(--san-glaze-sheen), var(--san-glaze-bg);
+    box-shadow: var(--san-cast-sm);
+  }
+  .demo-switch::after { content: ''; position: absolute; inset: 2px 2px 2px auto; aspect-ratio: 1; border-radius: var(--san-radius-full); background: var(--san-glaze-fg); }
+  .glazing__pane { width: 100%; padding: var(--san-space-4); text-align: center; font: var(--san-type-title-sm); border-radius: var(--san-radius-sm); }
+
+  .use {
+    height: var(--san-size-control-sm);
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead-strong);
+    border-radius: var(--san-radius-sm);
+    background: transparent;
+    color: var(--san-text);
+    font: var(--san-type-label-md);
+    cursor: pointer;
+  }
+  .use:hover { border-color: var(--san-accent); }
+  .use:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .use[aria-pressed='true'] { border-color: var(--san-accent); color: var(--san-accent-ink); }
+</style>

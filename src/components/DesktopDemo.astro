@@ -1,0 +1,101 @@
+---
+// A desktop rice in Sanctuary: a status bar and a terminal, read from the ANSI
+// tokens the core emits for its ports. A picture, not a control. The clock shows
+// the current flavor and follows it (the lectern script updates [data-clock]).
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import { defaultTheme } from '../data/theme';
+
+const flavorNames = Object.fromEntries(Object.entries(palette.flavors).map(([id, flavor]) => [id, flavor.name]));
+const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'];
+---
+
+<div class="desktop" aria-hidden="true">
+  <div class="bar">
+    <div class="bar__group">
+      <span class="ws ws--active">I</span><span class="ws">II</span><span class="ws">III</span><span class="ws ws--urgent">IV</span>
+    </div>
+    <div class="bar__title">kitty · ~/sanctuary</div>
+    <div class="bar__group">
+      <span class="mod" style="--c: var(--san-glass-verdure)">cpu 12%</span>
+      <span class="mod" style="--c: var(--san-glass-azure)">mem 4.1G</span>
+      <span class="mod mod--clock" data-clock={JSON.stringify(flavorNames)}>{flavorNames[defaultTheme.flavor]}</span>
+    </div>
+  </div>
+  <div class="win">
+    <pre class="term"><span class="a-blue">pilgrim</span><span class="a-dim">@</span><span class="a-magenta">sanctuary</span> <span class="a-cyan">~/nave</span> <span class="a-green">❯</span> git status -sb
+<span class="a-dim">## </span><span class="a-green">main</span><span class="a-dim">...</span><span class="a-red">origin/main</span> [<span class="a-yellow">ahead 2</span>]
+ <span class="a-red">M</span> tokens/flavor/vespers.tokens.json
+ <span class="a-green">A</span> ports/kitty/sanctuary-matins.conf
+<span class="a-blue">pilgrim</span><span class="a-dim">@</span><span class="a-magenta">sanctuary</span> <span class="a-cyan">~/nave</span> <span class="a-green">❯</span> ansi<span class="cursor"> </span></pre>
+    <div class="ansi">
+      {[...ansi, ...ansi.map((name) => `bright-${name}`)].map((name) => <i title={name} style={`background: var(--san-ansi-${name})`} />)}
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Carried over from the showcase's ricing section. */
+  .desktop {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--san-space-3);
+    padding: var(--san-space-3);
+    border: var(--san-border-width-came) solid var(--san-lead-came);
+    border-radius: var(--san-radius-lg);
+    background:
+      radial-gradient(ellipse at 12% 0%, color-mix(in oklch, var(--san-window-a) 60%, transparent), transparent 55%),
+      radial-gradient(ellipse at 92% 100%, color-mix(in oklch, var(--san-window-c) 35%, transparent), transparent 55%),
+      var(--san-surface-sunken);
+    box-shadow: var(--san-elevation-4);
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--san-space-4);
+    padding: var(--san-space-1) var(--san-space-2);
+    background: color-mix(in oklch, var(--san-surface) 78%, transparent);
+    backdrop-filter: blur(var(--san-blur-md));
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-sm);
+    font: var(--san-type-code-sm);
+  }
+  .bar__group { display: flex; align-items: center; gap: var(--san-space-2); }
+  .bar__title { color: var(--san-text-muted); overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+  .ws { display: grid; place-items: center; min-width: 1.75rem; height: 1.5rem; padding: 0 var(--san-space-1); border-radius: var(--san-radius-xs); color: var(--san-text-subtle); font-family: var(--san-font-family-inscription); }
+  .ws--active { background: var(--san-glaze-sheen), var(--san-glaze-bg); color: var(--san-glaze-fg); box-shadow: inset 0 0 0 1px var(--san-glaze-border), var(--san-glaze-glow); }
+  .ws--urgent { color: var(--san-danger); }
+  .mod { padding: 0 var(--san-space-2); color: var(--c); border-bottom: var(--san-border-width-came) solid var(--c); }
+  .mod--clock { --c: var(--san-text); }
+
+  .win {
+    min-width: 0;
+    padding: var(--san-space-4);
+    background: color-mix(in oklch, var(--san-surface) 94%, transparent);
+    border: var(--san-border-width-came) solid var(--san-accent);
+    border-radius: var(--san-radius-sm);
+    box-shadow: var(--san-cast-md);
+  }
+  .term { margin: 0; overflow-x: auto; font: var(--san-type-code-sm); color: var(--san-text); }
+
+  .a-red { color: var(--san-ansi-red); }
+  .a-green { color: var(--san-ansi-green); }
+  .a-yellow { color: var(--san-ansi-yellow); }
+  .a-blue { color: var(--san-ansi-blue); }
+  .a-magenta { color: var(--san-ansi-magenta); }
+  .a-cyan { color: var(--san-ansi-cyan); }
+  .a-dim { color: var(--san-ansi-bright-black); }
+  .cursor { background: var(--san-accent); animation: blink 1.1s steps(1) infinite; }
+  @keyframes blink { 50% { background: transparent; } }
+
+  .ansi { display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--san-space-half); margin-top: var(--san-space-4); }
+  .ansi i { height: 1.25rem; border-radius: var(--san-radius-xs); }
+
+  /* On phones the bar keeps what matters: the workspaces and the clock. */
+  @media (max-width: 40rem) {
+    .bar__title,
+    .mod:not(.mod--clock) { display: none; }
+  }
+</style>

@@ -39,10 +39,10 @@ test.describe('lectern controls', () => {
       if (await toggle.isVisible()) await toggle.click();
 
       for (const [axis, value] of [['flavor', 'lauds'], ['accent', 'ruby'], ['glazing', 'flashed'], ['window', 'harmonic']]) {
-        await page.locator(`[data-set="${axis}:${value}"]`).click();
+        await page.locator(`.lectern [data-set="${axis}:${value}"]`).click();
         await expect(page.locator('html')).toHaveAttribute(`data-san-${axis}`, value);
-        await expect(page.locator(`[data-set^="${axis}:"][aria-pressed="true"]`)).toHaveCount(1);
-        await expect(page.locator(`[data-set="${axis}:${value}"]`)).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.locator(`.lectern [data-set^="${axis}:"][aria-pressed="true"]`)).toHaveCount(1);
+        await expect(page.locator(`.lectern [data-set="${axis}:${value}"]`)).toHaveAttribute('aria-pressed', 'true');
       }
     });
 
@@ -84,7 +84,7 @@ test.describe('lectern controls', () => {
   test('changing the flavor retints the page once the light settles', async ({ page }) => {
     await page.goto('/');
     const before = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    await page.locator('[data-set="flavor:lauds"]').click();
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
     await expect(page.locator('html')).not.toHaveClass(/is-shifting/);
     const after = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(after).not.toBe(before);
@@ -126,11 +126,11 @@ test.describe('restoring the theme', () => {
 
   test('a choice survives a reload and the buttons reflect it', async ({ page }) => {
     await page.goto('/');
-    await page.locator('[data-set="flavor:lauds"]').click();
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     await page.reload();
     expect(await theme(page)).toBe('lauds/ruby/pot-metal/mono');
-    const pressed = await page.locator('[aria-pressed="true"]').evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set).sort());
+    const pressed = await page.locator('.lectern [aria-pressed="true"]').evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set).sort());
     expect(pressed).toEqual(['accent:ruby', 'flavor:lauds', 'glazing:pot-metal', 'window:mono']);
   });
 
@@ -164,7 +164,7 @@ test.describe('restoring the theme', () => {
   test('a saved value that is not an object is replaced, not merged into', async ({ page }) => {
     await seed(page, JSON.stringify(['junk']));
     await page.goto('/');
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     expect(await stored(page)).toEqual({ accent: 'ruby' });
   });
 
@@ -181,7 +181,7 @@ test.describe('restoring the theme', () => {
     });
     await page.goto('/');
     expect(await theme(page)).toBe('compline/cobalt/pot-metal/mono');
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'ruby');
     expect(errors).toEqual([]);
   });
@@ -194,7 +194,7 @@ test.describe('restoring the theme', () => {
       // Click and read in one call: the transition lasts as long as the core's
       // procession duration, and a separate round trip on a slow runner could miss it.
       const duration = await page.evaluate(() => {
-        document.querySelector<HTMLElement>('[data-set="flavor:lauds"]')!.click();
+        document.querySelector<HTMLElement>('.lectern [data-set="flavor:lauds"]')!.click();
         return getComputedStyle(document.body).transitionDuration;
       });
       const moving = duration.split(',').some((value) => parseFloat(value) > 0);
@@ -223,14 +223,14 @@ test.describe('preview links', () => {
   test('changing one axis on a preview saves only that axis', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="accent:viridian"]').click();
+    await page.locator('.lectern [data-set="accent:viridian"]').click();
     expect(await stored(page)).toMatchObject({ flavor: 'lauds', accent: 'viridian' });
   });
 
   test('a click on a preview survives a reload of that page', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="flavor:compline"]').click();
+    await page.locator('.lectern [data-set="flavor:compline"]').click();
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-flavor', 'compline');
   });
@@ -238,7 +238,7 @@ test.describe('preview links', () => {
   test('clicking the value a preview already shows keeps it', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     expect((await stored(page)).flavor).toBe('vespers');
     expect(new URL(page.url()).searchParams.has('flavor')).toBe(false);
     await page.goto('/');
@@ -248,7 +248,7 @@ test.describe('preview links', () => {
   test('the rest of the preview still applies after a click on another axis', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers&glazing=flashed');
-    await page.locator('[data-set="accent:gilt"]').click();
+    await page.locator('.lectern [data-set="accent:gilt"]').click();
     await page.reload();
     expect(await theme(page)).toBe('vespers/gilt/flashed/mono');
   });
@@ -257,7 +257,7 @@ test.describe('preview links', () => {
 test.describe('accent across flavors', () => {
   test('the accent on screen stays when the flavor changes, also after a reload', async ({ page }) => {
     await page.goto('/');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
@@ -268,14 +268,14 @@ test.describe('accent across flavors', () => {
     await seed(page, JSON.stringify({ flavor: 'compline', accent: 'renamed-pigment' }));
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
   });
 
   test('a preview accent is not saved when the visitor picks a flavor', async ({ page }) => {
     await page.goto('/?accent=viridian');
-    await page.locator('[data-set="flavor:matins"]').click();
+    await page.locator('.lectern [data-set="flavor:matins"]').click();
     const saved = await stored(page);
     expect(saved.flavor).toBe('matins');
     expect(saved).not.toHaveProperty('accent');
