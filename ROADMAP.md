@@ -83,10 +83,10 @@ Each phase is deployable on its own.
 ### Phase 1: Skeleton
 
 - [x] Choose the visual direction: build two or three page prototypes with the Sanctuary stylesheet and pick one in the browser. Chosen: the core showcase (see [Visual direction](#visual-direction)).
-- [ ] Astro project, static output, pnpm, Node version matching the core.
-- [ ] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
-- [ ] Core dependency pinned through git; stylesheet loaded globally.
-- [ ] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
+- [x] Astro project, static output, pnpm, Node version matching the core.
+- [x] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
+- [x] Core dependency pinned through git; stylesheet loaded globally.
+- [x] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
 - [ ] CI: install with a frozen lockfile, build, check internal links.
 - [ ] Deploy to GitHub Pages with one page live.
 
