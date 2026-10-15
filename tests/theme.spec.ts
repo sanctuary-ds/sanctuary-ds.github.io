@@ -115,6 +115,13 @@ test.describe('restoring the theme', () => {
     expect(errors).toEqual([]);
   });
 
+  test('a saved value that is not an object is replaced, not merged into', async ({ page }) => {
+    await seed(page, JSON.stringify(['junk']));
+    await page.goto('/');
+    await page.locator('[data-set="accent:ruby"]').click();
+    expect(await stored(page)).toEqual({ accent: 'ruby' });
+  });
+
   test('the light only moves when the visitor allows motion', async ({ browser }) => {
     for (const reducedMotion of ['no-preference', 'reduce'] as const) {
       const context = await browser.newContext({ reducedMotion });
@@ -158,6 +165,16 @@ test.describe('preview links', () => {
     await page.locator('[data-set="flavor:compline"]').click();
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-flavor', 'compline');
+  });
+
+  test('clicking the value a preview already shows keeps it', async ({ page }) => {
+    await seed(page, saved);
+    await page.goto('/?flavor=vespers');
+    await page.locator('[data-set="flavor:vespers"]').click();
+    expect((await stored(page)).flavor).toBe('vespers');
+    expect(new URL(page.url()).searchParams.has('flavor')).toBe(false);
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-san-flavor', 'vespers');
   });
 
   test('the rest of the preview still applies after a click on another axis', async ({ page }) => {

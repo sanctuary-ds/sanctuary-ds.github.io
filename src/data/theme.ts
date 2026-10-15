@@ -37,10 +37,16 @@ for (const [flavor, accent] of Object.entries(flavorAccents)) {
   }
 }
 
-// The theme a first-time visitor sees: the core's default flavor with its own accent.
+// The theme a first-time visitor sees: the core's default flavor with its own
+// accent. Check the flavor first, since its accent is looked up from it.
+const defaultFlavor = palette.defaultFlavor;
+if (!(defaultFlavor in palette.flavors)) {
+  throw new Error(`The core's default flavor "${defaultFlavor}" is not one of its flavors: ${options.flavor.join(', ')}.`);
+}
+
 export const defaultTheme: Record<Axis, string> = {
-  flavor: palette.defaultFlavor,
-  accent: palette.flavors[palette.defaultFlavor as keyof typeof palette.flavors].accent,
+  flavor: defaultFlavor,
+  accent: palette.flavors[defaultFlavor as keyof typeof palette.flavors].accent,
   glazing: 'pot-metal',
   window: 'mono',
 };

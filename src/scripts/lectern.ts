@@ -26,7 +26,9 @@ export function initLectern(): void {
     try {
       let saved: Record<string, string> = {};
       try {
-        saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') || {};
+        const parsed: unknown = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}');
+        // Only a plain object is a saved theme; anything else is replaced.
+        if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) saved = parsed as Record<string, string>;
       } catch {
         // Corrupt storage: start again from this change.
       }
@@ -54,12 +56,17 @@ export function initLectern(): void {
   };
 
   const set = (axis: string, value: string) => {
-    if (root.getAttribute(`data-san-${axis}`) === value) return;
-    root.classList.add('is-shifting');
-    window.clearTimeout(shiftTimer);
-    shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), SHIFT_MS);
-    root.setAttribute(`data-san-${axis}`, value);
-    sync();
+    const changed = root.getAttribute(`data-san-${axis}`) !== value;
+    // Clicking the value a preview already shows is still a choice: keep it.
+    const fromPreview = new URLSearchParams(window.location.search).has(axis);
+    if (!changed && !fromPreview) return;
+    if (changed) {
+      root.classList.add('is-shifting');
+      window.clearTimeout(shiftTimer);
+      shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), SHIFT_MS);
+      root.setAttribute(`data-san-${axis}`, value);
+      sync();
+    }
     save(axis, value);
     dropPreview(axis);
   };
