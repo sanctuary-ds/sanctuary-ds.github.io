@@ -5,10 +5,16 @@ import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 import { defaultTheme } from '../data/theme';
 import Inscription from './Inscription.astro';
 
+interface Props {
+  /** `pairs` lays the four flavors two by two (beside text); `row` fills the width. */
+  layout?: 'pairs' | 'row';
+}
+
+const { layout = 'pairs' } = Astro.props;
 const flavors = Object.entries(palette.flavors);
 ---
 
-<div class="flavors">
+<div class:list={['flavors', `flavors--${layout}`]}>
   {
     flavors.map(([id, flavor]) => (
       <button class="flavor" type="button" data-set={`flavor:${id}`} data-san-flavor={id} aria-pressed={String(defaultTheme.flavor === id)}>
@@ -33,8 +39,11 @@ const flavors = Object.entries(palette.flavors);
 
 <style>
   /* Carried over from the showcase's flavor cards. */
-  /* Four hours read as two by two; one column on phones. */
-  .flavors { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--san-space-5); }
+  /* Beside text, four hours read as two by two; across a page, in a row. One
+     column on phones. */
+  .flavors { display: grid; gap: var(--san-space-5); }
+  .flavors--pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flavors--row { grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); }
 
   .flavor {
     display: grid;
@@ -80,6 +89,6 @@ const flavors = Object.entries(palette.flavors);
   }
 
   @media (max-width: 40rem) {
-    .flavors { grid-template-columns: 1fr; }
+    .flavors--pairs { grid-template-columns: 1fr; }
   }
 </style>
