@@ -7,19 +7,6 @@
   box-sizing: border-box;
 }
 
-/* The core's type tokens name their families; the site hosts the fonts through
-   Astro's Fonts API (astro.config.mjs), whose generated family names carry a
-   suffix. Point each core family token at the matching hosted family and its
-   metric-matched fallback. The token names stay the core's. This only wins
-   because Base.astro imports this file after the core stylesheet: both rules
-   use :root, so the later one applies. */
-:root {
-  --san-font-family-display: var(--font-display);
-  --san-font-family-text: var(--font-text);
-  --san-font-family-mono: var(--font-mono);
-  --san-font-family-inscription: var(--font-inscription);
-}
-
 /* While the theme changes, light moves slowly across the page, only when the
    visitor allows motion. Set by the lectern script for a moment after a change. */
 @media (prefers-reduced-motion: no-preference) {

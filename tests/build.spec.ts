@@ -54,18 +54,17 @@ test('the fonts are hosted by the site and used by the core tokens', async ({ pa
   // Hosted families carry Astro's suffix ("Hanken Grotesk-4efb…"); the core's own
   // values name the bare family, so a missing bridge in global.css fails here.
   const hosted = (name: string) => new RegExp(`${name}-[0-9a-f]+`);
-  const families: Record<string, string> = {
-    '--san-font-family-display': 'Cormorant Garamond',
-    '--san-font-family-text': 'Hanken Grotesk',
-    '--san-font-family-mono': 'JetBrains Mono',
-    '--san-font-family-inscription': 'Cinzel',
-  };
-  for (const [token, name] of Object.entries(families)) {
+  // Every role the core publishes, whatever it is called, must reach its token.
+  const roles = Object.entries(palette.fonts as Record<string, { family: string }>);
+  expect(roles.length).toBeGreaterThan(0);
+  for (const [role, { family }] of roles) {
+    const token = `--san-font-family-${role}`;
     const value = await page.evaluate((t) => getComputedStyle(document.documentElement).getPropertyValue(t), token);
-    expect(value, `${token} names the hosted ${name}`).toMatch(hosted(name));
+    expect(value, `${token} names the hosted ${family}`).toMatch(hosted(family));
   }
-  expect(fonts.body).toMatch(hosted('Hanken Grotesk'));
-  expect(fonts.loaded.some((family) => family.startsWith('Hanken Grotesk')), 'the body font is loaded').toBe(true);
+  const text = palette.fonts.text.family as string;
+  expect(fonts.body).toMatch(hosted(text));
+  expect(fonts.loaded.some((family) => family.startsWith(text)), 'the body font is loaded').toBe(true);
 });
 
 test('the page declares exactly the font faces the core publishes', async ({ page }) => {
