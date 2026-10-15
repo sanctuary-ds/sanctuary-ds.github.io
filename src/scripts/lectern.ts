@@ -1,6 +1,9 @@
 // Wires the theme controls: any [data-set] button on the page (the lectern's,
 // and the home page's live demos) sets a core attribute on <html> and keeps the
 // choice; on phones the lectern's "Light" button folds its controls in and out.
+// Keys F, A, G and W step through the axes, and every change is announced with a
+// `sanctuary:themechange` event, so a section can follow the theme without
+// knowing where the change came from.
 import { STORAGE_KEY } from '../data/theme-storage';
 
 // How long the light takes to move across the page after a change: the core's
@@ -85,10 +88,26 @@ export function initLectern(): void {
       shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), shiftMs(root));
       root.setAttribute(`data-san-${axis}`, value);
       sync();
+      document.dispatchEvent(new CustomEvent('sanctuary:themechange', { detail: { axis, value } }));
     }
     save(axis, value);
     dropPreview(axis);
   };
+
+  // A key steps to the next value of its axis, in the order the lectern lists
+  // them. Ignored with modifier keys and while the visitor is typing.
+  const KEYS: Record<string, string> = { f: 'flavor', a: 'accent', g: 'glazing', w: 'window' };
+  document.addEventListener('keydown', (event) => {
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('input, select, textarea, [contenteditable=""], [contenteditable="true"]')) return;
+    const axis = KEYS[event.key.toLowerCase()];
+    if (!axis) return;
+    const values = [...lectern.querySelectorAll<HTMLElement>(`[data-set^="${axis}:"]`)].map((button) => button.dataset.set!.split(':')[1]);
+    if (values.length === 0) return;
+    const current = values.indexOf(root.getAttribute(`data-san-${axis}`) ?? '');
+    set(axis, values[(current + 1) % values.length]);
+  });
 
   // One listener for the whole page: a theme button may sit anywhere.
   document.addEventListener('click', (event) => {

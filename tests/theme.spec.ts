@@ -281,3 +281,49 @@ test.describe('accent across flavors', () => {
     expect(saved).not.toHaveProperty('accent');
   });
 });
+
+test.describe('keyboard shortcuts and theme events', () => {
+  // The next value of an axis, in the order the lectern lists it.
+  const next = async (page: Page, axis: string) => {
+    const values = await page.locator(`.lectern [data-set^="${axis}:"]`).evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set!.split(':')[1]));
+    const current = await page.evaluate((a) => document.documentElement.getAttribute(`data-san-${a}`), axis);
+    return values[(values.indexOf(current!) + 1) % values.length];
+  };
+
+  test('F, A, G and W step through their axes, in either case', async ({ page }) => {
+    await page.goto('/');
+    for (const [key, axis] of [['f', 'flavor'], ['A', 'accent'], ['g', 'glazing'], ['W', 'window']]) {
+      const expected = await next(page, axis);
+      await page.keyboard.press(key);
+      await expect(page.locator('html')).toHaveAttribute(`data-san-${axis}`, expected);
+      await expect(page.locator(`.lectern [data-set="${axis}:${expected}"]`)).toHaveAttribute('aria-pressed', 'true');
+    }
+  });
+
+  test('shortcuts stay quiet with modifier keys and while typing', async ({ page }) => {
+    await page.goto('/');
+    const before = await theme(page);
+    await page.keyboard.press('Control+f');
+    await page.keyboard.press('Alt+g');
+    await page.evaluate(() => {
+      const field = document.createElement('input');
+      field.id = 'probe';
+      document.body.append(field);
+    });
+    await page.locator('#probe').focus();
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+  });
+
+  test('every change is announced with its axis and value', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      (window as unknown as { seen: unknown[] }).seen = [];
+      document.addEventListener('sanctuary:themechange', (event) => (window as unknown as { seen: unknown[] }).seen.push((event as CustomEvent).detail));
+    });
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
+    await page.keyboard.press('f');
+    const seen = await page.evaluate(() => (window as unknown as { seen: { axis: string; value: string }[] }).seen);
+    expect(seen.map(({ axis, value }) => `${axis}:${value}`)).toEqual(['accent:ruby', `flavor:${await page.evaluate(() => document.documentElement.getAttribute('data-san-flavor'))}`]);
+  });
+});
