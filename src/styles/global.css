@@ -1,0 +1,31 @@
+/* The core defines tokens only and styles no elements. These are the few
+   site-wide element rules, and they read core tokens exclusively. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* While the theme changes, light moves slowly across the page, only when the
+   visitor allows motion. Set by the lectern script for a moment after a change. */
+@media (prefers-reduced-motion: no-preference) {
+  html.is-shifting *,
+  html.is-shifting *::before,
+  html.is-shifting *::after {
+    transition:
+      background-color var(--san-duration-procession) var(--san-ease-standard),
+      color var(--san-duration-procession) var(--san-ease-standard),
+      border-color var(--san-duration-procession) var(--san-ease-standard),
+      fill var(--san-duration-procession) var(--san-ease-standard),
+      box-shadow var(--san-duration-procession) var(--san-ease-standard) !important;
+  }
+}
+
+body {
+  margin: 0;
+  background: var(--san-surface);
+  color: var(--san-text);
+  font: var(--san-type-body-md);
+  letter-spacing: var(--san-type-body-md-tracking);
+}

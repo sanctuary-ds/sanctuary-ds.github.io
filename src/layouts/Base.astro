@@ -1,0 +1,60 @@
+---
+// Every page renders inside this layout, so the core stylesheet loads once for
+// the whole site.
+import '@sanctuary-ds/tokens/css';
+import '../styles/global.css';
+import Lectern from '../components/Lectern.astro';
+import { STORAGE_KEY, defaultTheme, flavorAccents, options } from '../data/theme';
+
+interface Props {
+  title: string;
+  description: string;
+}
+
+const { title, description } = Astro.props;
+const lang = Astro.currentLocale;
+---
+
+<!doctype html>
+<html
+  lang={lang}
+  data-san-flavor={defaultTheme.flavor}
+  data-san-accent={defaultTheme.accent}
+  data-san-glazing={defaultTheme.glazing}
+  data-san-window={defaultTheme.window}
+>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Restores the theme before the first paint, so a returning visitor never sees
+      the default theme flash first. A query string such as ?flavor=lauds wins and
+      previews a look without replacing the visitor's saved choice.
+    -->
+    <script is:inline define:vars={{ STORAGE_KEY, defaultTheme, flavorAccents, options }}>
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        // Storage is unavailable or corrupt: keep the defaults.
+      }
+      const query = new URLSearchParams(location.search);
+      const pick = (axis, fallback) =>
+        [query.get(axis), saved[axis], fallback].find((value) => options[axis].includes(value));
+      const flavor = pick('flavor', defaultTheme.flavor);
+      const theme = {
+        flavor,
+        accent: pick('accent', flavorAccents[flavor]),
+        glazing: pick('glazing', defaultTheme.glazing),
+        window: pick('window', defaultTheme.window),
+      };
+      for (const axis in theme) document.documentElement.setAttribute(`data-san-${axis}`, theme[axis]);
+    </script>
+    <title>{title}</title>
+    <meta name="description" content={description} />
+  </head>
+  <body>
+    <Lectern />
+    <slot />
+  </body>
+</html>

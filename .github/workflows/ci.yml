@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Read-only token: this workflow never writes to the repository.
+permissions:
+  contents: read
+
+# A newer push to the same branch or pull request cancels the run it supersedes.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Build, test and check links
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Installs the pnpm from packageManager and the Node.js from devEngines.runtime,
+      # then runs pnpm install --frozen-lockfile.
+      - uses: pnpm/setup@a0881977cd8ea73b1ed212236c99ca10dcc80cf4 # v3.1.1
+        with:
+          require-lockfile: true
+      # Builds the site, then runs the end-to-end tests on the Chrome preinstalled
+      # on the runner (see playwright.config.ts), so no browser is downloaded.
+      - run: pnpm test
+      # Offline: only links inside the built site. --index-files makes a link to a
+      # folder pass only when that folder has an index.html, as GitHub Pages needs.
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
+        with:
+          args: --offline --no-progress --root-dir ${{ github.workspace }}/dist --index-files index.html 'dist/**/*.html'

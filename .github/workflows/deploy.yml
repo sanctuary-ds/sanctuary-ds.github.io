@@ -1,0 +1,44 @@
+name: Deploy
+
+on:
+  # main only changes through pull requests, which the CI workflow checks first.
+  push:
+    branches: [main]
+  # Allows a manual redeploy from the Actions tab.
+  workflow_dispatch:
+
+# The build only reads the repository; publishing permissions are granted to the
+# deploy job alone.
+permissions:
+  contents: read
+
+# One deployment at a time, and a running deployment is never cancelled halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Installs the pnpm from packageManager and Node.js 24, builds the site and
+      # uploads dist/ as the Pages artifact.
+      - uses: withastro/action@3eafd002e65cc31b4f0eae0bb05450d521562247 # v6.1.3
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

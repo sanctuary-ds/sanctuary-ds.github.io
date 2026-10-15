@@ -6,7 +6,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 
 ## Principles
 
-- **Ship only what exists.** A section appears when what it documents is real. No "coming soon" pages; `/roadmap` says honestly what is planned.
+- **Ship only what exists.** No page appears before what it documents is real. Planned parts of the ecosystem may be listed, disabled, and point to `/roadmap`, which says honestly what is planned.
 - **Generate, do not copy.** Anything derived from the core (token tables, colour swatches, contrast pairs) is generated at build time from the core package, never written by hand.
 - **The core owns the design.** The site consumes tokens; it never defines colours, contrast or token names of its own. A missing token is requested in the core, not patched here.
 - **Small, reviewable steps.** Each phase lands as one pull request made of small Conventional Commits.
@@ -32,6 +32,7 @@ The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/san
 | Stylesheet | `@sanctuary-ds/tokens/css` | All site styling and theming |
 | Palette | `@sanctuary-ds/tokens/palette` | Playground, swatches, port previews |
 | DTCG tokens | `@sanctuary-ds/tokens/tokens/*` | The generated token reference |
+| Window modes | Requested from the core: list `mono` and `harmonic` in `palette` | The theme switcher, which writes them in the site until then |
 | Port list | To be defined with the ports milestone | Gallery and search |
 
 Rules:
@@ -42,11 +43,24 @@ Rules:
 - Theming uses the core's attributes on `<html>`: `data-san-flavor`, `data-san-accent`, `data-san-glazing` and `data-san-window`. The site never invents its own theme attributes.
 - Token names are the core's public API. See its [versioning rules](https://github.com/sanctuary-ds/sanctuary/blob/main/docs/ecosystem.md#versioning).
 
+## Visual direction
+
+The site speaks the visual language of the core showcase: the lectern header with its theme controls, the hero with the rose window, numbered section heads and panels. Three other directions (Nave, Scriptorium and Lantern) were prototyped and discarded.
+
+The showcase moves from the core into this repository: it becomes `/playground`, and its pieces (the lectern, the rose window, the section heads and panels) become site components. The core keeps the tokens, the stylesheet, the palette and the ports. Whether a flavor is light or dark comes from `palette` (`flavors.*.scheme`), so the site needs no theme attribute of its own. The decision is still to be recorded in the core's `docs/ecosystem.md`, as the working agreement requires.
+
+| Area | Content |
+|------|---------|
+| Header | The brand links home; the navigation lists the chapels, in the same order and state as on the home page. The GitHub link is an icon at the end of the first row, set apart from the chapels, and opens in a new tab. On phones the theme controls fold behind a "Light" button so the facade fills the first screen |
+| Home | "The facade and the chapels". The facade is the showcase hero filling the first screen. The nave is three or four short steps, each a key idea with a live demo that links to its playground section. The chapels are one card per part of the ecosystem (Playground, Docs, Roadmap, then Components, Ports, Changelog); a planned chapel is shown disabled and points to `/roadmap`. One list builds both the chapels and the header, and a chapel becomes available in the same commit that ships its page |
+| Playground | The showcase moved from the core, complete, with its eight sections (Flavors, Pigments, Glazing, Windows, Components, Light, Foundations, Ricing) and an index to them. Components and Ricing are previews; `/components` and `/ports` come later |
+| Docs | Text pages: getting started, foundations, token reference. Nothing duplicated from the playground |
+
 ## Site map
 
 ```text
-/                      Home: what Sanctuary is, a live rose window
-/playground            Every axis live (the core showcase, redesigned)
+/                      Home: the facade, the nave and the chapels
+/playground            The showcase, complete, with an index to its sections
 /roadmap               What exists and what is planned
 /docs/getting-started  Install and first use
 /docs/philosophy       The design language
@@ -68,18 +82,18 @@ Each phase is deployable on its own.
 
 ### Phase 1: Skeleton
 
-- [ ] Choose the visual direction: build two or three page prototypes with the Sanctuary stylesheet and pick one in the browser.
-- [ ] Astro project, static output, pnpm, Node version matching the core.
-- [ ] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
-- [ ] Core dependency pinned through git; stylesheet loaded globally.
-- [ ] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
+- [x] Choose the visual direction: build two or three page prototypes with the Sanctuary stylesheet and pick one in the browser. Chosen: the core showcase (see [Visual direction](#visual-direction)).
+- [x] Astro project, static output, pnpm, Node version matching the core.
+- [x] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
+- [x] Core dependency pinned through git; stylesheet loaded globally.
+- [x] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
 - [ ] CI: install with a frozen lockfile, build, check internal links.
 - [ ] Deploy to GitHub Pages with one page live.
 
 ### Phase 2: Home, playground and roadmap
 
-- [ ] Home page.
-- [ ] Playground rebuilt from the core showcase, including shareable query strings.
+- [ ] Home page: the facade, the nave and the chapels.
+- [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
 - [ ] `/roadmap` page.
 
 ### Phase 3: Documentation
@@ -106,7 +120,6 @@ Each phase is deployable on its own.
 
 | Decision | When |
 |----------|------|
-| Visual direction of the site | Start of phase 1 |
 | How the port list reaches the site (a file in the core, or the GitHub API) | Ports milestone |
 | Fonts: Google Fonts or self-hosted | Phase 1, together with the core's same open decision |
 
