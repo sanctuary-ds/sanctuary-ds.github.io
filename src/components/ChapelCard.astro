@@ -1,0 +1,108 @@
+---
+// One chapel: a lancet card. An available chapel is one link stretched over the
+// whole card; a planned one shows its glass unpainted and points to the roadmap.
+import type { Chapel } from '../data/chapels';
+import { ROADMAP_HREF } from '../data/chapels';
+import Button from './Button.astro';
+import Inscription from './Inscription.astro';
+import Lancet from './Lancet.astro';
+
+interface Props {
+  chapel: Chapel;
+  numeral: string;
+}
+
+const { chapel, numeral } = Astro.props;
+const { name, title, text, href, cta, accent, available } = chapel;
+---
+
+<article class:list={['chapel', { 'chapel--planned': !available }]} data-san-accent={accent}>
+  <div class="chapel__window"><Lancet /></div>
+  <div class="chapel__body">
+    <Inscription>{numeral} · {name}</Inscription>
+    <h3>{available ? <a class="chapel__link" href={href}>{title}</a> : title}</h3>
+    <p>{text}</p>
+    <div class="chapel__actions">
+      {
+        available ? (
+          // Decoration: the stretched title link is the card's one link.
+          <span class="chapel__cta" aria-hidden="true">{cta}</span>
+        ) : (
+          <>
+            <span class="chip">Planned</span>
+            <Button href={ROADMAP_HREF} variant="ghost" size="sm">On the roadmap</Button>
+          </>
+        )
+      }
+    </div>
+  </div>
+</article>
+
+<style>
+  /* The showcase's lancet card, stood upright for a gallery. */
+  .chapel {
+    position: relative;
+    display: grid;
+    grid-template-rows: 13rem auto;
+    overflow: hidden;
+    background: var(--san-surface-raised-2);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-md);
+    box-shadow: var(--san-elevation-2);
+    transition: box-shadow var(--san-duration-base) var(--san-ease-standard);
+  }
+
+  /* A narrow window in a wide wall keeps the lancet's proportions. */
+  .chapel__window { display: grid; place-items: end center; padding: var(--san-space-5) var(--san-space-4) 0; background: var(--san-surface-sunken); }
+  .chapel__window > :global(.glow) { width: 7.5rem; }
+
+  .chapel__body { display: grid; align-content: start; gap: var(--san-space-3); padding: var(--san-space-6); }
+  h3 { margin: 0; font: var(--san-type-headline-sm); letter-spacing: var(--san-type-headline-sm-tracking); }
+  p { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  .chapel__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--san-space-3); }
+
+  /* One link, stretched over the card: the whole card is the target, and
+     assistive technology still hears one short link name. */
+  .chapel__link { color: inherit; text-decoration: none; }
+  .chapel__link::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .chapel__link:focus-visible { outline: none; }
+  .chapel:has(.chapel__link:focus-visible) { box-shadow: var(--san-halo); }
+  .chapel:has(.chapel__link):hover { box-shadow: var(--san-elevation-3), var(--san-cast-md); }
+
+  .chapel__cta {
+    display: inline-flex;
+    align-items: center;
+    height: var(--san-size-control-sm);
+    padding: 0 var(--san-space-3);
+    border-radius: var(--san-radius-sm);
+    background: var(--san-glaze-sheen), var(--san-glaze-bg);
+    color: var(--san-glaze-fg);
+    font: var(--san-type-label-md);
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 1.75rem;
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-full);
+    background: var(--san-surface-raised-2);
+    color: var(--san-text-muted);
+    font: var(--san-type-label-md);
+    letter-spacing: var(--san-type-label-md-tracking);
+  }
+
+  /* Planned: unpainted glass. Visible and honest, but not a place to enter. */
+  .chapel--planned { background: var(--san-surface-raised-1); box-shadow: none; }
+  .chapel--planned .chapel__window { filter: saturate(0.12) brightness(0.85); }
+  .chapel--planned h3 { color: var(--san-text-muted); }
+
+  /* On phones a chapel goes back to the showcase's card: window beside the text. */
+  @media (max-width: 40rem) {
+    .chapel { grid-template-columns: 7rem minmax(0, 1fr); grid-template-rows: auto; }
+    .chapel__window { padding: var(--san-space-4) var(--san-space-3) 0; }
+    .chapel__window > :global(.glow) { width: 100%; min-height: 9rem; }
+    .chapel__body { padding: var(--san-space-4); gap: var(--san-space-2); }
+  }
+</style>

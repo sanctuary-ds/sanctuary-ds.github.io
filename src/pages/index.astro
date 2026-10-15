@@ -1,11 +1,22 @@
 ---
 // The home page: the facade, then (as they land) the nave and the chapels.
 import Base from '../layouts/Base.astro';
+import Button from '../components/Button.astro';
+import Chapels from '../components/Chapels.astro';
 import Facade from '../components/Facade.astro';
 ---
 
 <Base title="Sanctuary" description="Sanctuary, a design system of stone, glass and light.">
   <main>
-    <Facade />
+    <Facade>
+      <div class="actions" slot="actions">
+        <Button href="#chapels" variant="outline" size="lg">Visit the chapels</Button>
+      </div>
+    </Facade>
+    <Chapels />
   </main>
 </Base>
+
+<style>
+  .actions { display: flex; flex-wrap: wrap; gap: var(--san-space-3); }
+</style>

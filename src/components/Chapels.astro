@@ -1,0 +1,29 @@
+---
+// The chapels: the hub to every part of the ecosystem, in the order of the list.
+import { chapels } from '../data/chapels';
+import ChapelCard from './ChapelCard.astro';
+import SectionHead from './SectionHead.astro';
+
+const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+---
+
+<section class="chapels" id="chapels" aria-labelledby="chapels-title">
+  <SectionHead inscription="The chapels" title="Everything built on the same light" id="chapels-title" class="chapels__head">
+    Each part of the ecosystem has its own chapel. A new one opens when what it holds is real.
+  </SectionHead>
+  <div class="chapels__grid">
+    {chapels.map((chapel, index) => <ChapelCard chapel={chapel} numeral={NUMERALS[index]} />)}
+  </div>
+</section>
+
+<style>
+  .chapels {
+    max-width: 82rem;
+    margin: 0 auto;
+    padding: var(--san-space-20) clamp(var(--san-space-4), 4vw, var(--san-space-12));
+    border-top: var(--san-border-width-hairline) solid var(--san-lead-soft);
+  }
+  .chapels > :global(.chapels__head) { margin: 0 auto var(--san-space-10); text-align: center; justify-items: center; }
+  /* Wide enough tracks that six chapels fall into two even rows of three. */
+  .chapels__grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--san-space-6); }
+</style>

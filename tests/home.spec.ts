@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import { ROADMAP_HREF, chapels } from '../src/data/chapels';
 
 // The home page through what a visitor sees: the facade, its rose window and
 // its facts, which are counted from the core palette.
@@ -66,5 +67,59 @@ test.describe('facade', () => {
       else for (const name of animations) expect(name).not.toBe('none');
       await context.close();
     }
+  });
+});
+
+test.describe('chapels', () => {
+  test('the gallery shows every chapel of the list, numbered, in order', async ({ page }) => {
+    await page.goto('/');
+    const cards = page.locator('.chapel');
+    await expect(cards).toHaveCount(chapels.length);
+    const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+    for (const [index, chapel] of chapels.entries()) {
+      const card = cards.nth(index);
+      await expect(card.locator('.inscription')).toHaveText(`${numerals[index]} · ${chapel.name}`);
+      await expect(card.locator('h3')).toHaveText(chapel.title);
+      if (chapel.accent) await expect(card).toHaveAttribute('data-san-accent', chapel.accent);
+      else await expect(card).not.toHaveAttribute('data-san-accent');
+    }
+  });
+
+  test('an available chapel is one link; a planned one points to the roadmap', async ({ page }) => {
+    await page.goto('/');
+    for (const [index, chapel] of chapels.entries()) {
+      const card = page.locator('.chapel').nth(index);
+      if (chapel.available) {
+        await expect(card.locator('a')).toHaveCount(1);
+        await expect(card.locator('.chapel__link')).toHaveAttribute('href', chapel.href);
+      } else {
+        await expect(card.locator('.chapel__link')).toHaveCount(0);
+        await expect(card.locator('.chip')).toHaveText('Planned');
+        await expect(card.getByRole('link')).toHaveAttribute('href', ROADMAP_HREF);
+        await expect(card.getByRole('link')).toHaveText('On the roadmap');
+      }
+    }
+  });
+
+  test('the header lists the same chapels, planned ones as disabled text', async ({ page }) => {
+    await page.goto('/');
+    const items = page.locator('.lectern__nav > *');
+    await expect(items).toHaveCount(chapels.length);
+    for (const [index, chapel] of chapels.entries()) {
+      const item = items.nth(index);
+      await expect(item).toHaveText(chapel.name);
+      if (chapel.available) await expect(item).toHaveAttribute('href', chapel.href);
+      else {
+        await expect(item).toHaveAttribute('aria-disabled', 'true');
+        expect(await item.evaluate((el) => el.tagName)).not.toBe('A');
+      }
+    }
+  });
+
+  test('the facade leads to the chapels', async ({ page }) => {
+    await page.goto('/');
+    const link = page.locator('.facade').getByRole('link', { name: 'Visit the chapels' });
+    await expect(link).toHaveAttribute('href', '#chapels');
+    await expect(page.locator('#chapels')).toHaveCount(1);
   });
 });
