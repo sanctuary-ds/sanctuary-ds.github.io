@@ -20,6 +20,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 | UI | Astro components styled with the Sanctuary stylesheet | No UI framework until the Lit components exist; then the site uses them |
 | Deploy | GitHub Pages through `withastro/action` | Official action, no extra hosting |
 | Package manager | pnpm | Same as the core |
+| Fonts | Self-hosted through Astro's Fonts API, with Google Fonts as the source | Downloaded at build time and served from the site: no third-party request per visit, preloading and metric-matched fallbacks |
 
 [Starlight](https://starlight.astro.build/) was tried and rejected: its interface did not fit the system, and fighting its defaults cost more than building the pages.
 
@@ -93,7 +94,7 @@ Each phase is deployable on its own.
 ### Phase 2: Home, playground and roadmap
 
 - [ ] Deploy only when the site changes: Markdown files at the repository root (README, ROADMAP) do not trigger a deploy.
-- [ ] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1.
+- [x] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1; chosen: self-hosted (see [Stack](#stack)).
 - [ ] Light-flavor styles generated from `palette` (`flavors.*.scheme`), replacing the showcase's `data-scheme` attribute.
 - [ ] Home page: the facade, the nave and the chapels.
 - [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
@@ -124,7 +125,6 @@ Each phase is deployable on its own.
 | Decision | When |
 |----------|------|
 | How the port list reaches the site (a file in the core, or the GitHub API) | Ports milestone |
-| Fonts: Google Fonts or self-hosted | Phase 2, together with the core's same open decision |
 
 ## Working agreement
 
