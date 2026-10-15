@@ -1,9 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
+import { STORAGE_KEY } from '../src/data/theme-storage';
 
 // The theme switcher through its public interface: the lectern buttons, the
 // attributes on <html>, the query string and the visitor's saved choice.
 
-const KEY = 'sanctuary:theme';
+const KEY = STORAGE_KEY;
 const AXES = ['flavor', 'accent', 'glazing', 'window'] as const;
 
 const theme = (page: Page) =>
@@ -122,13 +123,35 @@ test.describe('restoring the theme', () => {
     expect(await stored(page)).toEqual({ accent: 'ruby' });
   });
 
+  test('blocked storage still lets the theme work, without errors', async ({ page }) => {
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    // As in a browser that blocks storage or whose quota is full.
+    await page.addInitScript(() => {
+      const fail = () => {
+        throw new DOMException('Storage is blocked', 'SecurityError');
+      };
+      Storage.prototype.getItem = fail;
+      Storage.prototype.setItem = fail;
+    });
+    await page.goto('/');
+    expect(await theme(page)).toBe('compline/cobalt/pot-metal/mono');
+    await page.locator('[data-set="accent:ruby"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'ruby');
+    expect(errors).toEqual([]);
+  });
+
   test('the light only moves when the visitor allows motion', async ({ browser }) => {
     for (const reducedMotion of ['no-preference', 'reduce'] as const) {
       const context = await browser.newContext({ reducedMotion });
       const page = await context.newPage();
       await page.goto('/');
-      await page.locator('[data-set="flavor:lauds"]').click();
-      const duration = await page.evaluate(() => getComputedStyle(document.body).transitionDuration);
+      // Click and read in one call: the transition lasts as long as the core's
+      // procession duration, and a separate round trip on a slow runner could miss it.
+      const duration = await page.evaluate(() => {
+        document.querySelector<HTMLElement>('[data-set="flavor:lauds"]')!.click();
+        return getComputedStyle(document.body).transitionDuration;
+      });
       const moving = duration.split(',').some((value) => parseFloat(value) > 0);
       expect(moving, `${reducedMotion}: ${duration}`).toBe(reducedMotion === 'no-preference');
       await context.close();
