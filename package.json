@@ -19,10 +19,14 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "astro build && playwright test"
   },
   "dependencies": {
     "@sanctuary-ds/tokens": "github:sanctuary-ds/sanctuary#0ee099db3070198e224b062e82b3f5fc51f75219",
     "astro": "7.3.5"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0"
   }
 }
