@@ -32,7 +32,7 @@ The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/san
 | Stylesheet | `@sanctuary-ds/tokens/css` | All site styling and theming |
 | Palette | `@sanctuary-ds/tokens/palette` | Playground, swatches, port previews |
 | DTCG tokens | `@sanctuary-ds/tokens/tokens/*` | The generated token reference |
-| Showcase | Not exported yet; to be defined with the core | The playground, and the visual pieces the other pages reuse |
+| Window modes | Requested from the core: list `mono` and `harmonic` in `palette` | The theme switcher, which writes them in the site until then |
 | Port list | To be defined with the ports milestone | Gallery and search |
 
 Rules:
@@ -47,18 +47,20 @@ Rules:
 
 The site speaks the visual language of the core showcase: the lectern header with its theme controls, the hero with the rose window, numbered section heads and panels. Three other directions (Nave, Scriptorium and Lantern) were prototyped and discarded.
 
+The showcase moves from the core into this repository: it becomes `/playground`, and its pieces (the lectern, the rose window, the section heads and panels) become site components. The core keeps the tokens, the stylesheet, the palette and the ports. Whether a flavor is light or dark comes from `palette` (`flavors.*.scheme`), so the site needs no theme attribute of its own. The decision is still to be recorded in the core's `docs/ecosystem.md`, as the working agreement requires.
+
 | Area | Content |
 |------|---------|
 | Header | The brand links home; the navigation lists the chapels, in the same order and state as on the home page. The GitHub link is an icon at the end of the first row, set apart from the chapels, and opens in a new tab. On phones the theme controls fold behind a "Light" button so the facade fills the first screen |
 | Home | "The facade and the chapels". The facade is the showcase hero filling the first screen. The nave is three or four short steps, each a key idea with a live demo that links to its playground section. The chapels are one card per part of the ecosystem (Playground, Docs, Roadmap, then Components, Ports, Changelog); a planned chapel is shown disabled and points to `/roadmap`. One list builds both the chapels and the header, and a chapel becomes available in the same commit that ships its page |
-| Playground | The core showcase, complete and intact, with its eight sections (Flavors, Pigments, Glazing, Windows, Components, Light, Foundations, Ricing) and an index to them. Components and Ricing are previews; `/components` and `/ports` come later |
+| Playground | The showcase moved from the core, complete, with its eight sections (Flavors, Pigments, Glazing, Windows, Components, Light, Foundations, Ricing) and an index to them. Components and Ricing are previews; `/components` and `/ports` come later |
 | Docs | Text pages: getting started, foundations, token reference. Nothing duplicated from the playground |
 
 ## Site map
 
 ```text
 /                      Home: the facade, the nave and the chapels
-/playground            The core showcase, complete, with an index to its sections
+/playground            The showcase, complete, with an index to its sections
 /roadmap               What exists and what is planned
 /docs/getting-started  Install and first use
 /docs/philosophy       The design language
@@ -91,7 +93,7 @@ Each phase is deployable on its own.
 ### Phase 2: Home, playground and roadmap
 
 - [ ] Home page: the facade, the nave and the chapels.
-- [ ] Playground: the core showcase, complete and intact, with an index to its eight sections and shareable query strings.
+- [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
 - [ ] `/roadmap` page.
 
 ### Phase 3: Documentation
@@ -118,7 +120,6 @@ Each phase is deployable on its own.
 
 | Decision | When |
 |----------|------|
-| How the showcase reaches the site (an export of the core, or a move into this repository), and what replaces its `data-scheme` attribute, which is not a core theme attribute | Before phase 2 |
 | How the port list reaches the site (a file in the core, or the GitHub API) | Ports milestone |
 | Fonts: Google Fonts or self-hosted | Phase 1, together with the core's same open decision |
 
