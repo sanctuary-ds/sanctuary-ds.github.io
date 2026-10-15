@@ -1,0 +1,123 @@
+---
+// The facade: the showcase hero filling the first screen. Its facts are counted
+// from the core palette, so they follow the system as it grows.
+import palette from '@sanctuary-ds/tokens/palette';
+import Inscription from './Inscription.astro';
+import Rose from './Rose.astro';
+
+const pigments = Object.values(palette.pigments);
+const modes = Object.values(palette.windowModes).map((mode) => mode.name.toLowerCase());
+const facts = [
+  { value: Object.keys(palette.flavors).length, label: 'flavors, the hours' },
+  { value: pigments.length, label: `pigments × ${Object.keys(pigments[0].tones).length} tones` },
+  { value: Object.keys(palette.glazings).length, label: 'glazings' },
+  { value: modes.length, label: `windows, ${modes.join(' or ')}` },
+];
+---
+
+<section class="facade">
+  <div class="facade__beams" aria-hidden="true"></div>
+  <div class="facade__copy">
+    <Inscription>Stone · Glass · Lead · Light</Inscription>
+    <h1 class="facade__title">Sanctuary</h1>
+    <p class="facade__lede">
+      A design system built the way a cathedral is: dark, quiet stone that exists so that coloured light has somewhere to fall.
+    </p>
+    <slot name="actions" />
+    <dl class="facade__facts">
+      {
+        facts.map(({ value, label }) => (
+          <div>
+            <dt>{value}</dt>
+            <dd>{label}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </div>
+  <div class="facade__rose">
+    <Rose cast />
+    <Rose />
+  </div>
+  <slot name="after" />
+</section>
+
+<style>
+  /* Carried over from the showcase hero, made to fill the first screen. */
+  .facade {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    align-items: center;
+    gap: var(--san-space-12);
+    min-height: calc(100svh - 8rem);
+    padding: var(--san-space-16) clamp(var(--san-space-4), 6vw, var(--san-space-24));
+    overflow: hidden;
+    background:
+      radial-gradient(ellipse 60% 70% at 76% 46%, color-mix(in oklch, var(--san-window-b) 18%, transparent), transparent 70%),
+      linear-gradient(180deg, var(--san-surface-sunken), var(--san-surface));
+  }
+
+  /* Light flavors shade the stone instead of lighting it (schemes.ts). */
+  .facade__beams {
+    position: absolute;
+    inset: -10%;
+    pointer-events: none;
+    background: conic-gradient(
+      from 196deg at 72% 46%,
+      transparent 0deg,
+      color-mix(in oklch, var(--san-window-b) 34%, transparent) 8deg,
+      transparent 15deg,
+      color-mix(in oklch, var(--san-window-c) 26%, transparent) 24deg,
+      transparent 33deg,
+      color-mix(in oklch, var(--san-window-a) 46%, transparent) 43deg,
+      transparent 54deg
+    );
+    filter: blur(22px);
+    mask-image: radial-gradient(circle at 72% 46%, #000 12%, transparent 72%);
+    mix-blend-mode: var(--site-light-blend, screen);
+    animation: breathe 14s var(--san-ease-standard) infinite alternate;
+  }
+
+  .facade__copy { position: relative; display: grid; gap: var(--san-space-6); justify-items: start; }
+
+  .facade__title {
+    margin: 0;
+    font: 500 clamp(4.25rem, 11.5vw, 10rem) / 0.86 var(--san-font-family-display);
+    letter-spacing: -0.035em;
+    padding-bottom: 0.08em;
+    background: linear-gradient(170deg, var(--san-text) 35%, color-mix(in oklch, var(--san-text) 45%, var(--san-window-b)) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .facade__lede {
+    margin: 0;
+    max-width: 34rem;
+    font: var(--san-type-body-lg);
+    font-size: 1.25rem;
+    color: var(--san-text-muted);
+  }
+
+  .facade__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--san-space-8);
+    margin: var(--san-space-4) 0 0;
+    padding-top: var(--san-space-5);
+    border-top: var(--san-border-width-hairline) solid var(--san-lead);
+  }
+  .facade__facts dt { font: 500 2.5rem/1 var(--san-font-family-display); color: var(--san-accent-ink); }
+  .facade__facts dd { margin: var(--san-space-1) 0 0; font: var(--san-type-label-md); color: var(--san-text-subtle); }
+
+  .facade__rose { position: relative; display: grid; place-items: center; }
+  .facade__rose > :global(*) { grid-area: 1 / 1; }
+
+  @keyframes breathe { from { opacity: 0.55; } to { opacity: 1; } }
+
+  @media (max-width: 64rem) {
+    .facade { grid-template-columns: 1fr; min-height: auto; padding-top: var(--san-space-10); }
+    .facade__rose { order: -1; }
+  }
+</style>

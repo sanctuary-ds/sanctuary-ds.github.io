@@ -1,0 +1,99 @@
+---
+// The rose window, carried over from the core showcase. Its geometry is computed
+// at build time, so the page ships plain SVG and no script. Panes are filled with
+// the window tokens, so the rose follows the accent and the window axis. `cast`
+// draws only the glass, as the coloured light thrown on the floor below it.
+interface Props {
+  cast?: boolean;
+}
+
+const { cast = false } = Astro.props;
+
+const polar = (r: number, deg: number) => {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return [Number((r * Math.cos(rad)).toFixed(2)), Number((r * Math.sin(rad)).toFixed(2))] as const;
+};
+const at = (r: number, deg: number) => polar(r, deg).join(' ');
+const sector = (r1: number, r2: number, from: number, to: number) =>
+  `M${at(r1, from)}A${r1} ${r1} 0 0 1 ${at(r1, to)}L${at(r2, to)}A${r2} ${r2} 0 0 0 ${at(r2, from)}Z`;
+const petal = (r1: number, r2: number, deg: number, half: number) =>
+  `M${at(r1, deg - half)}A${r1} ${r1} 0 0 1 ${at(r1, deg + half)}Q${at(r2 * 0.86, deg + half * 0.95)} ${at(r2, deg)}Q${at(r2 * 0.86, deg - half * 0.95)} ${at(r1, deg - half)}Z`;
+
+type Pane = { d?: string; circle?: readonly [number, number, number]; fill: string; i: number };
+const panes: Pane[] = [];
+const outer = ['window-a', 'window-b', 'window-c', 'window-b'];
+for (let i = 0; i < 24; i += 1) panes.push({ d: sector(67, 92, i * 15 + 0.9, i * 15 + 14.1), fill: outer[i % 4], i });
+for (let i = 0; i < 12; i += 1) {
+  panes.push({ d: petal(31, 63, i * 30, 12.5), fill: i % 2 ? 'window-c' : 'window-b', i: i + 3 });
+  panes.push({ d: sector(12, 28, i * 30 + 1.6, i * 30 + 28.4), fill: i % 2 ? 'window-a' : 'window-c', i: i + 7 });
+  const [cx, cy] = polar(58, i * 30 + 15);
+  panes.push({ circle: [cx, cy, 3.4], fill: 'glass-gilt', i });
+}
+panes.push({ circle: [0, 0, 9], fill: 'window-c', i: 2 });
+---
+
+<div class:list={['rose', { 'rose--cast': cast }]} aria-hidden="true">
+  <svg viewBox="-100 -100 200 200" role="presentation" focusable="false">
+    {
+      !cast && (
+        <defs>
+          {/* The sun's highlight is light itself, white fading to shade, not a theme colour. */}
+          <radialGradient id="rose-sun">
+            <stop offset="0" stop-color="#fff" stop-opacity=".55" />
+            <stop offset=".55" stop-color="#fff" stop-opacity=".08" />
+            <stop offset="1" stop-color="#000" stop-opacity=".28" />
+          </radialGradient>
+        </defs>
+      )
+    }
+    {!cast && <circle r="99" class="rose__stone" />}
+    {!cast && <circle r="94.5" class="rose__lead" />}
+    {
+      panes.map(({ d, circle, fill, i }) =>
+        d ? (
+          <path class="rose__pane" d={d} style={`fill:var(--san-${fill});--i:${i}`} />
+        ) : (
+          <circle class="rose__pane" cx={circle![0]} cy={circle![1]} r={circle![2]} style={`fill:var(--san-${fill});--i:${i}`} />
+        ),
+      )
+    }
+    {!cast && <circle r="94.5" class="rose__sun" fill="url(#rose-sun)" />}
+  </svg>
+</div>
+
+<style>
+  .rose { width: min(30rem, 78vw); aspect-ratio: 1; }
+
+  .rose svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 46px color-mix(in oklch, var(--san-window-b) 50%, transparent));
+  }
+
+  .rose__stone { fill: var(--san-surface-raised-3); }
+  .rose__lead { fill: var(--san-lead-came); }
+  .rose__sun { mix-blend-mode: soft-light; }
+
+  .rose__pane {
+    animation: shimmer 7s ease-in-out infinite;
+    animation-delay: calc(var(--i) * -0.55s);
+  }
+
+  /* The window's light, thrown on the floor in front of it. Light flavors shade
+     the stone instead of lighting it (schemes.ts). */
+  .rose--cast {
+    position: absolute;
+    transform: translate(-34%, 52%) scale(1.4, 0.5) skewX(-26deg);
+    filter: blur(34px) saturate(1.6);
+    opacity: var(--site-cast-opacity, 0.6);
+    mix-blend-mode: var(--site-light-blend, screen);
+    pointer-events: none;
+  }
+
+  @keyframes shimmer { 50% { opacity: 0.72; } }
+
+  @media (max-width: 64rem) {
+    .rose { width: min(20rem, 70vw); }
+  }
+</style>

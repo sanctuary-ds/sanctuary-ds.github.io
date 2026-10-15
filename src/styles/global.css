@@ -7,6 +7,16 @@
   box-sizing: border-box;
 }
 
+/* Visitors who ask for less motion get a still page: no breathing beams, no
+   shimmering glass. Transitions are already opted in under no-preference below. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+  }
+}
+
 /* While the theme changes, light moves slowly across the page, only when the
    visitor allows motion. Set by the lectern script for a moment after a change. */
 @media (prefers-reduced-motion: no-preference) {
