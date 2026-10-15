@@ -92,7 +92,7 @@ Each phase is deployable on its own.
 
 ### Phase 2: Home, playground and roadmap
 
-- [ ] Deploy only when the site changes: Markdown files at the repository root (README, ROADMAP) do not trigger a deploy.
+- [x] Deploy only when the site changes: Markdown files at the repository root (README, ROADMAP) do not trigger a deploy.
 - [x] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1; chosen: self-hosted (see [Stack](#stack)).
 - [x] Light-flavor styles generated from `palette` (`flavors.*.scheme`), replacing the showcase's `data-scheme` attribute.
 - [x] Home page: the facade, the nave and the chapels.
