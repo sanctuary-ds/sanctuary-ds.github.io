@@ -1,0 +1,254 @@
+---
+// The site header, carried over from the core showcase: the brand, the theme
+// controls and the repository link. The controls are generated from the
+// palette, and each button names the axis and value it sets in data-set.
+import { axes, defaultTheme } from '../data/theme';
+
+const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axis] === id);
+---
+
+<header class="lectern">
+  <div class="lectern__row">
+    <a class="brand" href="/" aria-label="Sanctuary, home">
+      <svg class="brand__mark" viewBox="-12 -12 24 24" aria-hidden="true">
+        <circle r="11" class="brand__lead" />
+        <g class="brand__panes">
+          <path d="M0-9.5A9.5 9.5 0 0 1 8.2-4.75L0 0Z" /><path d="M8.2-4.75A9.5 9.5 0 0 1 8.2 4.75L0 0Z" />
+          <path d="M8.2 4.75A9.5 9.5 0 0 1 0 9.5L0 0Z" /><path d="M0 9.5A9.5 9.5 0 0 1-8.2 4.75L0 0Z" />
+          <path d="M-8.2 4.75A9.5 9.5 0 0 1-8.2-4.75L0 0Z" /><path d="M-8.2-4.75A9.5 9.5 0 0 1 0-9.5L0 0Z" />
+        </g>
+        <circle r="2.6" class="brand__eye" />
+      </svg>
+      <span class="brand__name">Sanctuary</span>
+    </a>
+    <div class="lectern__tools">
+      <button class="lectern__toggle" type="button" aria-expanded="false" aria-controls="lectern-controls">Light</button>
+      <a
+        class="lectern__github"
+        href="https://github.com/sanctuary-ds"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Sanctuary on GitHub (opens in a new tab)"
+        title="Sanctuary on GitHub"
+      >
+        <svg viewBox="0 0 16 16" aria-hidden="true">
+          <path
+            d="M8 0c4.42 0 8 3.58 8 8a8.013 8.013 0 0 1-5.45 7.59c-.4.08-.55-.17-.55-.38 0-.27.01-1.13.01-2.2 0-.75-.25-1.23-.54-1.48 1.78-.2 3.65-.88 3.65-3.95 0-.88-.31-1.59-.82-2.15.08-.2.36-1.02-.08-2.12 0 0-.67-.22-2.2.82-.64-.18-1.32-.27-2-.27-.68 0-1.36.09-2 .27-1.53-1.03-2.2-.82-2.2-.82-.44 1.1-.16 1.92-.08 2.12-.51.56-.82 1.28-.82 2.15 0 3.06 1.86 3.75 3.64 3.95-.23.2-.44.55-.51 1.07-.46.21-1.61.55-2.33-.66-.15-.24-.6-.83-1.23-.82-.67.01-.27.38.01.53.34.19.73.9.82 1.13.16.45.68 1.31 2.69.94 0 .67.01 1.3.01 1.49 0 .21-.15.45-.55.38A7.995 7.995 0 0 1 0 8c0-4.42 3.58-8 8-8Z"
+          />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="lectern__row lectern__controls" id="lectern-controls">
+    <div class="control" role="group" aria-labelledby="control-flavor">
+      <span class="control__label" id="control-flavor">Flavor</span>
+      <div class="seg">
+        {axes.flavor.map(({ id, name }) => (
+          <button class="seg__item" type="button" data-set={`flavor:${id}`} aria-pressed={pressed('flavor', id)}>{name}</button>
+        ))}
+      </div>
+    </div>
+    <div class="control" role="group" aria-labelledby="control-accent">
+      <span class="control__label" id="control-accent">Accent</span>
+      <div class="tesserae">
+        {axes.accent.map(({ id, name }) => (
+          <button
+            class="tessera"
+            type="button"
+            data-set={`accent:${id}`}
+            aria-pressed={pressed('accent', id)}
+            aria-label={name}
+            title={name}
+            style={`--c: var(--san-glass-${id})`}
+          />
+        ))}
+      </div>
+    </div>
+    <div class="control" role="group" aria-labelledby="control-glazing">
+      <span class="control__label" id="control-glazing">Glazing</span>
+      <div class="seg">
+        {axes.glazing.map(({ id, name }) => (
+          <button class="seg__item" type="button" data-set={`glazing:${id}`} aria-pressed={pressed('glazing', id)}>{name}</button>
+        ))}
+      </div>
+    </div>
+    <div class="control" role="group" aria-labelledby="control-window">
+      <span class="control__label" id="control-window">Window</span>
+      <div class="lancets">
+        {axes.window.map(({ id, name }) => (
+          /* Each lancet scopes its own window, so it previews that mode. */
+          <button
+            class="lancet-btn"
+            type="button"
+            data-set={`window:${id}`}
+            data-san-window={id}
+            aria-pressed={pressed('window', id)}
+            aria-label={`${name} window`}
+            title={name}
+          ><span></span></button>
+        ))}
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  import { initLectern } from '../scripts/lectern';
+  initLectern();
+</script>
+
+<style>
+  /* Carried over from the core showcase, plus the phone fixes the prototype
+     review found. Every value is a core token. */
+  .lectern {
+    position: sticky;
+    top: 0;
+    z-index: var(--san-layer-sticky);
+    padding: var(--san-space-3) clamp(var(--san-space-4), 4vw, var(--san-space-12));
+    background: color-mix(in oklch, var(--san-surface-sunken) 84%, transparent);
+    backdrop-filter: blur(var(--san-blur-md)) saturate(1.4);
+    border-bottom: var(--san-border-width-came) solid var(--san-lead-came);
+    box-shadow: 0 1px 0 var(--san-lead-soft), var(--san-elevation-2);
+  }
+
+  .lectern__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--san-space-4) var(--san-space-8);
+    flex-wrap: wrap;
+  }
+
+  .lectern__controls { margin-top: var(--san-space-3); justify-content: flex-start; }
+
+  .brand { display: inline-flex; align-items: center; gap: var(--san-space-3); color: var(--san-text); text-decoration: none; }
+  .brand__mark { width: 30px; height: 30px; filter: drop-shadow(0 0 8px color-mix(in oklch, var(--san-accent) 60%, transparent)); }
+  .brand__lead { fill: var(--san-lead-came); }
+  .brand__panes path { stroke: var(--san-lead-came); stroke-width: 1; }
+  .brand__panes path:nth-child(3n + 1) { fill: var(--san-window-b); }
+  .brand__panes path:nth-child(3n + 2) { fill: var(--san-window-c); }
+  .brand__panes path:nth-child(3n) { fill: var(--san-window-a); }
+  .brand__eye { fill: var(--san-glass-gilt); stroke: var(--san-lead-came); }
+  .brand__name { font: 600 1.5rem/1 var(--san-font-family-display); letter-spacing: 0.01em; }
+
+  .lectern__tools { display: flex; align-items: center; gap: var(--san-space-3); }
+
+  .lectern__toggle {
+    display: none;
+    height: var(--san-size-control-sm);
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-sm);
+    background: transparent;
+    color: var(--san-text);
+    font: var(--san-type-label-md);
+    cursor: pointer;
+  }
+
+  .lectern__github {
+    display: inline-grid;
+    place-items: center;
+    width: var(--san-size-control-sm);
+    height: var(--san-size-control-sm);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-full);
+    color: var(--san-text-muted);
+  }
+  .lectern__github:hover { color: var(--san-text); border-color: var(--san-accent); box-shadow: var(--san-cast-sm); }
+  .lectern__github svg { width: var(--san-size-icon-sm); height: var(--san-size-icon-sm); fill: currentColor; }
+
+  .control { display: flex; align-items: center; gap: var(--san-space-3); }
+
+  .control__label {
+    font: var(--san-type-inscription);
+    letter-spacing: var(--san-type-inscription-tracking);
+    text-transform: uppercase;
+    color: var(--san-text-subtle);
+  }
+
+  .seg {
+    display: inline-flex;
+    padding: var(--san-space-half);
+    gap: var(--san-space-half);
+    background: var(--san-lead-came);
+    border-radius: var(--san-radius-sm);
+  }
+
+  .seg__item {
+    height: 1.875rem;
+    padding: 0 var(--san-space-3);
+    border: 0;
+    border-radius: var(--san-radius-xs);
+    background: var(--san-surface-raised-1);
+    color: var(--san-text-muted);
+    font: var(--san-type-label-lg);
+    cursor: pointer;
+    transition: background-color var(--san-duration-fast), color var(--san-duration-fast);
+  }
+  .seg__item:hover { background: var(--san-surface-raised-3); color: var(--san-text); }
+
+  /* Translucent glazings need stone behind them, not the dark lead of the track. */
+  .seg__item[aria-pressed='true'] {
+    background: var(--san-glaze-sheen), linear-gradient(var(--san-glaze-bg), var(--san-glaze-bg)), var(--san-surface-raised-1);
+    color: var(--san-glaze-fg);
+    box-shadow: inset 0 0 0 1px var(--san-glaze-border), var(--san-glaze-glow);
+  }
+
+  /* Accent picker: quarries, the diamond panes of plain glazing. */
+  .tesserae { display: flex; gap: var(--san-space-3); padding: 0 var(--san-space-1); }
+
+  .tessera {
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    rotate: 45deg;
+    border: var(--san-border-width-came) solid var(--san-lead-came);
+    border-radius: var(--san-radius-xs);
+    background: var(--c);
+    cursor: pointer;
+    transition: scale var(--san-duration-base) var(--san-ease-enter), box-shadow var(--san-duration-base);
+  }
+  .tessera:hover { scale: 1.25; }
+  .tessera[aria-pressed='true'] { scale: 1.35; border-color: var(--san-text); box-shadow: 0 0 14px 1px var(--c); }
+
+  .lancets { display: flex; gap: var(--san-space-2); align-items: flex-end; }
+
+  .lancet-btn {
+    position: relative;
+    width: 1.25rem;
+    height: 2.125rem;
+    padding: 0 0 var(--san-space-1);
+    border: 0;
+    background: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity var(--san-duration-fast);
+  }
+  .lancet-btn span { display: block; height: 100%; clip-path: var(--san-shape-lancet); background: var(--san-window); }
+  .lancet-btn:hover,
+  .lancet-btn[aria-pressed='true'] { opacity: 1; }
+  .lancet-btn[aria-pressed='true']::after {
+    content: '';
+    position: absolute;
+    inset: auto 2px 0;
+    height: var(--san-border-width-came);
+    background: var(--san-text);
+  }
+
+  :focus-visible { outline: none; box-shadow: var(--san-halo); }
+
+  @media (max-width: 64rem) {
+    .lectern { position: static; }
+  }
+
+  /* On phones the controls fold behind the "Light" button, so the page, not the
+     controls, fills the first screen; once open they wrap instead of overflowing. */
+  @media (max-width: 40rem) {
+    .lectern__toggle { display: inline-flex; align-items: center; }
+    .lectern__controls { display: none; }
+    .lectern.is-open .lectern__controls { display: flex; }
+    .control, .seg { flex-wrap: wrap; max-width: 100%; }
+    .tesserae { flex-wrap: wrap; }
+  }
+</style>

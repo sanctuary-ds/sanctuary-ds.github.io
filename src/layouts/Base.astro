@@ -3,6 +3,8 @@
 // the whole site.
 import '@sanctuary-ds/tokens/css';
 import '../styles/global.css';
+import Lectern from '../components/Lectern.astro';
+import { defaultTheme } from '../data/theme';
 
 interface Props {
   title: string;
@@ -14,7 +16,13 @@ const lang = Astro.currentLocale;
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html
+  lang={lang}
+  data-san-flavor={defaultTheme.flavor}
+  data-san-accent={defaultTheme.accent}
+  data-san-glazing={defaultTheme.glazing}
+  data-san-window={defaultTheme.window}
+>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -22,6 +30,7 @@ const lang = Astro.currentLocale;
     <meta name="description" content={description} />
   </head>
   <body>
+    <Lectern />
     <slot />
   </body>
 </html>
