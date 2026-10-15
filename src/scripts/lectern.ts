@@ -2,8 +2,6 @@
 // the choice, and on phones the "Light" button folds the controls in and out.
 import { STORAGE_KEY } from '../data/theme-storage';
 
-const AXES = ['flavor', 'accent', 'glazing', 'window'] as const;
-
 // How long the light takes to move across the page after a change; the CSS
 // transition only runs when the visitor allows motion.
 const SHIFT_MS = 900;
@@ -21,13 +19,30 @@ export function initLectern(): void {
     }
   };
 
-  const save = () => {
-    const theme = Object.fromEntries(AXES.map((axis) => [axis, root.getAttribute(`data-san-${axis}`)]));
+  // Save only the axis the visitor changed. The other axes on <html> may come
+  // from a preview link (?flavor=vespers), and a preview must never replace the
+  // visitor's own choice.
+  const save = (axis: string, value: string) => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+      let saved: Record<string, string> = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') || {};
+      } catch {
+        // Corrupt storage: start again from this change.
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, [axis]: value }));
     } catch {
       // Persisting is best effort: the theme still applies for this visit.
     }
+  };
+
+  // Once the visitor picks a value, the preview parameter for that axis no longer
+  // applies; dropping it lets their choice survive a reload of the same link.
+  const dropPreview = (axis: string) => {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has(axis)) return;
+    url.searchParams.delete(axis);
+    window.history.replaceState(window.history.state, '', url);
   };
 
   const set = (axis: string, value: string) => {
@@ -37,7 +52,8 @@ export function initLectern(): void {
     shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), SHIFT_MS);
     root.setAttribute(`data-san-${axis}`, value);
     sync();
-    save();
+    save(axis, value);
+    dropPreview(axis);
   };
 
   lectern.addEventListener('click', (event) => {

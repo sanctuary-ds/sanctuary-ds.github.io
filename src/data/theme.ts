@@ -29,6 +29,14 @@ export const flavorAccents = Object.fromEntries(
   Object.entries(palette.flavors).map(([id, flavor]) => [id, flavor.accent]),
 );
 
+// The restore script trusts these values; fail the build rather than ship a
+// flavor whose own accent is not a pigment.
+for (const [flavor, accent] of Object.entries(flavorAccents)) {
+  if (!options.accent.includes(accent)) {
+    throw new Error(`Flavor "${flavor}" names accent "${accent}", which is not a pigment in the core palette.`);
+  }
+}
+
 // The theme a first-time visitor sees: the core's default flavor with its own accent.
 export const defaultTheme: Record<Axis, string> = {
   flavor: palette.defaultFlavor,
