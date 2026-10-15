@@ -122,7 +122,9 @@ const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axi
     flex-wrap: wrap;
   }
 
-  .lectern__controls { margin-top: var(--san-space-3); justify-content: flex-start; }
+  /* A tighter gap than the showcase's space-8, which left the four controls 2px
+     short of one row at 1440px. */
+  .lectern__controls { margin-top: var(--san-space-3); justify-content: flex-start; column-gap: var(--san-space-6); }
 
   .brand { display: inline-flex; align-items: center; gap: var(--san-space-3); color: var(--san-text); text-decoration: none; }
   .brand__mark { width: 30px; height: 30px; filter: drop-shadow(0 0 8px color-mix(in oklch, var(--san-accent) 60%, transparent)); }

@@ -53,6 +53,21 @@ test.describe('lectern controls', () => {
     });
   }
 
+  test('on a desktop the four controls share one row', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    // Controls of different heights are centred, so compare vertical ranges, not tops.
+    const boxes = await page.locator('.lectern__controls .control').evaluateAll((controls) =>
+      controls.map((control) => {
+        const { top, bottom } = control.getBoundingClientRect();
+        return { top, bottom };
+      }),
+    );
+    const [first, ...rest] = boxes;
+    for (const box of rest) expect(box.top < first.bottom && box.bottom > first.top, JSON.stringify(boxes)).toBe(true);
+  });
+
   test('on phones the controls fold behind the Light button', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto('/');
