@@ -4,7 +4,7 @@
 import '@sanctuary-ds/tokens/css';
 import '../styles/global.css';
 import Lectern from '../components/Lectern.astro';
-import { defaultTheme } from '../data/theme';
+import { STORAGE_KEY, defaultTheme, flavorAccents, options } from '../data/theme';
 
 interface Props {
   title: string;
@@ -26,6 +26,30 @@ const lang = Astro.currentLocale;
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--
+      Restores the theme before the first paint, so a returning visitor never sees
+      the default theme flash first. A query string such as ?flavor=lauds wins and
+      previews a look without replacing the visitor's saved choice.
+    -->
+    <script is:inline define:vars={{ STORAGE_KEY, defaultTheme, flavorAccents, options }}>
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch {
+        // Storage is unavailable or corrupt: keep the defaults.
+      }
+      const query = new URLSearchParams(location.search);
+      const pick = (axis, fallback) =>
+        [query.get(axis), saved[axis], fallback].find((value) => options[axis].includes(value));
+      const flavor = pick('flavor', defaultTheme.flavor);
+      const theme = {
+        flavor,
+        accent: pick('accent', flavorAccents[flavor]),
+        glazing: pick('glazing', defaultTheme.glazing),
+        window: pick('window', defaultTheme.window),
+      };
+      for (const axis in theme) document.documentElement.setAttribute(`data-san-${axis}`, theme[axis]);
+    </script>
     <title>{title}</title>
     <meta name="description" content={description} />
   </head>

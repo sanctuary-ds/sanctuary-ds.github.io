@@ -7,6 +7,21 @@
   box-sizing: border-box;
 }
 
+/* While the theme changes, light moves slowly across the page, only when the
+   visitor allows motion. Set by the lectern script for a moment after a change. */
+@media (prefers-reduced-motion: no-preference) {
+  html.is-shifting *,
+  html.is-shifting *::before,
+  html.is-shifting *::after {
+    transition:
+      background-color var(--san-duration-procession) var(--san-ease-standard),
+      color var(--san-duration-procession) var(--san-ease-standard),
+      border-color var(--san-duration-procession) var(--san-ease-standard),
+      fill var(--san-duration-procession) var(--san-ease-standard),
+      box-shadow var(--san-duration-procession) var(--san-ease-standard) !important;
+  }
+}
+
 body {
   margin: 0;
   background: var(--san-surface);

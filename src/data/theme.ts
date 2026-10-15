@@ -17,6 +17,18 @@ export const axes = {
 
 export type Axis = keyof typeof axes;
 
+export { STORAGE_KEY } from './theme-storage';
+
+// The valid values of each axis, and each flavor's own accent, for the script
+// that restores the theme before the first paint.
+export const options = Object.fromEntries(
+  Object.entries(axes).map(([axis, values]) => [axis, values.map(({ id }) => id)]),
+) as Record<Axis, string[]>;
+
+export const flavorAccents = Object.fromEntries(
+  Object.entries(palette.flavors).map(([id, flavor]) => [id, flavor.accent]),
+);
+
 // The theme a first-time visitor sees: the core's default flavor with its own accent.
 export const defaultTheme: Record<Axis, string> = {
   flavor: palette.defaultFlavor,
