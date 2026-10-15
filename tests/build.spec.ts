@@ -1,4 +1,7 @@
+import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+
+const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 // The page is built in English, and the core stylesheet it depends on is loaded:
 // a renamed token after bumping the core pin fails here instead of silently.
@@ -63,6 +66,21 @@ test('the fonts are hosted by the site and used by the core tokens', async ({ pa
   }
   expect(fonts.body).toMatch(hosted('Hanken Grotesk'));
   expect(fonts.loaded.some((family) => family.startsWith('Hanken Grotesk')), 'the body font is loaded').toBe(true);
+});
+
+test('the page declares exactly the font faces the core publishes', async ({ page }) => {
+  const expected = Object.values(palette.fonts as Record<string, { family: string; weights: number[]; styles: string[] }>)
+    .flatMap(({ family, weights, styles }) => weights.flatMap((weight) => styles.map((style) => `${family} ${weight} ${style}`)))
+    .sort();
+  await page.goto('/');
+  const declared = await page.evaluate(() =>
+    [...document.fonts]
+      // Astro suffixes the family and adds metric-matched fallback faces; keep the real ones.
+      .filter((face) => !face.family.includes('fallback'))
+      .map((face) => `${face.family.replace(/"/g, '').replace(/-[0-9a-f]+$/, '')} ${face.weight} ${face.style}`)
+      .sort(),
+  );
+  expect(declared).toEqual(expected);
 });
 
 test('the page loads without console errors or failed requests', async ({ page }) => {

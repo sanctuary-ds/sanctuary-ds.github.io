@@ -4,6 +4,7 @@
 import '@sanctuary-ds/tokens/css';
 import '../styles/global.css';
 import { Font } from 'astro:assets';
+import { fontRoles } from '../data/fonts';
 import Lectern from '../components/Lectern.astro';
 import { STORAGE_KEY, defaultTheme, flavorAccents, options } from '../data/theme';
 
@@ -51,10 +52,7 @@ const lang = Astro.currentLocale;
       };
       for (const axis in theme) document.documentElement.setAttribute(`data-san-${axis}`, theme[axis]);
     </script>
-    <Font cssVariable="--font-text" preload={[{ weight: 400, style: 'normal' }]} />
-    <Font cssVariable="--font-display" />
-    <Font cssVariable="--font-inscription" />
-    <Font cssVariable="--font-mono" />
+    {fontRoles.map(({ cssVariable, preload }) => <Font cssVariable={cssVariable} preload={preload} />)}
     <title>{title}</title>
     <meta name="description" content={description} />
   </head>

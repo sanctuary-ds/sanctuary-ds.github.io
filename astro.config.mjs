@@ -1,16 +1,23 @@
+import { createRequire } from 'node:module';
 import { defineConfig, fontProviders } from 'astro/config';
 
-// The families the core's type tokens name, with the weights and styles the site
-// uses. Astro downloads them from Google Fonts at build time and serves them from
-// the site itself, so visitors never send requests to a third party.
+// The core publishes, for each type role (display, text, mono, inscription), the
+// family, weights, styles and fallbacks it is designed with. Astro downloads them
+// from Google Fonts at build time and serves them from the site itself, so
+// visitors never send requests to a third party. Each role gets the CSS variable
+// --font-<role>, which global.css maps onto the core's --san-font-family-<role>.
+const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 const google = fontProviders.google();
-const fonts = [
-  { name: 'Cormorant Garamond', cssVariable: '--font-display', weights: [400, 500, 600], styles: ['normal'], fallbacks: ['serif'] },
-  { name: 'Cormorant Garamond', cssVariable: '--font-display', weights: [500], styles: ['italic'], fallbacks: ['serif'] },
-  { name: 'Hanken Grotesk', cssVariable: '--font-text', weights: [400, 500, 600], styles: ['normal'], fallbacks: ['sans-serif'] },
-  { name: 'JetBrains Mono', cssVariable: '--font-mono', weights: [400, 500], styles: ['normal'], fallbacks: ['monospace'] },
-  { name: 'Cinzel', cssVariable: '--font-inscription', weights: [500, 600], styles: ['normal'], fallbacks: ['serif'] },
-].map((font) => ({ ...font, provider: google }));
+const fonts = Object.entries(palette.fonts).map(([role, font]) => ({
+  name: font.family,
+  cssVariable: `--font-${role}`,
+  provider: google,
+  weights: font.weights,
+  styles: font.styles,
+  // The core's own fallbacks, then its generic family, from which Astro builds a
+  // metric-matched fallback.
+  fallbacks: [...font.fallbacks, font.generic],
+}));
 
 // Static output is Astro's default. The site is a user site
 // (sanctuary-ds.github.io), so it is served from the root and needs no `base`.

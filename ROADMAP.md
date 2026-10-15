@@ -31,9 +31,8 @@ The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/san
 | Consumes | Export | Used for |
 |----------|--------|----------|
 | Stylesheet | `@sanctuary-ds/tokens/css` | All site styling and theming |
-| Palette | `@sanctuary-ds/tokens/palette` | Playground, swatches, port previews |
+| Palette | `@sanctuary-ds/tokens/palette` | Theme axes and their defaults, the fonts to host, playground, swatches, port previews |
 | DTCG tokens | `@sanctuary-ds/tokens/tokens/*` | The generated token reference |
-| Window modes | Requested from the core: list `mono` and `harmonic` in `palette` | The theme switcher, which writes them in the site until then |
 | Port list | To be defined with the ports milestone | Gallery and search |
 
 Rules:
