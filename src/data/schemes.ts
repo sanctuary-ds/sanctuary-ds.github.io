@@ -13,7 +13,11 @@ const BLEND = {
 
 export const schemeStyles = Object.entries(palette.flavors)
   .map(([id, flavor]) => {
-    const { blend, castOpacity } = BLEND[flavor.scheme === 'light' ? 'light' : 'dark'];
+    // A scheme the site does not know would otherwise pass silently as dark.
+    if (!(flavor.scheme in BLEND)) {
+      throw new Error(`Flavor "${id}" has scheme "${flavor.scheme}"; the site knows ${Object.keys(BLEND).join(' and ')}.`);
+    }
+    const { blend, castOpacity } = BLEND[flavor.scheme as keyof typeof BLEND];
     return `[data-san-flavor="${id}"]{--site-light-blend:${blend};--site-cast-opacity:${castOpacity};}`;
   })
   .join('');

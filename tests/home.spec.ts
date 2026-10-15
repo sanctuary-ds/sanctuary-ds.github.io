@@ -1,6 +1,7 @@
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
 import { ROADMAP_HREF, chapels } from '../src/data/chapels';
+import { toRoman } from '../src/data/numerals';
 
 // The home page through what a visitor sees: the facade, its rose window and
 // its facts, which are counted from the core palette.
@@ -75,10 +76,9 @@ test.describe('chapels', () => {
     await page.goto('/');
     const cards = page.locator('.chapel');
     await expect(cards).toHaveCount(chapels.length);
-    const numerals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     for (const [index, chapel] of chapels.entries()) {
       const card = cards.nth(index);
-      await expect(card.locator('.inscription')).toHaveText(`${numerals[index]} · ${chapel.name}`);
+      await expect(card.locator('.inscription')).toHaveText(`${toRoman(index + 1)} · ${chapel.name}`);
       await expect(card.locator('h3')).toHaveText(chapel.title);
       if (chapel.accent) await expect(card).toHaveAttribute('data-san-accent', chapel.accent);
       else await expect(card).not.toHaveAttribute('data-san-accent');

@@ -5,7 +5,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 // family, weights, styles and fallbacks it is designed with. Astro downloads them
 // from Google Fonts at build time and serves them from the site itself, so
 // visitors never send requests to a third party. Each role gets the CSS variable
-// --font-<role>, which global.css maps onto the core's --san-font-family-<role>.
+// --font-<role>, which src/data/fonts.ts bridges onto the core's
+// --san-font-family-<role> (inlined by Base.astro).
 const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 const google = fontProviders.google();
 const fonts = Object.entries(palette.fonts).map(([role, font]) => ({

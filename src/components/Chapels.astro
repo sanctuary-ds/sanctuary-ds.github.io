@@ -1,10 +1,9 @@
 ---
 // The chapels: the hub to every part of the ecosystem, in the order of the list.
 import { chapels } from '../data/chapels';
+import { toRoman } from '../data/numerals';
 import ChapelCard from './ChapelCard.astro';
 import SectionHead from './SectionHead.astro';
-
-const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
 ---
 
 <section class="chapels" id="chapels" aria-labelledby="chapels-title">
@@ -12,7 +11,7 @@ const NUMERALS = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
     Each part of the ecosystem has its own chapel. A new one opens when what it holds is real.
   </SectionHead>
   <div class="chapels__grid">
-    {chapels.map((chapel, index) => <ChapelCard chapel={chapel} numeral={NUMERALS[index]} />)}
+    {chapels.map((chapel, index) => <ChapelCard chapel={chapel} numeral={toRoman(index + 1)} />)}
   </div>
 </section>
 

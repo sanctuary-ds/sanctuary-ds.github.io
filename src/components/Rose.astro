@@ -19,6 +19,8 @@ const sector = (r1: number, r2: number, from: number, to: number) =>
 const petal = (r1: number, r2: number, deg: number, half: number) =>
   `M${at(r1, deg - half)}A${r1} ${r1} 0 0 1 ${at(r1, deg + half)}Q${at(r2 * 0.86, deg + half * 0.95)} ${at(r2, deg)}Q${at(r2 * 0.86, deg - half * 0.95)} ${at(r1, deg - half)}Z`;
 
+// `i` staggers each pane's shimmer (animation-delay: i × -0.55s). The offsets per
+// ring are the showcase's, so neighbouring rings never pulse in step.
 type Pane = { d?: string; circle?: readonly [number, number, number]; fill: string; i: number };
 const panes: Pane[] = [];
 const outer = ['window-a', 'window-b', 'window-c', 'window-b'];

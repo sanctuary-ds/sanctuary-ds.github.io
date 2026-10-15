@@ -52,7 +52,7 @@ test('the fonts are hosted by the site and used by the core tokens', async ({ pa
 
   expect(thirdParty, 'no requests to Google Fonts').toEqual([]);
   // Hosted families carry Astro's suffix ("Hanken Grotesk-4efb…"); the core's own
-  // values name the bare family, so a missing bridge in global.css fails here.
+  // values name the bare family, so a missing bridge (src/data/fonts.ts) fails here.
   const hosted = (name: string) => new RegExp(`${name}-[0-9a-f]+`);
   // Every role the core publishes, whatever it is called, must reach its token.
   const roles = Object.entries(palette.fonts as Record<string, { family: string }>);
