@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module';
 import { expect, test, type Page } from '@playwright/test';
 import { STORAGE_KEY } from '../src/data/theme-storage';
+
+const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 // The theme switcher through its public interface: the lectern buttons, the
 // attributes on <html>, the query string and the visitor's saved choice.
@@ -85,6 +88,33 @@ test.describe('lectern controls', () => {
     await expect(page.locator('html')).not.toHaveClass(/is-shifting/);
     const after = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(after).not.toBe(before);
+  });
+});
+
+test.describe('light and dark flavors', () => {
+  // Read the generated values on an element themed with a given flavor.
+  const schemeOf = (page: Page, flavor: string) =>
+    page.evaluate((f) => {
+      const probe = document.createElement('div');
+      probe.setAttribute('data-san-flavor', f);
+      document.body.append(probe);
+      const style = getComputedStyle(probe);
+      const values = [style.getPropertyValue('--site-light-blend').trim(), style.getPropertyValue('--site-cast-opacity').trim()];
+      probe.remove();
+      return values;
+    }, flavor);
+
+  test('each flavor gets the blend its scheme in the palette calls for', async ({ page }) => {
+    await page.goto('/');
+    for (const [flavor, { scheme }] of Object.entries(palette.flavors as Record<string, { scheme: string }>)) {
+      expect(await schemeOf(page, flavor), flavor).toEqual(scheme === 'light' ? ['multiply', '0.5'] : ['screen', '0.6']);
+    }
+  });
+
+  test('a dark flavor nested in a light page keeps its own blend', async ({ page }) => {
+    await page.goto('/?flavor=lauds');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--site-light-blend').trim())).toBe('multiply');
+    expect((await schemeOf(page, 'compline'))[0]).toBe('screen');
   });
 });
 
