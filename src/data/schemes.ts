@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette';
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 
 // Some light effects (the hero's beams, the rose window's cast) blend with the
 // stone behind them: added light on dark flavors, tinted shade on light ones.

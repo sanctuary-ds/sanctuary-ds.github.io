@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette';
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 
 // Theme axes for the site, generated from the core's palette export, including
 // the window modes and the starting glazing and window.
