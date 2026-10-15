@@ -4,7 +4,7 @@
 // Keys F, A, G and W step through the axes, and every change is announced with a
 // `sanctuary:themechange` event, so a section can follow the theme without
 // knowing where the change came from.
-import { STORAGE_KEY } from '../data/theme-storage';
+import { SHORTCUTS_KEY, STORAGE_KEY } from '../data/theme-storage';
 
 // How long the light takes to move across the page after a change: the core's
 // procession duration, the same token the CSS transition uses (global.css), read
@@ -96,8 +96,31 @@ export function initLectern(): void {
 
   // A key steps to the next value of its axis, in the order the lectern lists
   // them. Ignored with modifier keys and while the visitor is typing.
+  // The visitor can turn them off with the lectern's switch (WCAG 2.1.4), and the
+  // choice is kept like the theme. The values come from the lectern's own buttons,
+  // the one place that lists every value of every axis, in order.
   const KEYS: Record<string, string> = { f: 'flavor', a: 'accent', g: 'glazing', w: 'window' };
+  const keysSwitch = lectern.querySelector<HTMLElement>('.lectern__keys');
+  let shortcutsOn = true;
+  try {
+    shortcutsOn = localStorage.getItem(SHORTCUTS_KEY) !== 'off';
+  } catch {
+    // Storage is unavailable: the shortcuts stay on for this visit.
+  }
+  const showShortcuts = () => keysSwitch?.setAttribute('aria-checked', String(shortcutsOn));
+  keysSwitch?.addEventListener('click', () => {
+    shortcutsOn = !shortcutsOn;
+    showShortcuts();
+    try {
+      localStorage.setItem(SHORTCUTS_KEY, shortcutsOn ? 'on' : 'off');
+    } catch {
+      // Best effort, like the theme.
+    }
+  });
+  showShortcuts();
+
   document.addEventListener('keydown', (event) => {
+    if (!shortcutsOn) return;
     if (event.metaKey || event.ctrlKey || event.altKey) return;
     const target = event.target as HTMLElement;
     if (target.closest('input, select, textarea, [contenteditable=""], [contenteditable="true"]')) return;

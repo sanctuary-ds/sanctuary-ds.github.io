@@ -34,7 +34,8 @@ const sections = [
       'The window colours ambient light (beams, glows, hero gradients) while the accent keeps doing the precise work. It always follows the accent: alone, or leaded with its two neighbours on the hue wheel.',
   },
 ];
-const section = Object.fromEntries(sections.map((entry, index) => [entry.id, { ...entry, number: index + 1 }]));
+// The same sections, keyed by id and numbered, for rendering each one below.
+const byId = Object.fromEntries(sections.map((entry, index) => [entry.id, { ...entry, number: index + 1 }]));
 ---
 
 <Base title="Playground · Sanctuary" description="Every axis of Sanctuary live: flavors, glazing and windows.">
@@ -58,15 +59,15 @@ const section = Object.fromEntries(sections.map((entry, index) => [entry.id, { .
       </nav>
     </header>
 
-    <PlaygroundSection {...section.flavors}>
+    <PlaygroundSection {...byId.flavors}>
       <FlavorDemo layout="row" />
     </PlaygroundSection>
 
-    <PlaygroundSection {...section.glazing}>
+    <PlaygroundSection {...byId.glazing}>
       <GlazingDemo />
     </PlaygroundSection>
 
-    <PlaygroundSection {...section.windows}>
+    <PlaygroundSection {...byId.windows}>
       <WindowDemo />
       <h3 class="sub">Named windows</h3>
       <p class="note">Five fixed gradients for a single place, such as a cover or an illustration. They do not follow the accent and are not a theme switch.</p>

@@ -36,6 +36,19 @@ const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axi
     </nav>
     <div class="lectern__tools">
       <button class="lectern__toggle" type="button" aria-expanded="false" aria-controls="lectern-controls">Light</button>
+      <button
+        class="lectern__keys"
+        type="button"
+        role="switch"
+        aria-checked="true"
+        aria-label="Keyboard shortcuts"
+        title="Keyboard shortcuts: F flavor, A accent, G glazing, W window"
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="2.5" y="6" width="19" height="12" rx="2" />
+          <path d="M6 10h1M9.5 10h1M13 10h1M16.5 10h1M6 14h12" />
+        </svg>
+      </button>
       <a
         class="lectern__github"
         href="https://github.com/sanctuary-ds"
@@ -169,6 +182,23 @@ const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axi
     font: var(--san-type-label-md);
     cursor: pointer;
   }
+
+  /* The shortcut switch: a key outline, lit when the shortcuts are on. */
+  .lectern__keys {
+    display: inline-grid;
+    place-items: center;
+    width: var(--san-size-control-sm);
+    height: var(--san-size-control-sm);
+    padding: 0;
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-full);
+    background: transparent;
+    color: var(--san-text-subtle);
+    cursor: pointer;
+  }
+  .lectern__keys svg { width: var(--san-size-icon-sm); height: var(--san-size-icon-sm); fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+  .lectern__keys[aria-checked='true'] { color: var(--san-accent-ink); border-color: var(--san-accent); }
+  .lectern__keys:hover { color: var(--san-text); }
 
   .lectern__github {
     display: inline-grid;

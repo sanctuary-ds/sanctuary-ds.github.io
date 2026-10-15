@@ -327,3 +327,41 @@ test.describe('keyboard shortcuts and theme events', () => {
     expect(seen.map(({ axis, value }) => `${axis}:${value}`)).toEqual(['accent:ruby', `flavor:${await page.evaluate(() => document.documentElement.getAttribute('data-san-flavor'))}`]);
   });
 });
+
+test.describe('shortcut switch (WCAG 2.1.4: single-key shortcuts can be turned off)', () => {
+  const toggle = (page: Page) => page.getByRole('switch', { name: 'Keyboard shortcuts' });
+
+  test('the shortcuts start on, and the switch says so', async ({ page }) => {
+    await page.goto('/');
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'true');
+    const before = await page.evaluate(() => document.documentElement.getAttribute('data-san-flavor'));
+    await page.keyboard.press('f');
+    await expect(page.locator('html')).not.toHaveAttribute('data-san-flavor', before!);
+  });
+
+  test('turned off, a letter changes nothing, and the choice survives a reload', async ({ page }) => {
+    await page.goto('/');
+    await toggle(page).click();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'false');
+    // Move focus off the switch so the keys reach the page, as when typing elsewhere.
+    await page.locator('h1').click();
+    const before = await theme(page);
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+    await page.reload();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+  });
+
+  test('turned back on, the shortcuts work again', async ({ page }) => {
+    await page.goto('/');
+    await toggle(page).click();
+    await toggle(page).click();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'true');
+    await page.locator('h1').click();
+    const before = await page.evaluate(() => document.documentElement.getAttribute('data-san-glazing'));
+    await page.keyboard.press('g');
+    await expect(page.locator('html')).not.toHaveAttribute('data-san-glazing', before!);
+  });
+});
