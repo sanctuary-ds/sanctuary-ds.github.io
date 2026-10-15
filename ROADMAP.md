@@ -87,11 +87,14 @@ Each phase is deployable on its own.
 - [x] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
 - [x] Core dependency pinned through git; stylesheet loaded globally.
 - [x] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
-- [ ] CI: install with a frozen lockfile, build, check internal links.
-- [ ] Deploy to GitHub Pages with one page live.
+- [x] CI: install with a frozen lockfile, build, check internal links.
+- [x] Deploy to GitHub Pages with one page live.
 
 ### Phase 2: Home, playground and roadmap
 
+- [ ] Deploy only when the site changes: Markdown files at the repository root (README, ROADMAP) do not trigger a deploy.
+- [ ] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1.
+- [ ] Light-flavor styles generated from `palette` (`flavors.*.scheme`), replacing the showcase's `data-scheme` attribute.
 - [ ] Home page: the facade, the nave and the chapels.
 - [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
 - [ ] `/roadmap` page.
@@ -121,7 +124,7 @@ Each phase is deployable on its own.
 | Decision | When |
 |----------|------|
 | How the port list reaches the site (a file in the core, or the GitHub API) | Ports milestone |
-| Fonts: Google Fonts or self-hosted | Phase 1, together with the core's same open decision |
+| Fonts: Google Fonts or self-hosted | Phase 2, together with the core's same open decision |
 
 ## Working agreement
 
