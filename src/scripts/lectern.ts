@@ -2,9 +2,16 @@
 // the choice, and on phones the "Light" button folds the controls in and out.
 import { STORAGE_KEY } from '../data/theme-storage';
 
-// How long the light takes to move across the page after a change; the CSS
-// transition only runs when the visitor allows motion.
-const SHIFT_MS = 900;
+// How long the light takes to move across the page after a change: the core's
+// procession duration, the same token the CSS transition uses (global.css), read
+// at run time so the two never drift. The transition only runs when the visitor
+// allows motion.
+const shiftMs = (root: HTMLElement): number => {
+  const value = getComputedStyle(root).getPropertyValue('--san-duration-procession').trim();
+  const amount = parseFloat(value);
+  if (Number.isNaN(amount)) return 900;
+  return value.endsWith('ms') ? amount : amount * 1000;
+};
 
 export function initLectern(): void {
   const root = document.documentElement;
@@ -34,10 +41,11 @@ export function initLectern(): void {
       }
       const change: Record<string, string> = { [axis]: value };
       // Changing the flavor keeps the accent on screen. Save that accent too, or a
-      // reload would fall back to the new flavor's own accent and look different;
-      // unless the accent itself is a preview, which must stay out of storage.
+      // reload could fall back to the new flavor's own accent and look different
+      // (also when the saved accent is one the core no longer has); unless the
+      // accent itself is a preview, which must stay out of storage.
       const accentIsPreview = new URLSearchParams(window.location.search).has('accent');
-      if (axis === 'flavor' && !saved.accent && !accentIsPreview) {
+      if (axis === 'flavor' && !accentIsPreview) {
         change.accent = root.getAttribute('data-san-accent') ?? '';
       }
       localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, ...change }));
@@ -63,7 +71,7 @@ export function initLectern(): void {
     if (changed) {
       root.classList.add('is-shifting');
       window.clearTimeout(shiftTimer);
-      shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), SHIFT_MS);
+      shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), shiftMs(root));
       root.setAttribute(`data-san-${axis}`, value);
       sync();
     }

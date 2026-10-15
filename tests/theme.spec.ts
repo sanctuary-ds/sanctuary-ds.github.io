@@ -195,6 +195,16 @@ test.describe('accent across flavors', () => {
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
   });
 
+  test('a saved accent the core no longer has does not break that promise', async ({ page }) => {
+    // As after a core update that renamed a pigment: the restore ignores it.
+    await seed(page, JSON.stringify({ flavor: 'compline', accent: 'renamed-pigment' }));
+    await page.goto('/');
+    await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
+    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.reload();
+    await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
+  });
+
   test('a preview accent is not saved when the visitor picks a flavor', async ({ page }) => {
     await page.goto('/?accent=viridian');
     await page.locator('[data-set="flavor:matins"]').click();
