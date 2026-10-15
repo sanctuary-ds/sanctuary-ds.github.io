@@ -30,7 +30,15 @@ export function initLectern(): void {
       } catch {
         // Corrupt storage: start again from this change.
       }
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, [axis]: value }));
+      const change: Record<string, string> = { [axis]: value };
+      // Changing the flavor keeps the accent on screen. Save that accent too, or a
+      // reload would fall back to the new flavor's own accent and look different;
+      // unless the accent itself is a preview, which must stay out of storage.
+      const accentIsPreview = new URLSearchParams(window.location.search).has('accent');
+      if (axis === 'flavor' && !saved.accent && !accentIsPreview) {
+        change.accent = root.getAttribute('data-san-accent') ?? '';
+      }
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...saved, ...change }));
     } catch {
       // Persisting is best effort: the theme still applies for this visit.
     }

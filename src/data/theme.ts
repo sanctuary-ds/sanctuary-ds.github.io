@@ -44,3 +44,11 @@ export const defaultTheme: Record<Axis, string> = {
   glazing: 'pot-metal',
   window: 'mono',
 };
+
+// The same guard for the starting theme: glazing and window are written here,
+// so a renamed value in the core must fail the build, not render "undefined".
+for (const [axis, value] of Object.entries(defaultTheme) as [Axis, string][]) {
+  if (!options[axis].includes(value)) {
+    throw new Error(`The default ${axis} "${value}" is not one of the core's ${axis} values: ${options[axis].join(', ')}.`);
+  }
+}
