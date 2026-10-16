@@ -131,6 +131,69 @@ test.describe('playground', () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(roleHex);
   });
 
+  test('the component panels are all there, and a disabled button cannot be pressed', async ({ page }) => {
+    await page.goto('/playground');
+    for (const title of ['Buttons', 'Chips', 'Form', 'Navigation', 'Progress', 'Status']) {
+      await expect(page.locator('#components .panel__title', { hasText: title })).toHaveCount(1);
+    }
+    await expect(page.locator('#components .card')).toHaveCount(1);
+    await expect(page.locator('#components .dialog')).toHaveCount(1);
+    await expect(page.locator('#components button', { hasText: 'Disabled' })).toBeDisabled();
+    await expect(page.getByRole('progressbar', { name: 'Glazing the north transept' })).toHaveAttribute('aria-valuenow', '64');
+  });
+
+  test('the tabs follow the ARIA tabs pattern, by mouse and by keyboard', async ({ page }) => {
+    await page.goto('/playground');
+    const tabs = page.locator('#components [role="tab"]');
+    const count = await tabs.count();
+    expect(count).toBeGreaterThan(1);
+    // Exactly one tab is selected and reachable with Tab; only its panel shows.
+    const expectSelected = async (index: number) => {
+      for (let i = 0; i < count; i++) {
+        const tab = tabs.nth(i);
+        const panel = page.locator(`#${await tab.getAttribute('aria-controls')}`);
+        await expect(tab).toHaveAttribute('aria-selected', String(i === index));
+        await expect(tab).toHaveAttribute('tabindex', i === index ? '0' : '-1');
+        await expect(panel).toHaveAttribute('role', 'tabpanel');
+        await (i === index ? expect(panel).toBeVisible() : expect(panel).toBeHidden());
+      }
+    };
+    await expectSelected(0);
+    await tabs.nth(2).click();
+    await expectSelected(2);
+    await page.keyboard.press('ArrowRight');
+    await expectSelected(3);
+    await expect(tabs.nth(3)).toBeFocused();
+    await page.keyboard.press('ArrowRight');
+    await expectSelected(0);
+    await page.keyboard.press('ArrowLeft');
+    await expectSelected(count - 1);
+    await page.keyboard.press('Home');
+    await expectSelected(0);
+    await page.keyboard.press('End');
+    await expectSelected(count - 1);
+  });
+
+  test('the light section shows every Lumen level on its own elevation, and the casts', async ({ page }) => {
+    await page.goto('/playground');
+    const levels = page.locator('#light .lumen--levels .tile');
+    await expect(levels).toHaveCount(6);
+    for (let level = 0; level < 6; level++) {
+      const tile = levels.nth(level);
+      await expect(tile.locator('b')).toHaveText(`Lumen ${level}`);
+      const [shadow, token] = await tile.evaluate((el, n) => {
+        const probe = document.createElement('i');
+        probe.style.boxShadow = `var(--san-elevation-${n})`;
+        el.parentElement!.append(probe);
+        const expected = getComputedStyle(probe).boxShadow;
+        probe.remove();
+        return [getComputedStyle(el).boxShadow, expected];
+      }, level);
+      expect(shadow, `Lumen ${level}`).toBe(token);
+    }
+    expect(await page.locator('#light .lumen--cast .tile b').allTextContents()).toEqual(['cast-sm', 'cast-md', 'cast-lg', 'halo']);
+  });
+
   for (const [name, viewport] of [['phone', { width: 375, height: 812 }], ['desktop', { width: 1440, height: 900 }]] as const) {
     test(`the page never scrolls sideways (${name})`, async ({ page }) => {
       await page.setViewportSize(viewport);

@@ -7,6 +7,12 @@ import { pigmentStyles, ramps, roles } from '../data/pigments';
 
 <style is:inline set:html={pigmentStyles}></style>
 
+<script>
+  // Copying reports to the page's toast (Toast.astro).
+  import { initCopy } from '../scripts/copy';
+  initCopy();
+</script>
+
 <div class="ramps">
   {
     ramps.map(({ id, name, note, tones }) => (

@@ -1,17 +1,29 @@
 ---
-// The showcase's button as a link: every visual decision comes from core tokens,
-// and `glazed` follows the glazing axis.
+// The showcase's button: a link when it has an href, a button otherwise. Every
+// visual decision comes from core tokens, and `glazed` follows the glazing axis.
 interface Props {
-  href: string;
-  variant?: 'glazed' | 'outline' | 'ghost';
+  href?: string;
+  variant?: 'glazed' | 'pane' | 'outline' | 'ghost' | 'danger';
   size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
   class?: string;
 }
 
-const { href, variant = 'glazed', size = 'md', class: className } = Astro.props;
+const { href, variant = 'glazed', size = 'md', disabled = false, class: className } = Astro.props;
+const classes = ['btn', `btn--${variant}`, size !== 'md' && `btn--${size}`, className];
 ---
 
-<a class:list={['btn', `btn--${variant}`, size !== 'md' && `btn--${size}`, className]} href={href}><slot /></a>
+{
+  href ? (
+    <a class:list={classes} href={href}>
+      <slot />
+    </a>
+  ) : (
+    <button class:list={classes} type="button" disabled={disabled}>
+      <slot />
+    </button>
+  )
+}
 
 <style>
   .btn {
@@ -44,6 +56,8 @@ const { href, variant = 'glazed', size = 'md', class: className } = Astro.props;
   .btn:active::after { background: var(--san-state-pressed); }
   .btn:active { translate: 0 1px; }
   .btn:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .btn:disabled { opacity: var(--san-state-disabled-content); filter: saturate(0.2); cursor: not-allowed; }
+  .btn:disabled::after { display: none; }
 
   .btn--sm { height: var(--san-size-control-sm); padding: 0 var(--san-space-3); font: var(--san-type-label-md); }
   .btn--lg { height: var(--san-size-control-lg); padding: 0 var(--san-space-6); font-size: 1rem; }
@@ -57,6 +71,8 @@ const { href, variant = 'glazed', size = 'md', class: className } = Astro.props;
   }
   .btn--glazed:hover { background: var(--san-glaze-sheen), var(--san-glaze-bg-hover); box-shadow: var(--san-cast-md), var(--san-elevation-2); }
   .btn--glazed::after { display: none; }
+  .btn--pane { background: var(--san-accent-pane); color: var(--san-accent-on-pane); }
+  .btn--danger { background: var(--san-danger); color: var(--san-danger-on); }
   .btn--outline { border-color: var(--san-lead-strong); }
   .btn--outline:hover { border-color: var(--san-accent); }
   .btn--ghost { color: var(--san-accent-ink); }

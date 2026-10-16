@@ -1,14 +1,10 @@
 ---
-// The page's one toast: a polite live region, so screen readers announce what
-// was copied without moving focus.
+// The page's one toast: a polite live region, so screen readers announce a
+// message (such as what was copied) without moving focus. Scripts write to it
+// through [data-toast].
 ---
 
 <div class="toast" role="status" aria-live="polite" data-toast></div>
-
-<script>
-  import { initCopy } from '../scripts/copy';
-  initCopy();
-</script>
 
 <style>
   .toast {
