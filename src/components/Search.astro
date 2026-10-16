@@ -13,11 +13,11 @@
 </button>
 
 <dialog class="search" aria-labelledby="search-title">
-  <form class="search__form" role="search" method="dialog">
+  <form class="search__form" role="search">
     <h2 class="search__title" id="search-title">Search</h2>
     <label class="search__label" for="search-query">Search the site</label>
     <input class="search__input" id="search-query" type="search" autocomplete="off" spellcheck="false" />
-    <button class="search__close" type="submit" value="close">Close</button>
+    <button class="search__close" type="button">Close</button>
   </form>
   <p class="search__status" role="status"></p>
   <ul class="search__results"></ul>
@@ -64,12 +64,13 @@
     void load();
   });
 
-  // Enter goes to the first result; only the close button closes the dialog.
+  // The form has no submit button, so Enter in the field submits it with no
+  // submitter: open the first result instead of reloading the page.
   dialog.querySelector('form')!.addEventListener('submit', (event) => {
-    if ((event as SubmitEvent).submitter?.classList.contains('search__close')) return;
     event.preventDefault();
     list.querySelector('a')?.click();
   });
+  dialog.querySelector('.search__close')!.addEventListener('click', () => dialog.close());
 
   // A click on the backdrop lands on the dialog itself, not on its content.
   dialog.addEventListener('click', (event) => {

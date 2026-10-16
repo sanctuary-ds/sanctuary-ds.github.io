@@ -18,6 +18,13 @@ test.describe('search', () => {
     await expect(dialog.getByRole('status')).toHaveText(/^\d+ results?/);
   });
 
+  test('the Close button closes the dialog', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Search' }).click();
+    await page.getByRole('dialog', { name: 'Search' }).getByRole('button', { name: 'Close' }).click();
+    await expect(page.getByRole('dialog')).toBeHidden();
+  });
+
   test('says when nothing matches', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Search' }).click();
@@ -34,13 +41,13 @@ test.describe('search', () => {
     await expect(page.getByRole('dialog')).toBeHidden();
     await expect(button).toBeFocused();
 
+    // A word whose first result is another page, so arriving there proves Enter worked.
     await button.click();
-    await page.getByLabel('Search the site').fill('glazing');
+    await page.getByLabel('Search the site').fill('procession');
     const first = page.locator('.search__result').first();
-    await expect(first).toBeVisible();
-    const target = new URL((await first.getAttribute('href'))!, page.url()).pathname;
+    await expect(first).toHaveAttribute('href', '/docs/foundations/motion/');
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL((url) => url.pathname === target);
+    await expect(page).toHaveURL(/\/docs\/foundations\/motion\/$/);
   });
 
   // Only the main content is indexed, so the header's words lead nowhere.
