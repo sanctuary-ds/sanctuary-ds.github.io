@@ -1,0 +1,48 @@
+---
+title: Accessibility
+description: The contrast and motion guarantees of the tokens, and what stays your job.
+section: reference
+order: 2
+---
+
+import ContrastTable from '../../components/docs/ContrastTable.astro';
+import { stilled } from '../../data/accessibility';
+
+Sanctuary keeps two promises in every flavor and with every accent: text and accent colors are legible against the stone they sit on, and motion stops when the visitor asks for less. The core's tests check both on every build, and this page computes them again from the published palette.
+
+## Contrast
+
+WCAG 2 asks for a contrast ratio of at least 4.5:1 for normal text (level AA) and 3:1 for focus indicators. For each pairing below, the table shows the lowest ratio across every pigment and every stone it covers, and the pair that gives it. `<p>` stands for any pigment, and the stones run from `surface-sunken` to `surface-raised-4`.
+
+<ContrastTable />
+
+Each pigment's ramp fixes the lightness of every tone across hues, which is why swapping the accent never breaks these ratios.
+
+### What the guarantees do not cover
+
+- **`lume` is light, not text.** `glass-<p>-lume` and `accent-lume` have no text guarantee. Use them for glows, hover and gradients, never for words.
+- **Glass on sunken stone.** On `surface-sunken` (inputs, wells), accent text uses `ink`, not the glass itself.
+- **Disabled text.** `text-disabled` is deliberately faint. WCAG exempts inactive controls, but never put content a visitor needs in it.
+- **Your own colors.** Colors mixed outside the tokens, text over images, and the named windows as backgrounds are not checked. Test what you build.
+- **Color alone.** Contrast makes color legible, not meaningful: a state shown only by color still needs a label, an icon or a shape.
+
+## Focus
+
+`--san-halo` draws the focus ring: a band of stone, then a ring of the accent. The accent clears 3:1 against `surface` in every flavor (the last row above). Use it on `:focus-visible`, so a ring appears for keyboard visitors without flashing on every click:
+
+```css
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--san-halo);
+}
+```
+
+## Reduced motion
+
+When the visitor asks for reduced motion (`prefers-reduced-motion: reduce`), the stylesheet sets these tokens, read from it at build time:
+
+<ul>
+  {stilled.map(({ name, value }) => <li><code>{name}</code>: <code>{value}</code></li>)}
+</ul>
+
+Anything timed with the duration tokens then changes instantly. Animations and durations written without the tokens are not covered: time them with the tokens, or stop them yourself under the same media query. See the [motion foundations](/docs/foundations/motion) for the details.
