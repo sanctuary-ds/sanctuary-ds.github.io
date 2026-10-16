@@ -37,3 +37,25 @@ test.describe('search engines', () => {
     });
   }
 });
+
+// The brand rose, the organization's profile picture, as the site's icon.
+test.describe('icons', () => {
+  test('the page links its SVG favicon and its touch icon, and both are served', async ({ page, request }) => {
+    await page.goto('/');
+    for (const [rel, href, type] of [
+      ['icon', '/favicon.svg', 'image/svg+xml'],
+      ['apple-touch-icon', '/apple-touch-icon.png', 'image/png'],
+    ]) {
+      await expect(page.locator(`link[rel="${rel}"]`)).toHaveAttribute('href', href);
+      const response = await request.get(href);
+      expect(response.ok(), href).toBe(true);
+      expect(response.headers()['content-type'], href).toContain(type);
+    }
+  });
+
+  // Browsers and tools still ask for /favicon.ico on their own.
+  test('a favicon.ico is served for clients that ask for it', async ({ request }) => {
+    const response = await request.get('/favicon.ico');
+    expect(response.ok()).toBe(true);
+  });
+});
