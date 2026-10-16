@@ -48,16 +48,21 @@ const productName: Record<string, string> = Object.fromEntries(products.map(({ i
             <section class="horizon" data-horizon={id} aria-labelledby={`horizon-${id}`}>
               <h3 id={`horizon-${id}`}>{name}</h3>
               <p class="horizon__note">{note}</p>
-              <ul>
-                {items
-                  .filter((item) => item.horizon === id)
-                  .map((item) => (
-                    <li>
-                      <span class="item__text">{item.text}</span>
-                      {item.product && <span class="item__product">{productName[item.product]}</span>}
-                    </li>
-                  ))}
-              </ul>
+              {items.some((item) => item.horizon === id) ? (
+                <ul>
+                  {items
+                    .filter((item) => item.horizon === id)
+                    .map((item) => (
+                      <li>
+                        <span class="item__text">{item.text}</span>
+                        {item.product && <span class="item__product">{productName[item.product]}</span>}
+                      </li>
+                    ))}
+                </ul>
+              ) : (
+                // A horizon can be empty for a while; say so rather than show nothing.
+                <p class="horizon__empty">Nothing right now.</p>
+              )}
             </section>
           ))
         }
@@ -129,6 +134,7 @@ const productName: Record<string, string> = Object.fromEntries(products.map(({ i
   .horizon[data-horizon='exploring'] { border-style: dashed; background: transparent; }
   .horizon h3 { margin: 0; font: var(--san-type-title-lg); }
   .horizon__note { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+  .horizon__empty { grid-column: 2; grid-row: 1 / span 2; margin: 0; color: var(--san-text-muted); }
   .horizon ul { display: grid; grid-column: 2; grid-row: 1 / span 2; align-content: start; gap: var(--san-space-3); margin: 0; padding: 0; list-style: none; }
   .horizon li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--san-space-1) var(--san-space-4); }
   .item__text { flex: 1 1 24rem; }
@@ -136,6 +142,6 @@ const productName: Record<string, string> = Object.fromEntries(products.map(({ i
 
   @media (max-width: 48rem) {
     .horizon { grid-template-columns: 1fr; }
-    .horizon ul { grid-column: 1; grid-row: auto; margin-top: var(--san-space-3); }
+    .horizon :is(ul, .horizon__empty) { grid-column: 1; grid-row: auto; margin-top: var(--san-space-3); }
   }
 </style>

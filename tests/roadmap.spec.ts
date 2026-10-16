@@ -28,6 +28,7 @@ test.describe('roadmap', () => {
       const entries = items.filter((item) => item.horizon === horizon.id);
       const rows = sections.nth(index).locator('li');
       await expect(rows).toHaveCount(entries.length);
+      if (entries.length === 0) await expect(sections.nth(index).locator('.horizon__empty')).toHaveText('Nothing right now.');
       for (const [row, item] of entries.entries()) {
         await expect(rows.nth(row).locator('.item__text')).toHaveText(item.text);
         const tag = products.find((product) => product.id === item.product)?.name;

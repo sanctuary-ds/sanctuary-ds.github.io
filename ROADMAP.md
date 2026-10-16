@@ -17,6 +17,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 |-------|--------|--------|
 | Generator | [Astro](https://astro.build/), static output | No server; content in Markdown and MDX |
 | Search | [Pagefind](https://pagefind.app/), indexed at build time | Static, no external service |
+| Tests | [Playwright](https://playwright.dev/), with [axe](https://github.com/dequelabs/axe-core) auditing every page in every flavor | The built site is tested as visitors get it; WCAG rules run in CI |
 | UI | Astro components styled with the Sanctuary stylesheet | No UI framework until Sanctuary Web Components exist; then the site uses them |
 | Deploy | GitHub Pages through `withastro/action` | Official action, no extra hosting |
 | Package manager | pnpm | Same as the core |
@@ -100,10 +101,10 @@ Each phase is deployable on its own.
 
 ### Phase 3: Documentation
 
-- [ ] Getting started, philosophy, foundations, accessibility, guides.
-- [ ] Token reference generated from the DTCG files.
-- [ ] Pagefind search.
-- [ ] Automated accessibility check in CI.
+- [x] Getting started, philosophy, foundations, accessibility, guides.
+- [x] Token reference generated from the DTCG files.
+- [x] Pagefind search.
+- [x] Automated accessibility check in CI.
 - [x] Switch to `@sanctuary-ds/tokens` from npm once `0.1.0` is published.
 
 ### Phase 4: Spanish
