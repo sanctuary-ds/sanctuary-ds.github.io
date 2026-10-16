@@ -83,7 +83,7 @@ test.describe('playground', () => {
     }
   });
 
-  test('the roles show the current flavor\'s hex, and their swatch is that colour', async ({ page }) => {
+  test('the roles show the current flavor\'s hex, and their swatch is that color', async ({ page }) => {
     await page.goto('/playground');
     const roles = page.locator('#pigments .role');
     expect(await roles.count()).toBeGreaterThan(0);
@@ -92,7 +92,7 @@ test.describe('playground', () => {
       for (const role of await roles.all()) {
         const name = await role.locator('b').textContent();
         await expect(role.locator('code:visible')).toHaveText(colors[name!].hex);
-        // The core writes colours in OKLCH; a canvas turns any of them into sRGB
+        // The core writes colors in OKLCH; a canvas turns any of them into sRGB
         // bytes, compared with the hex allowing one step of rounding per channel.
         // Polled, because the theme change is animated.
         await expect
@@ -221,7 +221,7 @@ test.describe('playground', () => {
     await page.goto('/playground');
     await expect(page.locator('#rice .desktop .win')).toHaveCount(2);
     await expect(page.locator('#rice .code')).toContainText('customElements');
-    // The code is injected as HTML, so check that its syntax colours still apply.
+    // The code is injected as HTML, so check that its syntax colors still apply.
     const [keyword, token] = await page.locator('#rice .code .k').first().evaluate((el) => {
       const probe = document.createElement('i');
       probe.style.color = 'var(--san-syntax-keyword)';

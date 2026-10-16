@@ -60,7 +60,7 @@ test.describe('lectern controls', () => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto('/', { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
-    // Controls of different heights are centred, so compare vertical ranges, not tops.
+    // Controls of different heights are centered, so compare vertical ranges, not tops.
     const boxes = await page.locator('.lectern__controls .control').evaluateAll((controls) =>
       controls.map((control) => {
         const { top, bottom } = control.getBoundingClientRect();

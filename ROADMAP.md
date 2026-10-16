@@ -7,8 +7,8 @@ This document is the brief for whoever builds the site. Read it before changing 
 ## Principles
 
 - **Ship only what exists.** No page appears before what it documents is real. Planned parts of the ecosystem may be listed, disabled, and point to `/roadmap`, which says honestly what is planned.
-- **Generate, do not copy.** Anything derived from the core (token tables, colour swatches, contrast pairs) is generated at build time from the core package, never written by hand.
-- **The core owns the design.** The site consumes tokens; it never defines colours, contrast or token names of its own. A missing token is requested in the core, not patched here.
+- **Generate, do not copy.** Anything derived from the core (token tables, color swatches, contrast pairs) is generated at build time from the core package, never written by hand.
+- **The core owns the design.** The site consumes tokens; it never defines colors, contrast or token names of its own. A missing token is requested in the core, not patched here.
 - **Small, reviewable steps.** Each phase lands as one pull request made of small Conventional Commits.
 
 ## Stack
@@ -63,7 +63,7 @@ The showcase moves from the core into this repository: it becomes `/playground`,
 /roadmap               What exists and what is planned
 /docs/getting-started  Install and first use
 /docs/philosophy       The design language
-/docs/foundations/*    Colour, type, shape, light, motion
+/docs/foundations/*    Color, type, shape, light, motion
 /docs/tokens           Generated token reference
 /docs/accessibility    Contrast and motion guarantees
 /docs/guides/*         Theming an app, writing a port

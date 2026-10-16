@@ -35,7 +35,7 @@ export const roles = ROLE_NAMES.map((role) => ({
   hexes: flavors.map((flavor) => {
     const hex = colors(flavor)[role]?.hex;
     // A role the core renamed or dropped would otherwise show an empty swatch.
-    if (!hex) throw new Error(`Flavor "${flavor}" has no colour "${role}" in the core palette.`);
+    if (!hex) throw new Error(`Flavor "${flavor}" has no color "${role}" in the core palette.`);
     return { flavor, hex };
   }),
 }));

@@ -2,7 +2,7 @@
 // The rose window, carried over from the core showcase. Its geometry is computed
 // at build time, so the page ships plain SVG and no script. Panes are filled with
 // the window tokens, so the rose follows the accent and the window axis. `cast`
-// draws only the glass, as the coloured light thrown on the floor below it.
+// draws only the glass, as the colored light thrown on the floor below it.
 interface Props {
   cast?: boolean;
 }
@@ -20,7 +20,7 @@ const petal = (r1: number, r2: number, deg: number, half: number) =>
   `M${at(r1, deg - half)}A${r1} ${r1} 0 0 1 ${at(r1, deg + half)}Q${at(r2 * 0.86, deg + half * 0.95)} ${at(r2, deg)}Q${at(r2 * 0.86, deg - half * 0.95)} ${at(r1, deg - half)}Z`;
 
 // `i` staggers each pane's shimmer (animation-delay: i × -0.55s). The offsets per
-// ring are the showcase's, so neighbouring rings never pulse in step.
+// ring are the showcase's, so neighboring rings never pulse in step.
 type Pane = { d?: string; circle?: readonly [number, number, number]; fill: string; i: number };
 const panes: Pane[] = [];
 const outer = ['window-a', 'window-b', 'window-c', 'window-b'];
