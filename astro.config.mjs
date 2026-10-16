@@ -1,3 +1,4 @@
+import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 
@@ -33,4 +34,6 @@ export default defineConfig({
     },
   },
   fonts,
+  // Lists every page for search engines, from `site`; robots.txt points to it.
+  integrations: [sitemap()],
 });
