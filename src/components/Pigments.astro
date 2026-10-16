@@ -1,0 +1,117 @@
+---
+// The pigment ramps and the current flavor's roles. A ramp's name sets the
+// accent; every tone and role copies its hex. Which tone is marked and which hex
+// a role shows follow the flavor through pigmentStyles (src/data/pigments.ts).
+import { pigmentStyles, ramps, roles } from '../data/pigments';
+---
+
+<style is:inline set:html={pigmentStyles}></style>
+
+<div class="ramps">
+  {
+    ramps.map(({ id, name, note, tones }) => (
+      <div class="ramp" data-pigment={id}>
+        <button class="ramp__name" type="button" data-set={`accent:${id}`}>
+          <b>{name}</b>
+          <span>{note}</span>
+        </button>
+        <div class="ramp__tones">
+          {tones.map(({ tone, hex, glassIn }) => (
+            <button class="tone" type="button" data-copy={hex} data-glass-in={glassIn} style={`background: ${hex}`} aria-label={`Copy ${name} ${tone}, ${hex}`} title={`${name} ${tone} · ${hex}`}>
+              <span aria-hidden="true">{tone}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    ))
+  }
+</div>
+
+<h3 class="sub">Stone, lead and ink of this flavor</h3>
+<div class="roles">
+  {
+    roles.map(({ role, hexes }) => (
+      <button class="role" type="button" data-copy-current>
+        <i style={`background: var(--san-${role})`} />
+        <b>{role}</b>
+        {hexes.map(({ flavor, hex }) => (
+          <code data-for-flavor={flavor}>{hex}</code>
+        ))}
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  .ramps { display: grid; gap: var(--san-space-2); }
+  .ramp { display: grid; grid-template-columns: 17rem minmax(0, 1fr); gap: var(--san-space-4); align-items: center; }
+
+  .ramp__name {
+    display: grid;
+    gap: var(--san-space-half);
+    padding: var(--san-space-1) var(--san-space-2);
+    border: 0;
+    border-radius: var(--san-radius-xs);
+    background: none;
+    color: var(--san-text);
+    text-align: left;
+    cursor: pointer;
+  }
+  .ramp__name:hover { background: var(--san-surface-raised-2); }
+  .ramp__name[aria-pressed='true'] b { color: var(--san-accent-ink); }
+  .ramp__name b { font: var(--san-type-title-md); }
+  .ramp__name span { font: var(--san-type-label-md); color: var(--san-text-subtle); }
+
+  .ramp__tones {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    gap: var(--san-border-width-came);
+    padding: var(--san-border-width-came);
+    border-radius: var(--san-radius-xs);
+    background: var(--san-lead-came);
+  }
+
+  .tone {
+    position: relative;
+    height: 2.75rem;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+  }
+  /* Difference blending keeps the tone number legible on any tone. */
+  .tone span { font: var(--san-type-label-sm); color: white; mix-blend-mode: difference; opacity: 0; }
+  .tone:hover span,
+  .tone:focus-visible span { opacity: 0.9; }
+  .tone:hover { z-index: 1; box-shadow: var(--san-elevation-3); }
+  .tone:focus-visible { z-index: 2; outline: none; box-shadow: var(--san-halo); }
+  @media (prefers-reduced-motion: no-preference) {
+    .tone { transition: scale var(--san-duration-fast) var(--san-ease-enter); }
+    .tone:hover { scale: 1.12; }
+  }
+
+  .sub { margin: var(--san-space-12) 0 var(--san-space-3); font: var(--san-type-headline-sm); }
+
+  .roles { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: var(--san-space-3); }
+  .role {
+    display: grid;
+    gap: var(--san-space-half);
+    padding: var(--san-space-2);
+    border: var(--san-border-width-hairline) solid var(--san-lead-soft);
+    border-radius: var(--san-radius-sm);
+    background: var(--san-surface-raised-1);
+    color: var(--san-text);
+    text-align: left;
+    cursor: pointer;
+  }
+  .role:hover { border-color: var(--san-lead-strong); }
+  .role:focus-visible,
+  .ramp__name:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .role i { height: 3rem; margin-bottom: var(--san-space-1); border: var(--san-border-width-hairline) solid var(--san-lead); border-radius: var(--san-radius-xs); }
+  .role b { font: var(--san-type-label-md); }
+  .role code { font: var(--san-type-code-sm); color: var(--san-text-subtle); }
+
+  @media (max-width: 64rem) {
+    .ramp { grid-template-columns: 1fr; gap: var(--san-space-1); }
+  }
+</style>

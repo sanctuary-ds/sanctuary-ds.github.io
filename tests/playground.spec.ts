@@ -56,6 +56,81 @@ test.describe('playground', () => {
     expect(tops).toBe(1);
   });
 
+  test('every pigment ramp follows the palette, and its name sets the accent', async ({ page }) => {
+    await page.goto('/playground');
+    const pigments = Object.entries(palette.pigments as Record<string, { tones: Record<string, string> }>);
+    const ramps = page.locator('#pigments .ramp');
+    await expect(ramps).toHaveCount(pigments.length);
+    for (const [index, [id, pigment]] of pigments.entries()) {
+      const tones = ramps.nth(index).locator('.tone');
+      expect(await tones.evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.copy))).toEqual(Object.values(pigment.tones));
+      await expect(ramps.nth(index).locator('.ramp__name')).toHaveAttribute('data-set', `accent:${id}`);
+    }
+    await page.locator('#pigments [data-set="accent:verdure"]').click();
+    await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'verdure');
+  });
+
+  test('in every flavor, each ramp marks the one tone that flavor uses as its glass', async ({ page }) => {
+    await page.goto('/playground');
+    for (const [flavor, { colors }] of Object.entries(palette.flavors as Record<string, { colors: Record<string, { hex: string }> }>)) {
+      await page.locator(`.lectern [data-set="flavor:${flavor}"]`).click();
+      for (const id of Object.keys(palette.pigments)) {
+        const marked = await page
+          .locator(`#pigments .ramp[data-pigment="${id}"] .tone`)
+          .evaluateAll((els) => els.filter((el) => getComputedStyle(el).outlineStyle !== 'none').map((el) => (el as HTMLElement).dataset.copy));
+        expect(marked, `${flavor} ${id}`).toEqual([colors[`glass-${id}`].hex]);
+      }
+    }
+  });
+
+  test('the roles show the current flavor\'s hex, and their swatch is that colour', async ({ page }) => {
+    await page.goto('/playground');
+    const roles = page.locator('#pigments .role');
+    expect(await roles.count()).toBeGreaterThan(0);
+    for (const [flavor, { colors }] of Object.entries(palette.flavors as Record<string, { colors: Record<string, { hex: string }> }>)) {
+      await page.locator(`.lectern [data-set="flavor:${flavor}"]`).click();
+      for (const role of await roles.all()) {
+        const name = await role.locator('b').textContent();
+        await expect(role.locator('code:visible')).toHaveText(colors[name!].hex);
+        // The core writes colours in OKLCH; a canvas turns any of them into sRGB
+        // bytes, compared with the hex allowing one step of rounding per channel.
+        // Polled, because the theme change is animated.
+        await expect
+          .poll(
+            () =>
+              role.locator('i').evaluate((el, hex) => {
+                const context = document.createElement('canvas').getContext('2d')!;
+                context.fillStyle = getComputedStyle(el).backgroundColor;
+                context.fillRect(0, 0, 1, 1);
+                const shown = context.getImageData(0, 0, 1, 1).data;
+                return Math.max(...[0, 1, 2].map((i) => Math.abs(shown[i] - parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16))));
+              }, colors[name!].hex),
+            { message: `${flavor} ${name}` },
+          )
+          .toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  test('a tone or a role copies its hex and says so', async ({ page, context }) => {
+    await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+    await page.goto('/playground');
+    const toast = page.getByRole('status');
+    const tone = page.locator('#pigments .tone').first();
+    const hex = (await tone.getAttribute('data-copy'))!;
+    await tone.click();
+    await expect(toast).toHaveText(`Copied ${hex}`);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(hex);
+
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
+    const role = page.locator('#pigments .role').first();
+    const name = (await role.locator('b').textContent())!;
+    const roleHex = palette.flavors.lauds.colors[name].hex;
+    await role.click();
+    await expect(toast).toHaveText(`Copied ${roleHex}`);
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(roleHex);
+  });
+
   for (const [name, viewport] of [['phone', { width: 375, height: 812 }], ['desktop', { width: 1440, height: 900 }]] as const) {
     test(`the page never scrolls sideways (${name})`, async ({ page }) => {
       await page.setViewportSize(viewport);
