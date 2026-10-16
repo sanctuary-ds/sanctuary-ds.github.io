@@ -3,6 +3,7 @@
 // a new flavor, pigment, glazing or window mode appears here on its own. Only
 // the last column, which explains each axis, is written by hand.
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
 
 interface Value {
   id: string;
@@ -49,7 +50,8 @@ const rows: { attribute: string; values: Value[]; changes: string }[] = [
 ];
 ---
 
-<table>
+<ScrollBox label="Theme attributes">
+<table class="data">
   <thead>
     <tr><th>Attribute</th><th>Values</th><th>What it changes</th></tr>
   </thead>
@@ -73,3 +75,8 @@ const rows: { attribute: string; values: Value[]; changes: string }[] = [
     }
   </tbody>
 </table>
+</ScrollBox>
+
+<style>
+  .data { width: 100%; margin: 0; }
+</style>

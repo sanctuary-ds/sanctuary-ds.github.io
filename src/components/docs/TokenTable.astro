@@ -3,6 +3,7 @@
 // flavor when it changes with the flavor. Used by the token reference and by
 // the foundations pages, from the data in src/data/tokens.ts.
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
 import { flavors, tokensOf, type Token } from '../../data/tokens';
 
 interface Props {
@@ -11,9 +12,12 @@ interface Props {
   groups?: string[];
   /** The heading of the value column. */
   value?: string;
+  /** What the table holds, for its scrolling region; by default its groups. */
+  label?: string;
 }
 
 const { groups = [], value = 'Value' } = Astro.props;
+const label = Astro.props.label ?? `Tokens: ${groups.join(', ')}`;
 const tokens = Astro.props.tokens ?? tokensOf(groups);
 if (tokens.length === 0) throw new Error(`No tokens to show for the group(s) ${groups.join(', ')}.`);
 
@@ -22,7 +26,7 @@ const byFlavor = tokens.some((token) => token.byFlavor);
 const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
 ---
 
-<div class="scroll">
+<ScrollBox label={label}>
   <table class:list={['tokens', byFlavor && 'tokens--flavors']}>
     <thead>
       <tr>
@@ -52,11 +56,9 @@ const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'st
       }
     </tbody>
   </table>
-</div>
+</ScrollBox>
 
 <style>
-  /* Wide tables scroll inside their own box, never the page. */
-  .scroll { overflow-x: auto; margin: 0 0 var(--san-space-4); }
   .tokens { width: 100%; margin: 0; }
   /* The name column hugs its names, so values sit close to them. */
   .tokens th[scope='row'] { width: 1%; font: inherit; }

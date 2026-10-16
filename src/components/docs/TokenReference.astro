@@ -34,7 +34,7 @@ const foldNote = (groups: string[], key: string) => groups.map((group) => groupN
       <h2 id={id}>{title}</h2>
       {notes(groups).map(([, note]) => <p>{note}</p>)}
       {blocks(groups).map(({ key, tokens }) => {
-        const table = <TokenTable tokens={tokens} />;
+        const table = <TokenTable tokens={tokens} label={key ? `${title}: ${key}` : title} />;
         return key ? (
           <details>
             <summary>
@@ -57,7 +57,7 @@ const foldNote = (groups: string[], key: string) => groups.map((group) => groupN
     The DTCG format has no color functions and no clip paths, so these tokens exist only in the stylesheet. They are computed from the flavor, accent,
     glazing and window, and the value shown is the stylesheet's first declaration.
   </p>
-  <TokenTable tokens={cssOnly} value="Declaration" />
+  <TokenTable tokens={cssOnly} value="Declaration" label="CSS only" />
 </section>
 
 <style>

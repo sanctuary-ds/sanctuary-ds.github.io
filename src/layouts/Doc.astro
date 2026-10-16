@@ -100,8 +100,11 @@ const current = (href: string) => (href === here ? 'page' : undefined);
   .prose :global(a:focus-visible) { outline: none; border-radius: var(--san-radius-xs); box-shadow: var(--san-halo); }
   .prose :global(code) { font: var(--san-type-code-md); }
   .prose :global(:not(pre) > code) { padding: 0 var(--san-space-1); border-radius: var(--san-radius-xs); background: var(--san-surface-sunken); }
+  /* Long lines wrap instead of scrolling, so every line can be read without a
+     scrolling box that a keyboard would first need to focus. */
   .prose :global(pre) {
-    overflow-x: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
     padding: var(--san-space-4);
     border: var(--san-border-width-hairline) solid var(--san-lead-soft);
     border-left: var(--san-border-width-heavy) solid var(--san-accent);

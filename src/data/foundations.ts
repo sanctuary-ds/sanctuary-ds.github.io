@@ -6,6 +6,8 @@ import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 // Only explanations that are design prose, not data, are written here.
 
 export interface Table {
+  /** What the table holds, for its scrolling region. */
+  label: string;
   headers: string[];
   rows: string[][];
   /** Whether the first column holds ids, shown as code. */
@@ -19,6 +21,7 @@ const flavors = palette.flavors as Record<string, Flavor>;
 const pigments = palette.pigments as Record<string, Pigment>;
 
 const flavorsTable: Table = {
+  label: 'Flavors',
   headers: ['Flavor', 'Hour', 'Scheme', 'Default accent', 'Character'],
   rows: Object.entries(flavors).map(([id, flavor]) => [
     id,
@@ -31,6 +34,7 @@ const flavorsTable: Table = {
 };
 
 const pigmentsTable: Table = {
+  label: 'Pigments',
   headers: ['Pigment', 'Hue', 'Note'],
   rows: Object.entries(pigments).map(([id, pigment]) => [id, `${pigment.hue}°`, pigment.note]),
   ids: true,
@@ -63,6 +67,7 @@ const toneOf = (flavorId: string, suffix: string) => {
 };
 
 const glassRolesTable: Table = {
+  label: 'Glass roles',
   headers: ['Role', 'Purpose', ...Object.values(flavors).map(({ name }) => name)],
   rows: roles.map(({ suffix, role, purpose }) => [role, purpose, ...Object.keys(flavors).map((id) => toneOf(id, suffix))]),
   ids: true,
@@ -70,6 +75,7 @@ const glassRolesTable: Table = {
 
 type Named = { name: string; note: string };
 const glazingsTable: Table = {
+  label: 'Glazings',
   headers: ['Glazing', 'Name', 'Technique and rendering'],
   rows: Object.entries(palette.glazings as Record<string, Named>).map(([id, { name, note }]) => [
     id,
@@ -80,6 +86,7 @@ const glazingsTable: Table = {
 };
 
 const windowModesTable: Table = {
+  label: 'Window modes',
   headers: ['Window', 'Name', 'Light from', 'Note'],
   rows: Object.entries(palette.windowModes as Record<string, Named & { source: string }>).map(([id, { name, source, note }]) => [
     id,
@@ -91,6 +98,7 @@ const windowModesTable: Table = {
 };
 
 const namedWindowsTable: Table = {
+  label: 'Named windows',
   headers: ['Window', 'Name', 'Pigments', 'Character'],
   rows: Object.entries(palette.windows as Record<string, Named & { stops: string[] }>).map(([id, { name, stops, note }]) => [
     `window-${id}`,
@@ -111,6 +119,7 @@ const fontReasons: Record<string, string> = {
 
 type Font = { family: string; fallbacks: string[]; generic: string; weights: number[] };
 const fontsTable: Table = {
+  label: 'Font families',
   headers: ['Role', 'Family', 'Fallbacks', 'Weights', 'Why'],
   rows: Object.entries(palette.fonts as Record<string, Font>).map(([role, font]) => [
     role,

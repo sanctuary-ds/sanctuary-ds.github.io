@@ -3,12 +3,13 @@
 // pairing the core tests, the lowest ratio in each flavor and the pair that
 // gives it (src/data/accessibility.ts).
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
 import { lowest, pairings, ratioText } from '../../data/accessibility';
 
 const flavors = Object.entries(palette.flavors as Record<string, { name: string }>);
 ---
 
-<div class="scroll">
+<ScrollBox label="Contrast guarantees">
   <table class="data contrast">
     <thead>
       <tr>
@@ -37,10 +38,9 @@ const flavors = Object.entries(palette.flavors as Record<string, { name: string 
       }
     </tbody>
   </table>
-</div>
+</ScrollBox>
 
 <style>
-  .scroll { overflow-x: auto; margin: 0 0 var(--san-space-4); }
   .data { width: 100%; margin: 0; }
   .data th[scope='row'] { font: inherit; min-width: 10rem; }
   .data th[scope='col'] { white-space: nowrap; }

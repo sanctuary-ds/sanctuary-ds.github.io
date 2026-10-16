@@ -1,0 +1,17 @@
+---
+// A box that scrolls sideways when its table is wider than the column. It takes
+// the keyboard focus and is a named region, so a keyboard user can reach it and
+// scroll it with the arrow keys (WCAG 2.1.1).
+interface Props {
+  label: string;
+}
+---
+
+<div class="scroll" tabindex="0" role="region" aria-label={Astro.props.label}>
+  <slot />
+</div>
+
+<style>
+  .scroll { overflow-x: auto; margin: 0 0 var(--san-space-4); border-radius: var(--san-radius-xs); }
+  .scroll:focus-visible { outline: none; box-shadow: var(--san-halo); }
+</style>
