@@ -1,0 +1,35 @@
+---
+// The documentation's front page: every page, by section, with what it covers.
+import Doc from '../../layouts/Doc.astro';
+import { docHref, docsBySection } from '../../data/docs';
+
+const sections = await docsBySection();
+---
+
+<Doc title="Documentation" description="How to install Sanctuary, use its tokens and build on them." inscription="Build with the tokens">
+  <p>
+    To try every axis live, open the <a href="/playground">playground</a>. These pages explain what you see there and how to use it in your own work.
+  </p>
+  {
+    sections.map((section) => (
+      <section class="index-section" aria-labelledby={`docs-${section.id}`}>
+        <h2 id={`docs-${section.id}`}>{section.name}</h2>
+        <ul class="index">
+          {section.docs.map((doc) => (
+            <li class="index__item">
+              <a href={docHref(doc)}>{doc.data.title}</a>
+              <span>{doc.data.description}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))
+  }
+</Doc>
+
+<style>
+  .index { display: grid; gap: var(--san-space-5); padding: 0; list-style: none; }
+  .index__item { display: grid; gap: var(--san-space-1); }
+  .index a { font: var(--san-type-title-md); }
+  .index span { color: var(--san-text-muted); }
+</style>

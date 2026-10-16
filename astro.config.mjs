@@ -34,6 +34,9 @@ export default defineConfig({
     },
   },
   fonts,
+  // Code blocks stay plain text styled with the tokens (src/layouts/Doc.astro): a
+  // fixed highlighting theme would ignore the flavor and could fail its contrast.
+  markdown: { syntaxHighlight: false },
   // Lists every page for search engines, from `site`; robots.txt points to it.
   integrations: [sitemap()],
 });

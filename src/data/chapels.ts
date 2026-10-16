@@ -36,7 +36,7 @@ export const chapels: Chapel[] = [
     href: '/docs',
     cta: 'Read the docs',
     accent: 'gilt',
-    available: false,
+    available: true,
   },
   {
     id: 'roadmap',

@@ -1,0 +1,75 @@
+import { createRequire } from 'node:module';
+import { expect, test } from '@playwright/test';
+import { chapel } from '../src/data/chapels';
+import { sections } from '../src/data/doc-sections';
+import { docFiles } from './docs-content';
+
+// The documentation: an index of every page by section, and each page with its
+// title and the same index beside it.
+
+const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
+
+const ordered = sections.flatMap(({ id }) => docFiles.filter((doc) => doc.section === id).sort((a, b) => a.order - b.order));
+
+test.describe('docs', () => {
+  test('the Docs chapel leads to the documentation', async ({ page }) => {
+    expect(chapel('docs').available).toBe(true);
+    await page.goto(chapel('docs').href);
+    await expect(page.locator('h1')).toHaveText('Documentation');
+  });
+
+  test('the overview lists every page, by section, in order', async ({ page }) => {
+    await page.goto('/docs');
+    const links = page.locator('.index a');
+    expect(await links.allTextContents()).toEqual(ordered.map((doc) => doc.title));
+    for (const [index, doc] of ordered.entries()) await expect(links.nth(index)).toHaveAttribute('href', doc.path);
+  });
+
+  for (const doc of docFiles) {
+    test(`${doc.path} shows its title and marks itself in the index`, async ({ page }) => {
+      await page.goto(doc.path);
+      await expect(page.locator('h1')).toHaveText(doc.title);
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', doc.description);
+      const nav = page.getByRole('navigation', { name: 'Documentation' });
+      expect(await nav.locator('li a').allTextContents()).toEqual(ordered.map((entry) => entry.title));
+      await expect(nav.locator('[aria-current="page"]')).toHaveText(doc.title);
+    });
+  }
+
+  // On a phone the page opens on its text; the index follows it.
+  test('the index comes after the text in the document', async ({ page }) => {
+    await page.goto(ordered[0].path);
+    const order = await page.evaluate(() => {
+      const main = document.querySelector('main')!;
+      const nav = document.querySelector('nav[aria-label="Documentation"]')!;
+      return main.compareDocumentPosition(nav) & Node.DOCUMENT_POSITION_FOLLOWING;
+    });
+    expect(order).toBeTruthy();
+  });
+});
+
+test.describe('getting started', () => {
+  // The install steps as the core's README gives them.
+  test('shows the pnpm install, the CSS import and the CDN link', async ({ page }) => {
+    await page.goto('/docs/getting-started');
+    const code = await page.locator('pre code').allTextContents();
+    expect(code).toContain('pnpm add @sanctuary-ds/tokens\n');
+    expect(code).toContain("import '@sanctuary-ds/tokens/css';\n");
+    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.1/dist/css/sanctuary.css">\n');
+  });
+
+  // The table is written by hand; this keeps it in step with the core.
+  test('lists every value of every attribute in the palette', async ({ page }) => {
+    await page.goto('/docs/getting-started');
+    const values = {
+      'data-san-flavor': Object.keys(palette.flavors),
+      'data-san-accent': Object.keys(palette.pigments),
+      'data-san-glazing': Object.keys(palette.glazings),
+      'data-san-window': Object.keys(palette.windowModes),
+    };
+    for (const [attribute, ids] of Object.entries(values)) {
+      const row = page.locator('tr', { has: page.locator('td:first-child code', { hasText: attribute }) });
+      expect((await row.locator('td:nth-child(2) code').allTextContents()).sort()).toEqual([...ids].sort());
+    }
+  });
+});
