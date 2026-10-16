@@ -1,0 +1,55 @@
+---
+// Lumen: each level pairs a lighter stone with a deeper umbra (elevation-N). The
+// stone stops brightening at level 4, where Lauds already reaches white, so
+// level 5 only deepens the umbra. Cast is the separate, coloured glow of glass.
+const surfaces = ['surface', 'surface-raised-1', 'surface-raised-2', 'surface-raised-3', 'surface-raised-4', 'surface-raised-4'];
+const levels = surfaces.map((surface, level) => ({
+  level,
+  surface,
+  label: level === 5 ? 'raised-4, deeper umbra' : surface.replace('surface-', ''),
+}));
+const casts = [
+  { token: 'cast-sm', use: 'focus, chips' },
+  { token: 'cast-md', use: 'hovered glass' },
+  { token: 'cast-lg', use: 'heroes, active windows' },
+  { token: 'halo', use: 'focus ring' },
+];
+---
+
+<div class="lumen lumen--levels">
+  {
+    levels.map(({ level, surface, label }) => (
+      <div class="tile" style={`background: var(--san-${surface}); box-shadow: var(--san-elevation-${level})`}>
+        <b>Lumen {level}</b>
+        <span>{label}</span>
+      </div>
+    ))
+  }
+</div>
+<div class="lumen lumen--cast">
+  {
+    casts.map(({ token, use }) => (
+      <div class="tile tile--cast" style={`box-shadow: var(--san-${token})`}>
+        <b>{token}</b>
+        <span>{use}</span>
+      </div>
+    ))
+  }
+</div>
+
+<style>
+  .lumen { display: grid; grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr)); gap: var(--san-space-8); padding: var(--san-space-8); border-radius: var(--san-radius-lg); background: var(--san-surface-sunken); }
+  .lumen--cast { margin-top: var(--san-space-6); }
+  .tile {
+    display: grid;
+    align-content: end;
+    gap: var(--san-space-half);
+    height: 7.5rem;
+    padding: var(--san-space-4);
+    border: var(--san-border-width-hairline) solid var(--san-lead-soft);
+    border-radius: var(--san-radius-md);
+  }
+  .tile b { font: var(--san-type-title-sm); }
+  .tile span { font: var(--san-type-label-md); color: var(--san-text-subtle); }
+  .tile--cast { border-color: color-mix(in oklch, var(--san-accent) 45%, transparent); background: var(--san-surface-raised-2); }
+</style>

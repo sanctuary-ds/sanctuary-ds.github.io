@@ -1,0 +1,26 @@
+---
+// A section's head as the showcase sets it: a carved overline, the title and an
+// introduction.
+import Inscription from './Inscription.astro';
+
+interface Props {
+  inscription: string;
+  title: string;
+  id?: string;
+  class?: string;
+}
+
+const { inscription, title, id, class: className } = Astro.props;
+---
+
+<header class:list={['section-head', className]}>
+  <Inscription>{inscription}</Inscription>
+  <h2 id={id}>{title}</h2>
+  <p><slot /></p>
+</header>
+
+<style>
+  .section-head { display: grid; gap: var(--san-space-3); max-width: var(--san-size-measure); }
+  h2 { margin: 0; font: var(--san-type-headline-lg); letter-spacing: var(--san-type-headline-lg-tracking); }
+  p { margin: 0; color: var(--san-text-muted); }
+</style>

@@ -1,10 +1,7 @@
-import palette from '@sanctuary-ds/tokens/palette';
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 
-// Theme axes for the site, generated from the core's palette export. Only the
-// window modes and the starting glazing and window are written here: the core
-// does not publish them yet.
-
-const WINDOW_MODES = ['mono', 'harmonic'] as const;
+// Theme axes for the site, generated from the core's palette export, including
+// the window modes and the starting glazing and window.
 
 const title = (id: string) => id[0].toUpperCase() + id.slice(1);
 
@@ -12,7 +9,7 @@ export const axes = {
   flavor: Object.entries(palette.flavors).map(([id, flavor]) => ({ id, name: flavor.name })),
   accent: Object.keys(palette.pigments).map((id) => ({ id, name: title(id) })),
   glazing: Object.entries(palette.glazings).map(([id, glazing]) => ({ id, name: glazing.name })),
-  window: WINDOW_MODES.map((id) => ({ id, name: title(id) })),
+  window: Object.entries(palette.windowModes).map(([id, mode]) => ({ id, name: mode.name })),
 };
 
 export type Axis = keyof typeof axes;
@@ -47,12 +44,12 @@ if (!(defaultFlavor in palette.flavors)) {
 export const defaultTheme: Record<Axis, string> = {
   flavor: defaultFlavor,
   accent: palette.flavors[defaultFlavor as keyof typeof palette.flavors].accent,
-  glazing: 'pot-metal',
-  window: 'mono',
+  glazing: palette.defaultGlazing,
+  window: palette.defaultWindow,
 };
 
-// The same guard for the starting theme: glazing and window are written here,
-// so a renamed value in the core must fail the build, not render "undefined".
+// The same guard for the whole starting theme: if the core's defaults ever stop
+// matching its own values, fail the build rather than render "undefined".
 for (const [axis, value] of Object.entries(defaultTheme) as [Axis, string][]) {
   if (!options[axis].includes(value)) {
     throw new Error(`The default ${axis} "${value}" is not one of the core's ${axis} values: ${options[axis].join(', ')}.`);

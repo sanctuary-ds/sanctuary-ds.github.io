@@ -4,6 +4,10 @@ on:
   # main only changes through pull requests, which the CI workflow checks first.
   push:
     branches: [main]
+    # Root Markdown (README, ROADMAP) is not part of the site, so changing it does
+    # not redeploy. '*' stops at '/', so Markdown pages under src/ still deploy.
+    paths-ignore:
+      - '*.md'
   # Allows a manual redeploy from the Actions tab.
   workflow_dispatch:
 

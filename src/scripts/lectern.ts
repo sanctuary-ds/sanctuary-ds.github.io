@@ -1,6 +1,10 @@
-// Wires the lectern: theme buttons set the core attributes on <html> and keep
-// the choice, and on phones the "Light" button folds the controls in and out.
-import { STORAGE_KEY } from '../data/theme-storage';
+// Wires the theme controls: any [data-set] button on the page (the lectern's,
+// and the home page's live demos) sets a core attribute on <html> and keeps the
+// choice; on phones the lectern's "Light" button folds its controls in and out.
+// Keys F, A, G and W step through the axes, and every change is announced with a
+// `sanctuary:themechange` event, so a section can follow the theme without
+// knowing where the change came from.
+import { SHORTCUTS_KEY, STORAGE_KEY } from '../data/theme-storage';
 
 // How long the light takes to move across the page after a change: the core's
 // procession duration, the same token the CSS transition uses (global.css), read
@@ -20,9 +24,19 @@ export function initLectern(): void {
   let shiftTimer: number | undefined;
 
   const sync = () => {
-    for (const button of lectern.querySelectorAll<HTMLElement>('[data-set]')) {
+    for (const button of document.querySelectorAll<HTMLElement>('[data-set]')) {
       const [axis, value] = button.dataset.set!.split(':');
       button.setAttribute('aria-pressed', String(root.getAttribute(`data-san-${axis}`) === value));
+    }
+    // Clocks name the current flavor; each carries the names it may show.
+    for (const clock of document.querySelectorAll<HTMLElement>('[data-clock]')) {
+      try {
+        const names: Record<string, string> = JSON.parse(clock.dataset.clock ?? '{}');
+        const flavor = root.getAttribute('data-san-flavor') ?? '';
+        if (names[flavor]) clock.textContent = names[flavor];
+      } catch {
+        // A malformed list leaves the clock as rendered.
+      }
     }
   };
 
@@ -74,12 +88,53 @@ export function initLectern(): void {
       shiftTimer = window.setTimeout(() => root.classList.remove('is-shifting'), shiftMs(root));
       root.setAttribute(`data-san-${axis}`, value);
       sync();
+      document.dispatchEvent(new CustomEvent('sanctuary:themechange', { detail: { axis, value } }));
     }
     save(axis, value);
     dropPreview(axis);
   };
 
-  lectern.addEventListener('click', (event) => {
+  // A key steps to the next value of its axis, in the order the lectern lists
+  // them. One step per press: a held key's auto-repeat is ignored, as are
+  // modifier keys and keys typed into a field.
+  // The visitor can turn them off with the lectern's switch (WCAG 2.1.4), and the
+  // choice is kept like the theme. The values come from the lectern's own buttons,
+  // the one place that lists every value of every axis, in order.
+  const KEYS: Record<string, string> = { f: 'flavor', a: 'accent', g: 'glazing', w: 'window' };
+  const keysSwitch = lectern.querySelector<HTMLElement>('.lectern__keys');
+  let shortcutsOn = true;
+  try {
+    shortcutsOn = localStorage.getItem(SHORTCUTS_KEY) !== 'off';
+  } catch {
+    // Storage is unavailable: the shortcuts stay on for this visit.
+  }
+  const reflectShortcuts = () => keysSwitch?.setAttribute('aria-checked', String(shortcutsOn));
+  keysSwitch?.addEventListener('click', () => {
+    shortcutsOn = !shortcutsOn;
+    reflectShortcuts();
+    try {
+      localStorage.setItem(SHORTCUTS_KEY, shortcutsOn ? 'on' : 'off');
+    } catch {
+      // Best effort, like the theme.
+    }
+  });
+  reflectShortcuts();
+
+  document.addEventListener('keydown', (event) => {
+    if (!shortcutsOn || event.repeat) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target as HTMLElement;
+    if (target.closest('input, select, textarea, [contenteditable=""], [contenteditable="true"]')) return;
+    const axis = KEYS[event.key.toLowerCase()];
+    if (!axis) return;
+    const values = [...lectern.querySelectorAll<HTMLElement>(`[data-set^="${axis}:"]`)].map((button) => button.dataset.set!.split(':')[1]);
+    if (values.length === 0) return;
+    const current = values.indexOf(root.getAttribute(`data-san-${axis}`) ?? '');
+    set(axis, values[(current + 1) % values.length]);
+  });
+
+  // One listener for the whole page: a theme button may sit anywhere.
+  document.addEventListener('click', (event) => {
     const target = event.target as Element;
     const setter = target.closest<HTMLElement>('[data-set]');
     if (setter) {

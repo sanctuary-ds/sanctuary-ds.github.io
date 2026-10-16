@@ -1,0 +1,34 @@
+---
+// The nave: three or four short steps, each a key idea with a live demo. A step
+// links to its playground section only once the playground chapel is available,
+// so the home never points to a page that does not exist yet.
+import { chapel } from '../data/chapels';
+import { toRoman } from '../data/numerals';
+import DesktopDemo from './DesktopDemo.astro';
+import FlavorDemo from './FlavorDemo.astro';
+import GlazingDemo from './GlazingDemo.astro';
+import Step from './Step.astro';
+import WindowDemo from './WindowDemo.astro';
+
+const playground = chapel('playground');
+const more = (section: string, label: string) => (playground.available ? { href: `${playground.href}#${section}`, label } : undefined);
+---
+
+<div class="nave" id="nave">
+  <Step inscription={`${toRoman(1)} · The hours`} title="The same building, four hours of light" more={more('flavors', 'All flavors in the playground')}>
+    Matins, Lauds, Vespers and Compline. Stone, ink and shadow change with the hour; every pigment is re-toned to stay legible. Pick one.
+    <FlavorDemo slot="demo" />
+  </Step>
+  <Step inscription={`${toRoman(2)} · The glass`} title="One accent, three ways of holding colour" flip more={more('glazing', 'Pigments and glazing in the playground')}>
+    Twelve pigments, any of them the accent. Glazing decides how it is rendered: pot-metal, flashed or grisaille.
+    <GlazingDemo slot="demo" />
+  </Step>
+  <Step inscription={`${toRoman(3)} · The light`} title="Light that is cast, not applied" more={more('windows', 'Windows and light in the playground')}>
+    The window colours ambient light while the accent does the precise work: alone, or leaded with its neighbours.
+    <WindowDemo slot="demo" />
+  </Step>
+  <Step inscription={`${toRoman(4)} · Beyond the browser`} title="Out of the browser, onto the desktop" flip more={more('rice', 'Ricing in the playground')}>
+    The same palette ships as themes for terminals, bars and window managers.
+    <DesktopDemo slot="demo" />
+  </Step>
+</div>

@@ -1,0 +1,94 @@
+---
+// One card per flavor, each themed on its own and nested in the page. Clicking a
+// card makes its flavor the page's (data-set, handled by the lectern script).
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import { defaultTheme } from '../data/theme';
+import Inscription from './Inscription.astro';
+
+interface Props {
+  /** `pairs` lays the four flavors two by two (beside text); `row` fills the width. */
+  layout?: 'pairs' | 'row';
+}
+
+const { layout = 'pairs' } = Astro.props;
+const flavors = Object.entries(palette.flavors);
+---
+
+<div class:list={['flavors', `flavors--${layout}`]}>
+  {
+    flavors.map(([id, flavor]) => (
+      <button class="flavor" type="button" data-set={`flavor:${id}`} data-san-flavor={id} aria-pressed={String(defaultTheme.flavor === id)}>
+        <span class="flavor__sky" aria-hidden="true">
+          <span class="flavor__glass" />
+        </span>
+        <Inscription>{flavor.hour}</Inscription>
+        <span class="flavor__name">{flavor.name}</span>
+        <span class="flavor__blurb">{flavor.blurb}</span>
+        <span class="flavor__stack" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+          <i />
+          <b>Aa</b>
+        </span>
+      </button>
+    ))
+  }
+</div>
+
+<style>
+  /* Carried over from the showcase's flavor cards. */
+  /* Beside text, four hours read as two by two; across a page, in a row. One
+     column on phones. */
+  .flavors { display: grid; gap: var(--san-space-5); }
+  .flavors--pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .flavors--row { grid-template-columns: repeat(auto-fit, minmax(min(15rem, 100%), 1fr)); }
+
+  .flavor {
+    display: grid;
+    gap: var(--san-space-2);
+    padding: var(--san-space-4);
+    text-align: left;
+    font: inherit;
+    background: var(--san-surface);
+    color: var(--san-text);
+    border: var(--san-border-width-came) solid var(--san-lead);
+    border-radius: var(--san-radius-md);
+    box-shadow: var(--san-elevation-2);
+    cursor: pointer;
+    transition: translate var(--san-duration-base) var(--san-ease-enter), box-shadow var(--san-duration-base);
+  }
+  .flavor:hover { box-shadow: var(--san-elevation-4); }
+  .flavor:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .flavor[aria-pressed='true'] { border-color: var(--san-accent); box-shadow: var(--san-cast-md), var(--san-elevation-3); }
+
+  .flavor__sky {
+    display: grid;
+    place-items: end center;
+    height: 8.5rem;
+    margin-bottom: var(--san-space-2);
+    background: radial-gradient(ellipse at 50% 100%, color-mix(in oklch, var(--san-window-b) 28%, transparent), transparent 70%), var(--san-surface-sunken);
+    border-radius: var(--san-radius-sm);
+  }
+  .flavor__glass { display: block; width: 3.5rem; height: 6.75rem; clip-path: var(--san-shape-lancet); background: var(--san-window); }
+  .flavor__name { font: var(--san-type-headline-md); }
+  .flavor__blurb { font: var(--san-type-body-sm); color: var(--san-text-muted); min-height: 3.75rem; }
+
+  .flavor__stack { display: flex; align-items: center; margin-top: var(--san-space-2); border: var(--san-border-width-hairline) solid var(--san-lead); border-radius: var(--san-radius-xs); overflow: hidden; }
+  .flavor__stack i { flex: 1; height: 1.75rem; }
+  .flavor__stack i:nth-child(1) { background: var(--san-surface-sunken); }
+  .flavor__stack i:nth-child(2) { background: var(--san-surface-raised-1); }
+  .flavor__stack i:nth-child(3) { background: var(--san-surface-raised-3); }
+  .flavor__stack i:nth-child(4) { background: var(--san-lead-strong); }
+  .flavor__stack i:nth-child(5) { background: var(--san-accent); }
+  .flavor__stack b { padding: 0 var(--san-space-3); font: var(--san-type-title-md); }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .flavor:hover { translate: 0 -4px; }
+  }
+
+  @media (max-width: 40rem) {
+    .flavors--pairs { grid-template-columns: 1fr; }
+  }
+</style>

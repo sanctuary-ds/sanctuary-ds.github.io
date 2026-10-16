@@ -23,7 +23,7 @@
     "test": "astro build && playwright test"
   },
   "dependencies": {
-    "@sanctuary-ds/tokens": "github:sanctuary-ds/sanctuary#0ee099db3070198e224b062e82b3f5fc51f75219",
+    "@sanctuary-ds/tokens": "github:sanctuary-ds/sanctuary#50d8fc38302695e8ef3c56c23647a6ef019f74d9",
     "astro": "7.3.5"
   },
   "devDependencies": {

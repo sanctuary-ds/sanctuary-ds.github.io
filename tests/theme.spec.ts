@@ -1,5 +1,8 @@
+import { createRequire } from 'node:module';
 import { expect, test, type Page } from '@playwright/test';
 import { STORAGE_KEY } from '../src/data/theme-storage';
+
+const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 // The theme switcher through its public interface: the lectern buttons, the
 // attributes on <html>, the query string and the visitor's saved choice.
@@ -36,10 +39,10 @@ test.describe('lectern controls', () => {
       if (await toggle.isVisible()) await toggle.click();
 
       for (const [axis, value] of [['flavor', 'lauds'], ['accent', 'ruby'], ['glazing', 'flashed'], ['window', 'harmonic']]) {
-        await page.locator(`[data-set="${axis}:${value}"]`).click();
+        await page.locator(`.lectern [data-set="${axis}:${value}"]`).click();
         await expect(page.locator('html')).toHaveAttribute(`data-san-${axis}`, value);
-        await expect(page.locator(`[data-set^="${axis}:"][aria-pressed="true"]`)).toHaveCount(1);
-        await expect(page.locator(`[data-set="${axis}:${value}"]`)).toHaveAttribute('aria-pressed', 'true');
+        await expect(page.locator(`.lectern [data-set^="${axis}:"][aria-pressed="true"]`)).toHaveCount(1);
+        await expect(page.locator(`.lectern [data-set="${axis}:${value}"]`)).toHaveAttribute('aria-pressed', 'true');
       }
     });
 
@@ -52,6 +55,21 @@ test.describe('lectern controls', () => {
       expect(overflow).toBeLessThanOrEqual(0);
     });
   }
+
+  test('on a desktop the four controls share one row', async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto('/', { waitUntil: 'networkidle' });
+    await page.evaluate(() => document.fonts.ready);
+    // Controls of different heights are centred, so compare vertical ranges, not tops.
+    const boxes = await page.locator('.lectern__controls .control').evaluateAll((controls) =>
+      controls.map((control) => {
+        const { top, bottom } = control.getBoundingClientRect();
+        return { top, bottom };
+      }),
+    );
+    const [first, ...rest] = boxes;
+    for (const box of rest) expect(box.top < first.bottom && box.bottom > first.top, JSON.stringify(boxes)).toBe(true);
+  });
 
   test('on phones the controls fold behind the Light button', async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
@@ -66,10 +84,37 @@ test.describe('lectern controls', () => {
   test('changing the flavor retints the page once the light settles', async ({ page }) => {
     await page.goto('/');
     const before = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
-    await page.locator('[data-set="flavor:lauds"]').click();
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
     await expect(page.locator('html')).not.toHaveClass(/is-shifting/);
     const after = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
     expect(after).not.toBe(before);
+  });
+});
+
+test.describe('light and dark flavors', () => {
+  // Read the generated values on an element themed with a given flavor.
+  const schemeOf = (page: Page, flavor: string) =>
+    page.evaluate((f) => {
+      const probe = document.createElement('div');
+      probe.setAttribute('data-san-flavor', f);
+      document.body.append(probe);
+      const style = getComputedStyle(probe);
+      const values = [style.getPropertyValue('--site-light-blend').trim(), style.getPropertyValue('--site-cast-opacity').trim()];
+      probe.remove();
+      return values;
+    }, flavor);
+
+  test('each flavor gets the blend its scheme in the palette calls for', async ({ page }) => {
+    await page.goto('/');
+    for (const [flavor, { scheme }] of Object.entries(palette.flavors as Record<string, { scheme: string }>)) {
+      expect(await schemeOf(page, flavor), flavor).toEqual(scheme === 'light' ? ['multiply', '0.5'] : ['screen', '0.6']);
+    }
+  });
+
+  test('a dark flavor nested in a light page keeps its own blend', async ({ page }) => {
+    await page.goto('/?flavor=lauds');
+    expect(await page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--site-light-blend').trim())).toBe('multiply');
+    expect((await schemeOf(page, 'compline'))[0]).toBe('screen');
   });
 });
 
@@ -81,11 +126,11 @@ test.describe('restoring the theme', () => {
 
   test('a choice survives a reload and the buttons reflect it', async ({ page }) => {
     await page.goto('/');
-    await page.locator('[data-set="flavor:lauds"]').click();
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="flavor:lauds"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     await page.reload();
     expect(await theme(page)).toBe('lauds/ruby/pot-metal/mono');
-    const pressed = await page.locator('[aria-pressed="true"]').evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set).sort());
+    const pressed = await page.locator('.lectern [aria-pressed="true"]').evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set).sort());
     expect(pressed).toEqual(['accent:ruby', 'flavor:lauds', 'glazing:pot-metal', 'window:mono']);
   });
 
@@ -119,7 +164,7 @@ test.describe('restoring the theme', () => {
   test('a saved value that is not an object is replaced, not merged into', async ({ page }) => {
     await seed(page, JSON.stringify(['junk']));
     await page.goto('/');
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     expect(await stored(page)).toEqual({ accent: 'ruby' });
   });
 
@@ -136,7 +181,7 @@ test.describe('restoring the theme', () => {
     });
     await page.goto('/');
     expect(await theme(page)).toBe('compline/cobalt/pot-metal/mono');
-    await page.locator('[data-set="accent:ruby"]').click();
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'ruby');
     expect(errors).toEqual([]);
   });
@@ -149,7 +194,7 @@ test.describe('restoring the theme', () => {
       // Click and read in one call: the transition lasts as long as the core's
       // procession duration, and a separate round trip on a slow runner could miss it.
       const duration = await page.evaluate(() => {
-        document.querySelector<HTMLElement>('[data-set="flavor:lauds"]')!.click();
+        document.querySelector<HTMLElement>('.lectern [data-set="flavor:lauds"]')!.click();
         return getComputedStyle(document.body).transitionDuration;
       });
       const moving = duration.split(',').some((value) => parseFloat(value) > 0);
@@ -178,14 +223,14 @@ test.describe('preview links', () => {
   test('changing one axis on a preview saves only that axis', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="accent:viridian"]').click();
+    await page.locator('.lectern [data-set="accent:viridian"]').click();
     expect(await stored(page)).toMatchObject({ flavor: 'lauds', accent: 'viridian' });
   });
 
   test('a click on a preview survives a reload of that page', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="flavor:compline"]').click();
+    await page.locator('.lectern [data-set="flavor:compline"]').click();
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-flavor', 'compline');
   });
@@ -193,7 +238,7 @@ test.describe('preview links', () => {
   test('clicking the value a preview already shows keeps it', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     expect((await stored(page)).flavor).toBe('vespers');
     expect(new URL(page.url()).searchParams.has('flavor')).toBe(false);
     await page.goto('/');
@@ -203,7 +248,7 @@ test.describe('preview links', () => {
   test('the rest of the preview still applies after a click on another axis', async ({ page }) => {
     await seed(page, saved);
     await page.goto('/?flavor=vespers&glazing=flashed');
-    await page.locator('[data-set="accent:gilt"]').click();
+    await page.locator('.lectern [data-set="accent:gilt"]').click();
     await page.reload();
     expect(await theme(page)).toBe('vespers/gilt/flashed/mono');
   });
@@ -212,7 +257,7 @@ test.describe('preview links', () => {
 test.describe('accent across flavors', () => {
   test('the accent on screen stays when the flavor changes, also after a reload', async ({ page }) => {
     await page.goto('/');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
@@ -223,16 +268,110 @@ test.describe('accent across flavors', () => {
     await seed(page, JSON.stringify({ flavor: 'compline', accent: 'renamed-pigment' }));
     await page.goto('/');
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
-    await page.locator('[data-set="flavor:vespers"]').click();
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
     await page.reload();
     await expect(page.locator('html')).toHaveAttribute('data-san-accent', 'cobalt');
   });
 
   test('a preview accent is not saved when the visitor picks a flavor', async ({ page }) => {
     await page.goto('/?accent=viridian');
-    await page.locator('[data-set="flavor:matins"]').click();
+    await page.locator('.lectern [data-set="flavor:matins"]').click();
     const saved = await stored(page);
     expect(saved.flavor).toBe('matins');
     expect(saved).not.toHaveProperty('accent');
+  });
+});
+
+test.describe('keyboard shortcuts and theme events', () => {
+  // The next value of an axis, in the order the lectern lists it.
+  const next = async (page: Page, axis: string) => {
+    const values = await page.locator(`.lectern [data-set^="${axis}:"]`).evaluateAll((els) => els.map((el) => (el as HTMLElement).dataset.set!.split(':')[1]));
+    const current = await page.evaluate((a) => document.documentElement.getAttribute(`data-san-${a}`), axis);
+    return values[(values.indexOf(current!) + 1) % values.length];
+  };
+
+  test('F, A, G and W step through their axes, in either case', async ({ page }) => {
+    await page.goto('/');
+    for (const [key, axis] of [['f', 'flavor'], ['A', 'accent'], ['g', 'glazing'], ['W', 'window']]) {
+      const expected = await next(page, axis);
+      await page.keyboard.press(key);
+      await expect(page.locator('html')).toHaveAttribute(`data-san-${axis}`, expected);
+      await expect(page.locator(`.lectern [data-set="${axis}:${expected}"]`)).toHaveAttribute('aria-pressed', 'true');
+    }
+  });
+
+  test('shortcuts stay quiet with modifier keys and while typing', async ({ page }) => {
+    await page.goto('/');
+    const before = await theme(page);
+    await page.keyboard.press('Control+f');
+    await page.keyboard.press('Alt+g');
+    await page.evaluate(() => {
+      const field = document.createElement('input');
+      field.id = 'probe';
+      document.body.append(field);
+    });
+    await page.locator('#probe').focus();
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+  });
+
+  test('holding a key steps once, not once per auto-repeat', async ({ page }) => {
+    await page.goto('/');
+    const expected = await next(page, 'flavor');
+    // Pressing a key that is already down sends keydown with `repeat` set, as
+    // the browser does while a key is held.
+    for (let i = 0; i < 3; i++) await page.keyboard.down('f');
+    await page.keyboard.up('f');
+    await expect(page.locator('html')).toHaveAttribute('data-san-flavor', expected);
+  });
+
+  test('every change is announced with its axis and value', async ({ page }) => {
+    await page.goto('/');
+    await page.evaluate(() => {
+      (window as unknown as { seen: unknown[] }).seen = [];
+      document.addEventListener('sanctuary:themechange', (event) => (window as unknown as { seen: unknown[] }).seen.push((event as CustomEvent).detail));
+    });
+    await page.locator('.lectern [data-set="accent:ruby"]').click();
+    await page.keyboard.press('f');
+    const seen = await page.evaluate(() => (window as unknown as { seen: { axis: string; value: string }[] }).seen);
+    expect(seen.map(({ axis, value }) => `${axis}:${value}`)).toEqual(['accent:ruby', `flavor:${await page.evaluate(() => document.documentElement.getAttribute('data-san-flavor'))}`]);
+  });
+});
+
+test.describe('shortcut switch (WCAG 2.1.4: single-key shortcuts can be turned off)', () => {
+  const toggle = (page: Page) => page.getByRole('switch', { name: 'Keyboard shortcuts' });
+
+  test('the shortcuts start on, and the switch says so', async ({ page }) => {
+    await page.goto('/');
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'true');
+    const before = await page.evaluate(() => document.documentElement.getAttribute('data-san-flavor'));
+    await page.keyboard.press('f');
+    await expect(page.locator('html')).not.toHaveAttribute('data-san-flavor', before!);
+  });
+
+  test('turned off, a letter changes nothing, and the choice survives a reload', async ({ page }) => {
+    await page.goto('/');
+    await toggle(page).click();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'false');
+    // Move focus off the switch so the keys reach the page, as when typing elsewhere.
+    await page.locator('h1').click();
+    const before = await theme(page);
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+    await page.reload();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'false');
+    await page.keyboard.type('fagw');
+    expect(await theme(page)).toBe(before);
+  });
+
+  test('turned back on, the shortcuts work again', async ({ page }) => {
+    await page.goto('/');
+    await toggle(page).click();
+    await toggle(page).click();
+    await expect(toggle(page)).toHaveAttribute('aria-checked', 'true');
+    await page.locator('h1').click();
+    const before = await page.evaluate(() => document.documentElement.getAttribute('data-san-glazing'));
+    await page.keyboard.press('g');
+    await expect(page.locator('html')).not.toHaveAttribute('data-san-glazing', before!);
   });
 });

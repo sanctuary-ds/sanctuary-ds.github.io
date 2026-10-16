@@ -17,9 +17,10 @@ This document is the brief for whoever builds the site. Read it before changing 
 |-------|--------|--------|
 | Generator | [Astro](https://astro.build/), static output | No server; content in Markdown and MDX |
 | Search | [Pagefind](https://pagefind.app/), indexed at build time | Static, no external service |
-| UI | Astro components styled with the Sanctuary stylesheet | No UI framework until the Lit components exist; then the site uses them |
+| UI | Astro components styled with the Sanctuary stylesheet | No UI framework until Sanctuary Web Components exist; then the site uses them |
 | Deploy | GitHub Pages through `withastro/action` | Official action, no extra hosting |
 | Package manager | pnpm | Same as the core |
+| Fonts | Self-hosted through Astro's Fonts API, with Google Fonts as the source | Downloaded at build time and served from the site: no third-party request per visit, preloading and metric-matched fallbacks |
 
 [Starlight](https://starlight.astro.build/) was tried and rejected: its interface did not fit the system, and fighting its defaults cost more than building the pages.
 
@@ -30,9 +31,8 @@ The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/san
 | Consumes | Export | Used for |
 |----------|--------|----------|
 | Stylesheet | `@sanctuary-ds/tokens/css` | All site styling and theming |
-| Palette | `@sanctuary-ds/tokens/palette` | Playground, swatches, port previews |
+| Palette | `@sanctuary-ds/tokens/palette` | Theme axes and their defaults, the fonts to host, playground, swatches, port previews |
 | DTCG tokens | `@sanctuary-ds/tokens/tokens/*` | The generated token reference |
-| Window modes | Requested from the core: list `mono` and `harmonic` in `palette` | The theme switcher, which writes them in the site until then |
 | Port list | To be defined with the ports milestone | Gallery and search |
 
 Rules:
@@ -71,7 +71,7 @@ The showcase moves from the core into this repository: it becomes `/playground`,
 /ports                 Gallery with search and filters      (blocked)
 /ports/<app>           Preview and install steps per port   (blocked)
 /changelog             Changes per version                  (blocked)
-/components            The Lit library                      (blocked)
+/components            Sanctuary Web Components (Lit)       (blocked)
 ```
 
 Routes are English and unprefixed. Spanish arrives later under `/es/`, so no existing URL changes.
@@ -87,14 +87,17 @@ Each phase is deployable on its own.
 - [x] Astro i18n configured with `en` as the default locale and no prefix, so phase 4 adds a locale without moving pages.
 - [x] Core dependency pinned through git; stylesheet loaded globally.
 - [x] Site-wide theme switcher (flavor, accent, glazing, window) that persists the choice and respects `prefers-reduced-motion`.
-- [ ] CI: install with a frozen lockfile, build, check internal links.
-- [ ] Deploy to GitHub Pages with one page live.
+- [x] CI: install with a frozen lockfile, build, check internal links.
+- [x] Deploy to GitHub Pages with one page live.
 
 ### Phase 2: Home, playground and roadmap
 
-- [ ] Home page: the facade, the nave and the chapels.
-- [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
-- [ ] `/roadmap` page.
+- [x] Deploy only when the site changes: Markdown files at the repository root (README, ROADMAP) do not trigger a deploy.
+- [x] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1; chosen: self-hosted (see [Stack](#stack)).
+- [x] Light-flavor styles generated from `palette` (`flavors.*.scheme`), replacing the showcase's `data-scheme` attribute.
+- [x] Home page: the facade, the nave and the chapels.
+- [x] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
+- [x] `/roadmap` page: a public roadmap by horizon (available, in progress, next, later, exploring), with no dates, for the people who use Sanctuary.
 
 ### Phase 3: Documentation
 
@@ -114,14 +117,13 @@ Each phase is deployable on its own.
 |---------|------------|
 | `/ports` | The ports milestone: which apps, which repositories, and how the port list is published |
 | `/changelog` | Published versions of the core |
-| `/components` | The Lit component library |
+| `/components` | Sanctuary Web Components, the Lit library in the `web-components` repository |
 
 ## Open decisions
 
 | Decision | When |
 |----------|------|
 | How the port list reaches the site (a file in the core, or the GitHub API) | Ports milestone |
-| Fonts: Google Fonts or self-hosted | Phase 1, together with the core's same open decision |
 
 ## Working agreement
 

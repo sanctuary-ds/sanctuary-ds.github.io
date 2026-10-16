@@ -1,0 +1,29 @@
+---
+// The page's one toast: a polite live region, so screen readers announce a
+// message (such as what was copied) without moving focus. Scripts write to it
+// through [data-toast].
+---
+
+<div class="toast" role="status" aria-live="polite" data-toast></div>
+
+<style>
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: var(--san-space-8);
+    z-index: var(--san-layer-toast);
+    padding: var(--san-space-2) var(--san-space-4);
+    border-radius: var(--san-radius-sm);
+    background: var(--san-surface-inverse);
+    color: var(--san-text-inverse);
+    box-shadow: var(--san-elevation-4);
+    font: var(--san-type-code-sm);
+    translate: -50% 1rem;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .toast.is-open { translate: -50% 0; opacity: 1; }
+  @media (prefers-reduced-motion: no-preference) {
+    .toast { transition: opacity var(--san-duration-base), translate var(--san-duration-base) var(--san-ease-enter); }
+  }
+</style>

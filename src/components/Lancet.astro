@@ -1,0 +1,28 @@
+---
+// A lancet window: leaded glass clipped to the core's lancet shape, filled with
+// the window tokens, with its coloured light around it. The glow is a wrapper
+// because a clip-path would cut a shadow set on the glass itself.
+---
+
+<span class="glow" aria-hidden="true"><span class="glass"></span></span>
+
+<style>
+  .glow {
+    display: block;
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 18px color-mix(in oklch, var(--san-window-b) 55%, transparent));
+  }
+
+  /* The highlight at the top is light itself, a white sheen, not a theme colour. */
+  .glass {
+    display: block;
+    height: 100%;
+    clip-path: var(--san-shape-lancet);
+    background:
+      radial-gradient(ellipse at 50% 22%, oklch(1 0 0 / 0.38), transparent 62%),
+      repeating-linear-gradient(60deg, var(--san-lead-came) 0 1.5px, transparent 1.5px 24px),
+      repeating-linear-gradient(-60deg, var(--san-lead-came) 0 1.5px, transparent 1.5px 24px),
+      var(--san-window);
+  }
+</style>

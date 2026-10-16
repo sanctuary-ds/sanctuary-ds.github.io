@@ -1,0 +1,35 @@
+---
+// The core's named windows: fixed gradients for a single place, such as a cover.
+// They do not follow the accent, so each lancet sets --san-window to its own.
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import Lancet from './Lancet.astro';
+
+const windows = Object.entries(palette.windows);
+---
+
+<div class="named-windows">
+  {
+    windows.map(([id, window]) => (
+      <figure class="named-window" data-window={id} style={`--san-window: var(--san-window-${id})`}>
+        <span class="named-window__lead">
+          <Lancet />
+        </span>
+        <figcaption>
+          <b>{window.name}</b>
+          <span>{window.stops.join(' · ')}</span>
+          <small>{window.note}</small>
+        </figcaption>
+      </figure>
+    ))
+  }
+</div>
+
+<style>
+  .named-windows { display: grid; grid-template-columns: repeat(auto-fit, minmax(9.5rem, 1fr)); gap: var(--san-space-6); }
+  .named-window { display: grid; justify-items: center; align-content: start; gap: var(--san-space-1); margin: 0; padding: var(--san-space-4) var(--san-space-2); text-align: center; }
+  .named-window__lead { display: block; width: 100%; max-width: 8rem; aspect-ratio: 5 / 9; padding: 5px; margin-bottom: var(--san-space-3); clip-path: var(--san-shape-lancet); background: var(--san-lead-came); }
+  figcaption { display: grid; gap: var(--san-space-1); }
+  b { font: var(--san-type-headline-sm); }
+  figcaption span { font: var(--san-type-label-md); color: var(--san-accent-ink); }
+  small { font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+</style>

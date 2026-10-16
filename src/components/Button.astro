@@ -1,0 +1,79 @@
+---
+// The showcase's button: a link when it has an href, a button otherwise. Every
+// visual decision comes from core tokens, and `glazed` follows the glazing axis.
+interface Props {
+  href?: string;
+  variant?: 'glazed' | 'pane' | 'outline' | 'ghost' | 'danger';
+  size?: 'sm' | 'md' | 'lg';
+  disabled?: boolean;
+  class?: string;
+}
+
+const { href, variant = 'glazed', size = 'md', disabled = false, class: className } = Astro.props;
+const classes = ['btn', `btn--${variant}`, size !== 'md' && `btn--${size}`, className];
+---
+
+{
+  href ? (
+    <a class:list={classes} href={href}>
+      <slot />
+    </a>
+  ) : (
+    <button class:list={classes} type="button" disabled={disabled}>
+      <slot />
+    </button>
+  )
+}
+
+<style>
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--san-space-2);
+    height: var(--san-size-control-md);
+    padding: 0 var(--san-space-5);
+    border: var(--san-border-width-hairline) solid transparent;
+    border-radius: var(--san-radius-sm);
+    background: transparent;
+    color: var(--san-text);
+    font: var(--san-type-label-lg);
+    letter-spacing: var(--san-type-label-lg-tracking);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color var(--san-duration-fast) var(--san-ease-standard),
+      border-color var(--san-duration-fast) var(--san-ease-standard),
+      box-shadow var(--san-duration-base) var(--san-ease-standard),
+      translate var(--san-duration-fast) var(--san-ease-standard);
+  }
+
+  /* State layer: the content colour laid over the control. */
+  .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background-color var(--san-duration-fast); }
+  .btn:hover::after { background: var(--san-state-hover); }
+  .btn:active::after { background: var(--san-state-pressed); }
+  .btn:active { translate: 0 1px; }
+  .btn:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .btn:disabled { opacity: var(--san-state-disabled-content); filter: saturate(0.2); cursor: not-allowed; }
+  .btn:disabled::after { display: none; }
+
+  .btn--sm { height: var(--san-size-control-sm); padding: 0 var(--san-space-3); font: var(--san-type-label-md); }
+  .btn--lg { height: var(--san-size-control-lg); padding: 0 var(--san-space-6); font-size: 1rem; }
+
+  .btn--glazed {
+    background: var(--san-glaze-sheen), var(--san-glaze-bg);
+    color: var(--san-glaze-fg);
+    border-color: var(--san-glaze-border);
+    box-shadow: var(--san-glaze-glow), var(--san-elevation-1);
+    backdrop-filter: var(--san-glaze-blur);
+  }
+  .btn--glazed:hover { background: var(--san-glaze-sheen), var(--san-glaze-bg-hover); box-shadow: var(--san-cast-md), var(--san-elevation-2); }
+  .btn--glazed::after { display: none; }
+  .btn--pane { background: var(--san-accent-pane); color: var(--san-accent-on-pane); }
+  .btn--danger { background: var(--san-danger); color: var(--san-danger-on); }
+  .btn--outline { border-color: var(--san-lead-strong); }
+  .btn--outline:hover { border-color: var(--san-accent); }
+  .btn--ghost { color: var(--san-accent-ink); }
+</style>
