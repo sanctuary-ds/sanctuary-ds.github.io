@@ -14,13 +14,13 @@
     filter: drop-shadow(0 0 18px color-mix(in oklch, var(--san-window-b) 55%, transparent));
   }
 
-  /* The highlight at the top is light itself, a white sheen, not a theme colour. */
+  /* The highlight at the top is the core's white light, not a theme colour. */
   .glass {
     display: block;
     height: 100%;
     clip-path: var(--san-shape-lancet);
     background:
-      radial-gradient(ellipse at 50% 22%, oklch(1 0 0 / 0.38), transparent 62%),
+      radial-gradient(ellipse at 50% 22%, color-mix(in oklch, var(--san-light) 38%, transparent), transparent 62%),
       repeating-linear-gradient(60deg, var(--san-lead-came) 0 1.5px, transparent 1.5px 24px),
       repeating-linear-gradient(-60deg, var(--san-lead-came) 0 1.5px, transparent 1.5px 24px),
       var(--san-window);

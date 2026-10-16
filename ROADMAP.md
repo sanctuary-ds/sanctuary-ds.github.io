@@ -26,7 +26,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 
 ## Contract with the core
 
-The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/sanctuary) and is consumed as `@sanctuary-ds/tokens`.
+The core lives in [`sanctuary-ds/tokens`](https://github.com/sanctuary-ds/tokens) and is consumed as `@sanctuary-ds/tokens`.
 
 | Consumes | Export | Used for |
 |----------|--------|----------|
@@ -37,11 +37,11 @@ The core lives in [`sanctuary-ds/sanctuary`](https://github.com/sanctuary-ds/san
 
 Rules:
 
-- Until the core is on npm, depend on it through git, pinned to a commit: `"@sanctuary-ds/tokens": "github:sanctuary-ds/sanctuary#<commit>"`. The built files are committed in the core, so no build runs on install.
+- Until the core is on npm, depend on it through git, pinned to a commit: `"@sanctuary-ds/tokens": "github:sanctuary-ds/tokens#<commit>"`. The built files are committed in the core, so no build runs on install.
 - The core publishes `0.1.0` to npm when this site reaches phase 3, because the token reference fixes token names as public API. Switch the dependency then.
 - Updating the core version is its own commit, reviewed for visual changes.
 - Theming uses the core's attributes on `<html>`: `data-san-flavor`, `data-san-accent`, `data-san-glazing` and `data-san-window`. The site never invents its own theme attributes.
-- Token names are the core's public API. See its [versioning rules](https://github.com/sanctuary-ds/sanctuary/blob/main/docs/ecosystem.md#versioning).
+- Token names are the core's public API. See its [versioning rules](https://github.com/sanctuary-ds/tokens/blob/main/docs/ecosystem.md#versioning).
 
 ## Visual direction
 
@@ -127,6 +127,6 @@ Each phase is deployable on its own.
 
 ## Working agreement
 
-- Implementation happens in a session opened in this repository. Cross-repository decisions are made in the core and recorded in its [`docs/ecosystem.md`](https://github.com/sanctuary-ds/sanctuary/blob/main/docs/ecosystem.md); this document is updated to match.
+- Implementation happens in a session opened in this repository. Cross-repository decisions are made in the core and recorded in its [`docs/ecosystem.md`](https://github.com/sanctuary-ds/tokens/blob/main/docs/ecosystem.md); this document is updated to match.
 - Commits are signed and follow Conventional Commits (`type(scope): subject`), with no emoji.
 - Work happens on a branch per phase and merges through a pull request.

@@ -39,11 +39,11 @@ panes.push({ circle: [0, 0, 9], fill: 'window-c', i: 2 });
     {
       !cast && (
         <defs>
-          {/* The sun's highlight is light itself, white fading to shade, not a theme colour. */}
+          {/* The sun: the core's white light fading to the flavor's own shade. */}
           <radialGradient id="rose-sun">
-            <stop offset="0" stop-color="#fff" stop-opacity=".55" />
-            <stop offset=".55" stop-color="#fff" stop-opacity=".08" />
-            <stop offset="1" stop-color="#000" stop-opacity=".28" />
+            <stop offset="0" class="rose__sun-core" />
+            <stop offset=".55" class="rose__sun-halo" />
+            <stop offset="1" class="rose__sun-shade" />
           </radialGradient>
         </defs>
       )
@@ -76,6 +76,11 @@ panes.push({ circle: [0, 0, 9], fill: 'window-c', i: 2 });
   .rose__stone { fill: var(--san-surface-raised-3); }
   .rose__lead { fill: var(--san-lead-came); }
   .rose__sun { mix-blend-mode: soft-light; }
+  /* Set in CSS, since the stop-color attribute does not take custom properties.
+     The shade is half the flavor's key umbra: deep on dark stone, faint on Lauds. */
+  .rose__sun-core { stop-color: color-mix(in oklch, var(--san-light) 55%, transparent); }
+  .rose__sun-halo { stop-color: color-mix(in oklch, var(--san-light) 8%, transparent); }
+  .rose__sun-shade { stop-color: color-mix(in oklch, var(--san-umbra-key) 50%, transparent); }
 
   .rose__pane {
     animation: shimmer 7s ease-in-out infinite;
