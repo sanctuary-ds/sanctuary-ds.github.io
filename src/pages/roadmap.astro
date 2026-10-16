@@ -1,0 +1,141 @@
+---
+// The public roadmap: the products, then what people can use today and what
+// comes after, by horizon. The data lives in src/data/roadmap.ts.
+import Base from '../layouts/Base.astro';
+import Inscription from '../components/Inscription.astro';
+import SectionHead from '../components/SectionHead.astro';
+import { horizons, items, products } from '../data/roadmap';
+
+const horizonName: Record<string, string> = Object.fromEntries(horizons.map(({ id, name }) => [id, name]));
+const productName: Record<string, string> = Object.fromEntries(products.map(({ id, name }) => [id, name]));
+---
+
+<Base title="Roadmap · Sanctuary" description="What you can use from Sanctuary today, and what comes next.">
+  <main>
+    <header class="intro">
+      <Inscription>What stands and what is planned</Inscription>
+      <h1>Roadmap</h1>
+      <p>What you can use today, and what comes after, in order. There are no dates: an item moves up when it ships.</p>
+    </header>
+
+    <section class="block" aria-labelledby="products-title">
+      <SectionHead inscription="The products" title="Four parts, one palette" id="products-title" class="block__head">
+        Everything starts from the tokens; the rest reads them.
+      </SectionHead>
+      <div class="products">
+        {
+          products.map((product) => (
+            <article class="product">
+              <span class="chip" data-horizon={product.horizon}>
+                {horizonName[product.horizon]}
+              </span>
+              <h3>{product.name}</h3>
+              <p>{product.text}</p>
+              {'href' in product && <a href={product.href}>Repository</a>}
+            </article>
+          ))
+        }
+      </div>
+    </section>
+
+    <section class="block" aria-labelledby="horizons-title">
+      <SectionHead inscription="The roadmap" title="From today to someday" id="horizons-title" class="block__head">
+        Each horizon lists what it holds and which product it belongs to.
+      </SectionHead>
+      <div class="horizons">
+        {
+          horizons.map(({ id, name, note }) => (
+            <section class="horizon" data-horizon={id} aria-labelledby={`horizon-${id}`}>
+              <h3 id={`horizon-${id}`}>{name}</h3>
+              <p class="horizon__note">{note}</p>
+              <ul>
+                {items
+                  .filter((item) => item.horizon === id)
+                  .map((item) => (
+                    <li>
+                      <span class="item__text">{item.text}</span>
+                      {item.product && <span class="item__product">{productName[item.product]}</span>}
+                    </li>
+                  ))}
+              </ul>
+            </section>
+          ))
+        }
+      </div>
+    </section>
+  </main>
+</Base>
+
+<style>
+  .intro,
+  .block {
+    max-width: 82rem;
+    margin: 0 auto;
+    padding-inline: clamp(var(--san-space-4), 4vw, var(--san-space-12));
+  }
+  .intro { display: grid; gap: var(--san-space-4); padding-block: var(--san-space-16) var(--san-space-12); }
+  h1 { margin: 0; font: var(--san-type-display-md); letter-spacing: var(--san-type-display-md-tracking); }
+  .intro p { max-width: var(--san-size-measure); margin: 0; font: var(--san-type-body-lg); color: var(--san-text-muted); }
+
+  .block { padding-block: var(--san-space-16); border-top: var(--san-border-width-hairline) solid var(--san-lead-soft); }
+  .block > :global(.block__head) { margin-bottom: var(--san-space-10); }
+
+  .products { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 16rem), 1fr)); gap: var(--san-space-6); }
+  .product {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: var(--san-space-3);
+    padding: var(--san-space-6);
+    border: var(--san-border-width-hairline) solid var(--san-lead-soft);
+    border-radius: var(--san-radius-md);
+    background: var(--san-surface-raised-1);
+  }
+  .product h3 { margin: 0; font: var(--san-type-title-lg); }
+  .product p { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  .product a { color: var(--san-accent-ink); font: var(--san-type-label-lg); }
+  .product a:focus-visible { outline: none; border-radius: var(--san-radius-xs); box-shadow: var(--san-halo); }
+
+  /* What is here glows with the accent; what is further away fades to stone. */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 1.5rem;
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-full);
+    color: var(--san-text-subtle);
+    font: var(--san-type-label-md);
+  }
+  .chip[data-horizon='available'] { border-color: transparent; background: var(--san-accent-pane); color: var(--san-accent-on-pane); }
+  .chip[data-horizon='in-progress'],
+  .chip[data-horizon='next'] { border-color: var(--san-accent); color: var(--san-accent-ink); }
+
+  .horizons { display: grid; gap: var(--san-space-4); }
+  .horizon {
+    display: grid;
+    grid-template-columns: 14rem minmax(0, 1fr);
+    /* The list spans both rows; the second takes the slack, so the note stays under the title. */
+    grid-template-rows: auto 1fr;
+    gap: var(--san-space-2) var(--san-space-8);
+    padding: var(--san-space-6);
+    border: var(--san-border-width-hairline) solid var(--san-lead-soft);
+    border-left: var(--san-border-width-heavy) solid var(--san-lead);
+    border-radius: var(--san-radius-sm);
+    background: var(--san-surface-raised-1);
+  }
+  .horizon[data-horizon='available'] { border-left-color: var(--san-accent); box-shadow: var(--san-cast-sm); }
+  .horizon[data-horizon='in-progress'] { border-left-color: var(--san-accent-lume); }
+  .horizon[data-horizon='exploring'] { border-style: dashed; background: transparent; }
+  .horizon h3 { margin: 0; font: var(--san-type-title-lg); }
+  .horizon__note { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+  .horizon ul { display: grid; grid-column: 2; grid-row: 1 / span 2; align-content: start; gap: var(--san-space-3); margin: 0; padding: 0; list-style: none; }
+  .horizon li { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--san-space-1) var(--san-space-4); }
+  .item__text { flex: 1 1 24rem; }
+  .item__product { font: var(--san-type-label-md); color: var(--san-text-subtle); }
+
+  @media (max-width: 48rem) {
+    .horizon { grid-template-columns: 1fr; }
+    .horizon ul { grid-column: 1; grid-row: auto; margin-top: var(--san-space-3); }
+  }
+</style>

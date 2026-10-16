@@ -3,7 +3,7 @@ import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 // The chapels: one per part of the ecosystem. This one list builds both the
 // gallery on the home page and the header navigation, so the two never drift.
 // A chapel becomes `available` in the same commit that ships its page; until
-// then it is shown disabled and points to the roadmap.
+// then it is shown disabled and points to the roadmap chapel.
 
 export interface Chapel {
   /** A stable key for code that needs one chapel; the name is display text. */
@@ -17,9 +17,6 @@ export interface Chapel {
   accent?: string;
   available: boolean;
 }
-
-// Where planned chapels point until the site's own /roadmap page ships.
-export const ROADMAP_HREF = 'https://github.com/sanctuary-ds/sanctuary-ds.github.io/blob/main/ROADMAP.md';
 
 export const chapels: Chapel[] = [
   {
@@ -49,12 +46,12 @@ export const chapels: Chapel[] = [
     href: '/roadmap',
     cta: 'See the roadmap',
     accent: 'viridian',
-    available: false,
+    available: true,
   },
   {
     id: 'components',
     name: 'Components',
-    title: 'The Lit library',
+    title: 'Sanctuary Web Components',
     text: 'Web components that read the same tokens, for any framework or none.',
     href: '/components',
     cta: 'Browse components',

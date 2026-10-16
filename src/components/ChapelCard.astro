@@ -1,8 +1,7 @@
 ---
 // One chapel: a lancet card. An available chapel is one link stretched over the
 // whole card; a planned one shows its glass unpainted and points to the roadmap.
-import type { Chapel } from '../data/chapels';
-import { ROADMAP_HREF } from '../data/chapels';
+import { chapel as findChapel, type Chapel } from '../data/chapels';
 import Button from './Button.astro';
 import Inscription from './Inscription.astro';
 import Lancet from './Lancet.astro';
@@ -30,7 +29,7 @@ const { name, title, text, href, cta, accent, available } = chapel;
         ) : (
           <>
             <span class="chip">Planned</span>
-            <Button href={ROADMAP_HREF} variant="ghost" size="sm">On the roadmap</Button>
+            <Button href={findChapel('roadmap').href} variant="ghost" size="sm">On the roadmap</Button>
           </>
         )
       }

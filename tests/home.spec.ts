@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
-import { ROADMAP_HREF, chapel, chapels } from '../src/data/chapels';
+import { chapel, chapels } from '../src/data/chapels';
 import { toRoman } from '../src/data/numerals';
 
 // The home page through what a visitor sees: the facade, its rose window and
@@ -87,15 +87,15 @@ test.describe('chapels', () => {
 
   test('an available chapel is one link; a planned one points to the roadmap', async ({ page }) => {
     await page.goto('/');
-    for (const [index, chapel] of chapels.entries()) {
+    for (const [index, entry] of chapels.entries()) {
       const card = page.locator('.chapel').nth(index);
-      if (chapel.available) {
+      if (entry.available) {
         await expect(card.locator('a')).toHaveCount(1);
-        await expect(card.locator('.chapel__link')).toHaveAttribute('href', chapel.href);
+        await expect(card.locator('.chapel__link')).toHaveAttribute('href', entry.href);
       } else {
         await expect(card.locator('.chapel__link')).toHaveCount(0);
         await expect(card.locator('.chip')).toHaveText('Planned');
-        await expect(card.getByRole('link')).toHaveAttribute('href', ROADMAP_HREF);
+        await expect(card.getByRole('link')).toHaveAttribute('href', chapel('roadmap').href);
         await expect(card.getByRole('link')).toHaveText('On the roadmap');
       }
     }
