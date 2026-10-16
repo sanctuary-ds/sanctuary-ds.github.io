@@ -96,7 +96,7 @@ Each phase is deployable on its own.
 - [x] Fonts: choose Google Fonts or self-hosted, together with the core, and load them site-wide. This decision was scheduled for phase 1; chosen: self-hosted (see [Stack](#stack)).
 - [x] Light-flavor styles generated from `palette` (`flavors.*.scheme`), replacing the showcase's `data-scheme` attribute.
 - [x] Home page: the facade, the nave and the chapels.
-- [ ] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
+- [x] Playground: the showcase moved from the core, complete, with an index to its eight sections and shareable query strings.
 - [ ] `/roadmap` page.
 
 ### Phase 3: Documentation

@@ -1,6 +1,6 @@
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
-import { ROADMAP_HREF, chapels } from '../src/data/chapels';
+import { ROADMAP_HREF, chapel, chapels } from '../src/data/chapels';
 import { toRoman } from '../src/data/numerals';
 
 // The home page through what a visitor sees: the facade, its rose window and
@@ -137,8 +137,26 @@ test.describe('nave', () => {
 
   test('no step links to the playground before it exists', async ({ page }) => {
     await page.goto('/');
-    const playground = chapels.find((chapel) => chapel.name === 'Playground')!;
-    await expect(page.locator('.step__more')).toHaveCount(playground.available ? 4 : 0);
+    await expect(page.locator('.step__more')).toHaveCount(chapel('playground').available ? 4 : 0);
+  });
+
+  // Link checkers do not follow fragments, so check that each step's section is
+  // really on the playground page.
+  test('every step links to a section that exists on the playground', async ({ page }) => {
+    await page.goto('/');
+    const hrefs = await page.locator('.step__more').evaluateAll((links) => links.map((link) => link.getAttribute('href')!));
+    expect(hrefs).toHaveLength(4);
+    await page.goto(chapel('playground').href);
+    for (const href of hrefs) {
+      const [path, id] = href.split('#');
+      expect(path).toBe(chapel('playground').href);
+      await expect(page.locator(`main > section#${id}`), href).toHaveCount(1);
+    }
+  });
+
+  test('chapels are looked up by id, and an unknown id fails loudly', () => {
+    expect(chapel('playground').name).toBe('Playground');
+    expect(() => chapel('nowhere')).toThrow('No chapel "nowhere"');
   });
 
   test('each flavor card shows its hour and themes the page when picked', async ({ page }) => {

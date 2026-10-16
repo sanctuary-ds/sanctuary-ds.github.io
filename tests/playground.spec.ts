@@ -194,6 +194,47 @@ test.describe('playground', () => {
     expect(await page.locator('#light .lumen--cast .tile b').allTextContents()).toEqual(['cast-sm', 'cast-md', 'cast-lg', 'halo']);
   });
 
+  test('the foundations read their tokens, and Play runs the motion tracks', async ({ page }) => {
+    await page.goto('/playground');
+    const spaces = page.locator('#foundations .space');
+    expect(await spaces.count()).toBeGreaterThan(0);
+    for (const space of await spaces.all()) {
+      const step = (await space.locator('code').textContent())!;
+      const [width, token] = await space.locator('i').evaluate((el, s) => {
+        const probe = document.createElement('i');
+        probe.style.width = `var(--san-space-${s})`;
+        el.parentElement!.append(probe);
+        const expected = getComputedStyle(probe).width;
+        probe.remove();
+        return [getComputedStyle(el).width, expected];
+      }, step);
+      expect(width, `space-${step}`).toBe(token);
+    }
+    const play = page.locator('#foundations button', { hasText: 'Play' });
+    await expect(play).toHaveAttribute('aria-pressed', 'false');
+    await play.click();
+    await expect(play).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('#foundations .motion__track.is-played')).toHaveCount(await page.locator('#foundations .motion__track').count());
+  });
+
+  test('the ricing desktop has its terminal and code windows, and its clock follows the flavor', async ({ page }) => {
+    await page.goto('/playground');
+    await expect(page.locator('#rice .desktop .win')).toHaveCount(2);
+    await expect(page.locator('#rice .code')).toContainText('customElements');
+    // The code is injected as HTML, so check that its syntax colours still apply.
+    const [keyword, token] = await page.locator('#rice .code .k').first().evaluate((el) => {
+      const probe = document.createElement('i');
+      probe.style.color = 'var(--san-syntax-keyword)';
+      el.append(probe);
+      const expected = getComputedStyle(probe).color;
+      probe.remove();
+      return [getComputedStyle(el).color, expected];
+    });
+    expect(keyword).toBe(token);
+    await page.locator('.lectern [data-set="flavor:vespers"]').click();
+    await expect(page.locator('#rice [data-clock]')).toHaveText(palette.flavors.vespers.name);
+  });
+
   for (const [name, viewport] of [['phone', { width: 375, height: 812 }], ['desktop', { width: 1440, height: 900 }]] as const) {
     test(`the page never scrolls sideways (${name})`, async ({ page }) => {
       await page.setViewportSize(viewport);

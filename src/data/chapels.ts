@@ -6,6 +6,8 @@ import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 // then it is shown disabled and points to the roadmap.
 
 export interface Chapel {
+  /** A stable key for code that needs one chapel; the name is display text. */
+  id: string;
   name: string;
   title: string;
   text: string;
@@ -21,14 +23,16 @@ export const ROADMAP_HREF = 'https://github.com/sanctuary-ds/sanctuary-ds.github
 
 export const chapels: Chapel[] = [
   {
+    id: 'playground',
     name: 'Playground',
     title: 'Every axis, live',
     text: 'The full showcase: flavors, pigments, glazing, windows, components, light, foundations and ricing.',
     href: '/playground',
     cta: 'Enter the playground',
-    available: false,
+    available: true,
   },
   {
+    id: 'docs',
     name: 'Docs',
     title: 'Build with the tokens',
     text: 'Getting started, the foundations and the generated token reference.',
@@ -38,6 +42,7 @@ export const chapels: Chapel[] = [
     available: false,
   },
   {
+    id: 'roadmap',
     name: 'Roadmap',
     title: 'What stands and what is planned',
     text: 'An honest account of what is built and what comes next.',
@@ -47,6 +52,7 @@ export const chapels: Chapel[] = [
     available: false,
   },
   {
+    id: 'components',
     name: 'Components',
     title: 'The Lit library',
     text: 'Web components that read the same tokens, for any framework or none.',
@@ -56,6 +62,7 @@ export const chapels: Chapel[] = [
     available: false,
   },
   {
+    id: 'ports',
     name: 'Ports',
     title: 'Onto the desktop',
     text: 'Themes for terminals, bars and window managers, with a preview of each.',
@@ -65,6 +72,7 @@ export const chapels: Chapel[] = [
     available: false,
   },
   {
+    id: 'changelog',
     name: 'Changelog',
     title: 'Every version',
     text: 'What changed in each release of the core, and why.',
@@ -81,3 +89,11 @@ for (const { name, accent } of chapels) {
     throw new Error(`Chapel "${name}" names accent "${accent}", which is not a pigment in the core palette.`);
   }
 }
+
+// One chapel by id. An unknown id fails the build instead of quietly hiding
+// whatever depended on it.
+export const chapel = (id: string): Chapel => {
+  const found = chapels.find((entry) => entry.id === id);
+  if (!found) throw new Error(`No chapel "${id}"; the chapels are ${chapels.map((entry) => entry.id).join(', ')}.`);
+  return found;
+};

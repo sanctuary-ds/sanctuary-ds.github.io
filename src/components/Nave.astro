@@ -2,7 +2,7 @@
 // The nave: three or four short steps, each a key idea with a live demo. A step
 // links to its playground section only once the playground chapel is available,
 // so the home never points to a page that does not exist yet.
-import { chapels } from '../data/chapels';
+import { chapel } from '../data/chapels';
 import { toRoman } from '../data/numerals';
 import DesktopDemo from './DesktopDemo.astro';
 import FlavorDemo from './FlavorDemo.astro';
@@ -10,9 +10,8 @@ import GlazingDemo from './GlazingDemo.astro';
 import Step from './Step.astro';
 import WindowDemo from './WindowDemo.astro';
 
-const playground = chapels.find((chapel) => chapel.name === 'Playground');
-const more = (section: string, label: string) =>
-  playground?.available ? { href: `${playground.href}#${section}`, label } : undefined;
+const playground = chapel('playground');
+const more = (section: string, label: string) => (playground.available ? { href: `${playground.href}#${section}`, label } : undefined);
 ---
 
 <div class="nave" id="nave">

@@ -5,6 +5,33 @@
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 import { defaultTheme } from '../data/theme';
 
+interface Props {
+  /** Adds a second window with code in the core's syntax colours. */
+  withCode?: boolean;
+}
+
+const { withCode = false } = Astro.props;
+
+// The code window's text, marked up by syntax role. Written as HTML because a
+// <pre> keeps every space and line break exactly as given.
+const code = [
+  '<span class="c">// A future Sanctuary component, themed by tokens alone.</span>',
+  '<span class="k">import</span> { <span class="t">LitElement</span>, <span class="f">html</span>, <span class="f">css</span> } <span class="k">from</span> <span class="s">\'lit\'</span>;',
+  '',
+  '<span class="k">export class</span> <span class="t">SanButton</span> <span class="k">extends</span> <span class="t">LitElement</span> {',
+  '  <span class="k">static</span> <span class="p">styles</span> <span class="o">=</span> <span class="f">css</span><span class="s">`',
+  '    button {',
+  '      background: var(--san-glaze-bg);',
+  '      color: var(--san-glaze-fg);',
+  '    }`</span>;',
+  '',
+  '  <span class="f">render</span>() {',
+  '    <span class="k">return</span> <span class="f">html</span><span class="s">`</span><span class="tag">&lt;button&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/button&gt;</span><span class="s">`</span>;',
+  '  }',
+  '}',
+  '<span class="p">customElements</span>.<span class="f">define</span>(<span class="s">\'san-button\'</span>, <span class="t">SanButton</span>);',
+].join('\n');
+
 const flavorNames = Object.fromEntries(Object.entries(palette.flavors).map(([id, flavor]) => [id, flavor.name]));
 const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'];
 ---
@@ -18,10 +45,12 @@ const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'whi
     <div class="bar__group">
       <span class="mod" style="--c: var(--san-glass-verdure)">cpu 12%</span>
       <span class="mod" style="--c: var(--san-glass-azure)">mem 4.1G</span>
+      {withCode && <span class="mod" style="--c: var(--san-glass-gilt)">vol 60%</span>}
       <span class="mod mod--clock" data-clock={JSON.stringify(flavorNames)}>{flavorNames[defaultTheme.flavor]}</span>
     </div>
   </div>
-  <div class="win">
+  <div class:list={['tiles', withCode && 'tiles--two']}>
+  <div class="win win--active">
     <pre class="term"><span class="a-blue">pilgrim</span><span class="a-dim">@</span><span class="a-magenta">sanctuary</span> <span class="a-cyan">~/nave</span> <span class="a-green">❯</span> git status -sb
 <span class="a-dim">## </span><span class="a-green">main</span><span class="a-dim">...</span><span class="a-red">origin/main</span> [<span class="a-yellow">ahead 2</span>]
  <span class="a-red">M</span> tokens/flavor/vespers.tokens.json
@@ -30,6 +59,14 @@ const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'whi
     <div class="ansi">
       {[...ansi, ...ansi.map((name) => `bright-${name}`)].map((name) => <i title={name} style={`background: var(--san-ansi-${name})`} />)}
     </div>
+  </div>
+  {
+    withCode && (
+      <div class="win">
+        <pre class="code" set:html={code} />
+      </div>
+    )
+  }
   </div>
 </div>
 
@@ -70,15 +107,17 @@ const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'whi
   .mod { padding: 0 var(--san-space-2); color: var(--c); border-bottom: var(--san-border-width-came) solid var(--c); }
   .mod--clock { --c: var(--san-text); }
 
+  .tiles { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--san-space-3); }
+  .tiles--two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); }
   .win {
     min-width: 0;
     padding: var(--san-space-4);
     background: color-mix(in oklch, var(--san-surface) 94%, transparent);
-    border: var(--san-border-width-came) solid var(--san-accent);
+    border: var(--san-border-width-came) solid var(--san-lead);
     border-radius: var(--san-radius-sm);
-    box-shadow: var(--san-cast-md);
   }
-  .term { margin: 0; overflow-x: auto; font: var(--san-type-code-sm); color: var(--san-text); }
+  .win--active { border-color: var(--san-accent); box-shadow: var(--san-cast-md); }
+  .term, .code { margin: 0; overflow-x: auto; font: var(--san-type-code-sm); color: var(--san-text); }
 
   .a-red { color: var(--san-ansi-red); }
   .a-green { color: var(--san-ansi-green); }
@@ -89,6 +128,16 @@ const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'whi
   .a-dim { color: var(--san-ansi-bright-black); }
   .cursor { background: var(--san-accent); animation: blink 1.1s steps(1) infinite; }
   @keyframes blink { 50% { background: transparent; } }
+
+  /* The code arrives as HTML (set:html), which scoped styles do not reach. */
+  .code :global(.c) { color: var(--san-syntax-comment); font-style: italic; }
+  .code :global(.k) { color: var(--san-syntax-keyword); }
+  .code :global(.s) { color: var(--san-syntax-string); }
+  .code :global(.f) { color: var(--san-syntax-function); }
+  .code :global(.t) { color: var(--san-syntax-type); }
+  .code :global(.p) { color: var(--san-syntax-property); }
+  .code :global(.o) { color: var(--san-syntax-operator); }
+  .code :global(.tag) { color: var(--san-syntax-tag); }
 
   .ansi { display: grid; grid-template-columns: repeat(8, 1fr); gap: var(--san-space-half); margin-top: var(--san-space-4); }
   .ansi i { height: 1.25rem; border-radius: var(--san-radius-xs); }

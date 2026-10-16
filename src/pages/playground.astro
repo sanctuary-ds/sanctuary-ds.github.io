@@ -4,7 +4,9 @@
 // renders, so it never links to a section that is not here.
 import Base from '../layouts/Base.astro';
 import ComponentsDemo from '../components/ComponentsDemo.astro';
+import DesktopDemo from '../components/DesktopDemo.astro';
 import FlavorDemo from '../components/FlavorDemo.astro';
+import FoundationsDemo from '../components/FoundationsDemo.astro';
 import GlazingDemo from '../components/GlazingDemo.astro';
 import Inscription from '../components/Inscription.astro';
 import LightDemo from '../components/LightDemo.astro';
@@ -57,12 +59,25 @@ const sections = [
     intro:
       'In a dark building, what is nearer to you is not only shadowed from behind, it is better lit. Each Lumen level pairs a lighter stone with a deeper umbra; at level 5 only the umbra deepens. Cast is the separate, coloured glow that glass throws on its surroundings.',
   },
+  {
+    id: 'foundations',
+    name: 'Foundations',
+    title: 'Type, shape, space and motion',
+    intro: 'The systemic layer: every value below is a DTCG token with a matching custom property.',
+  },
+  {
+    id: 'rice',
+    name: 'Ricing',
+    title: 'Out of the browser, onto the desktop',
+    intro:
+      'The same palette is emitted as terminal themes, base16 schemes and bar and window-manager variables. This mock reads the generated ANSI and syntax tokens.',
+  },
 ];
 // The same sections, keyed by id and numbered, for rendering each one below.
 const byId = Object.fromEntries(sections.map((entry, index) => [entry.id, { ...entry, number: index + 1 }]));
 ---
 
-<Base title="Playground · Sanctuary" description="Every axis of Sanctuary live: flavors, pigments, glazing, windows, components and light.">
+<Base title="Playground · Sanctuary" description="Every axis of Sanctuary live: flavors, pigments, glazing, windows, components, light, foundations and ricing.">
   <main>
     <header class="intro">
       <Inscription>Every axis, live</Inscription>
@@ -108,6 +123,14 @@ const byId = Object.fromEntries(sections.map((entry, index) => [entry.id, { ...e
 
     <PlaygroundSection {...byId.light}>
       <LightDemo />
+    </PlaygroundSection>
+
+    <PlaygroundSection {...byId.foundations}>
+      <FoundationsDemo />
+    </PlaygroundSection>
+
+    <PlaygroundSection {...byId.rice}>
+      <DesktopDemo withCode />
     </PlaygroundSection>
   </main>
   <Toast />
