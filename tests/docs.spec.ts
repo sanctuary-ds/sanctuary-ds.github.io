@@ -36,6 +36,20 @@ test.describe('docs', () => {
     });
   }
 
+  // Code samples name tokens by hand; each must exist in the core.
+  for (const doc of docFiles) {
+    test(`every token in the code of ${doc.path} is defined by the stylesheet`, async ({ page }) => {
+      await page.goto(doc.path);
+      const code = (await page.locator('.prose code').allTextContents()).join('\n');
+      const tokens = [...new Set(code.match(/--san-[a-z0-9][a-z0-9-]*/g) ?? [])];
+      const missing = await page.evaluate(
+        (names) => names.filter((name) => getComputedStyle(document.documentElement).getPropertyValue(name) === ''),
+        tokens,
+      );
+      expect(missing).toEqual([]);
+    });
+  }
+
   // On a phone the page opens on its text; the index follows it.
   test('the index comes after the text in the document', async ({ page }) => {
     await page.goto(ordered[0].path);

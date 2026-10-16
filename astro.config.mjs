@@ -1,3 +1,4 @@
+import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { defineConfig, fontProviders } from 'astro/config';
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
@@ -37,6 +38,9 @@ export default defineConfig({
   // Code blocks stay plain text styled with the tokens (src/layouts/Doc.astro): a
   // fixed highlighting theme would ignore the flavor and could fail its contrast.
   markdown: { syntaxHighlight: false },
-  // Lists every page for search engines, from `site`; robots.txt points to it.
-  integrations: [sitemap()],
+  // MDX lets a docs page place components among its Markdown, so tables derived
+  // from the core are generated from its palette instead of copied by hand. It
+  // inherits the markdown settings above. The sitemap lists every page for
+  // search engines, from `site`; robots.txt points to it.
+  integrations: [mdx(), sitemap()],
 });

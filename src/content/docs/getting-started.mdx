@@ -5,6 +5,8 @@ section: start
 order: 1
 ---
 
+import AxesTable from '../../components/docs/AxesTable.astro';
+
 Sanctuary ships as design tokens: CSS custom properties, the same values as JSON, and DTCG files for design tools. This page takes you from nothing to a themed page.
 
 ## Install
@@ -37,12 +39,7 @@ Four attributes set the look. Put them on `<html>` for the whole page:
 <html data-san-flavor="vespers" data-san-accent="amber" data-san-glazing="flashed">
 ```
 
-| Attribute | Values | What it changes |
-|-----------|--------|-----------------|
-| `data-san-flavor` | `lauds` (dawn, light), `vespers` (dusk), `compline` (night, default), `matins` (deep night) | Stone, ink, lead and shadow. Every pigment is re-toned to stay legible. |
-| `data-san-accent` | `ruby` `ember` `amber` `gilt` `verdure` `viridian` `azure` `cobalt` `indigo` `amethyst` `murrey` `rose` | Which pigment does the precise work: actions, focus, selection. Without it, each flavor uses its own. |
-| `data-san-glazing` | `pot-metal` (solid, default), `flashed` (translucent, glowing), `grisaille` (line only) | How the accent is rendered on a filled element. |
-| `data-san-window` | `mono` (default), `harmonic` | The light that is cast: gradients, glows, heroes. `mono` uses the accent alone; `harmonic` leads it with its two neighbors on the hue wheel. |
+<AxesTable />
 
 Any element can carry these attributes, so a card can sit in another flavor or accent than its page. To compare looks before you choose, try them in the [playground](/playground).
 
