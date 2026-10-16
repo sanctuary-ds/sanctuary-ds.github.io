@@ -37,8 +37,7 @@ The core lives in [`sanctuary-ds/tokens`](https://github.com/sanctuary-ds/tokens
 
 Rules:
 
-- Until the core is on npm, depend on it through git, pinned to a commit: `"@sanctuary-ds/tokens": "github:sanctuary-ds/tokens#<commit>"`. The built files are committed in the core, so no build runs on install.
-- The core publishes `0.1.0` to npm when this site reaches phase 3, because the token reference fixes token names as public API. Switch the dependency then.
+- Depend on the core from npm, pinned to an exact version: `"@sanctuary-ds/tokens": "0.1.0"`. The core published `0.1.0` when this site reached phase 3, because the token reference fixes token names as public API.
 - Updating the core version is its own commit, reviewed for visual changes.
 - Theming uses the core's attributes on `<html>`: `data-san-flavor`, `data-san-accent`, `data-san-glazing` and `data-san-window`. The site never invents its own theme attributes.
 - Token names are the core's public API. See its [versioning rules](https://github.com/sanctuary-ds/tokens/blob/main/docs/ecosystem.md#versioning).
@@ -105,7 +104,7 @@ Each phase is deployable on its own.
 - [ ] Token reference generated from the DTCG files.
 - [ ] Pagefind search.
 - [ ] Automated accessibility check in CI.
-- [ ] Switch to `@sanctuary-ds/tokens` from npm once `0.1.0` is published.
+- [x] Switch to `@sanctuary-ds/tokens` from npm once `0.1.0` is published.
 
 ### Phase 4: Spanish
 

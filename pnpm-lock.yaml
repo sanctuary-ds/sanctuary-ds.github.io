@@ -170,8 +170,8 @@ importers:
         specifier: 3.7.4
         version: 3.7.4
       '@sanctuary-ds/tokens':
-        specifier: github:sanctuary-ds/tokens#32c02862096cdaed1c5330bdb06d51360acb4f31
-        version: https://codeload.github.com/sanctuary-ds/tokens/tar.gz/32c02862096cdaed1c5330bdb06d51360acb4f31
+        specifier: 0.1.0
+        version: 0.1.0
       astro:
         specifier: 7.3.5
         version: 7.3.5(@types/node@24.19.2)
@@ -807,9 +807,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@sanctuary-ds/tokens@https://codeload.github.com/sanctuary-ds/tokens/tar.gz/32c02862096cdaed1c5330bdb06d51360acb4f31':
-    resolution: {gitHosted: true, integrity: sha512-IPRpTAPHWsmwhIyCQ2pVBbJWI48nbY/UzbISFdrCSMOf4TPXEspgHaBwMKhka71wH2/uUx++GZDo893n5i2ZCg==, tarball: https://codeload.github.com/sanctuary-ds/tokens/tar.gz/32c02862096cdaed1c5330bdb06d51360acb4f31}
-    version: 0.1.0
+  '@sanctuary-ds/tokens@0.1.0':
+    resolution: {integrity: sha512-lpQ0r7PQAIq3GEer2HIOlNqYrbNGKAwyTPwAXqw0TnlZOg6D0XZ/pu1XT4aPyccLBVWVHnBxmpKb7f+KFUYuvw==}
     engines: {node: '>=22'}
 
   '@shikijs/core@4.5.0':
@@ -1350,6 +1349,17 @@ packages:
           targets:
             - cpu: x64
               os: win32
+        - resolution:
+            archive: tarball
+            bin:
+              node: bin/node
+            integrity: sha256-aBKlPls3+8MkdtbDURA40rw7vRs7s0jWwE3Sxwocj0o=
+            type: binary
+            url: https://unofficial-builds.nodejs.org/download/release/v24.22.0/node-v24.22.0-linux-arm64-musl.tar.gz
+          targets:
+            - cpu: arm64
+              os: linux
+              libc: musl
         - resolution:
             archive: tarball
             bin:
@@ -2156,7 +2166,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@sanctuary-ds/tokens@https://codeload.github.com/sanctuary-ds/tokens/tar.gz/32c02862096cdaed1c5330bdb06d51360acb4f31': {}
+  '@sanctuary-ds/tokens@0.1.0': {}
 
   '@shikijs/core@4.5.0':
     dependencies:
