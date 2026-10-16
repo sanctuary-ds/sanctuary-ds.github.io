@@ -23,8 +23,7 @@ export const products = [
     name: 'Sanctuary Tokens',
     text: 'The foundation: a CSS stylesheet, DTCG tokens and a resolved palette.json, with contrast checked by tests.',
     horizon: 'available',
-    // The repository becomes `tokens` before the npm release; GitHub redirects the old name.
-    href: `${ORG}/sanctuary`,
+    href: `${ORG}/tokens`,
   },
   {
     id: 'web-components',
@@ -58,8 +57,7 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
     text: `A CSS stylesheet with ${count(palette.flavors)} flavors, ${count(palette.pigments)} accents and ${count(palette.glazings)} glazings, switched with three HTML attributes.`,
   },
   { horizon: 'available', product: 'tokens', text: 'DTCG design tokens and a plain palette.json for tools without a token pipeline.' },
-  { horizon: 'available', product: 'tokens', text: 'WCAG AA contrast, checked by tests in every flavor.' },
-  { horizon: 'available', product: 'tokens', text: 'Motion tokens meant to be dropped under reduced motion, as this site does.' },
+  { horizon: 'available', product: 'tokens', text: 'WCAG AA contrast, checked by tests in every flavor; reduced motion respected.' },
   { horizon: 'available', product: 'site', text: 'This site: the home page, the playground and this roadmap.' },
 
   { horizon: 'in-progress', product: 'site', text: 'Documentation: getting started, philosophy, foundations and a generated token reference.' },

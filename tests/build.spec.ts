@@ -15,7 +15,7 @@ test('the core tokens the site reads are defined', async ({ page }) => {
   await page.goto('/');
   const tokens = await page.evaluate(() => {
     const style = getComputedStyle(document.documentElement);
-    return ['--san-surface', '--san-text', '--san-type-body-md', '--san-type-body-md-tracking'].map((name) => [
+    return ['--san-surface', '--san-text', '--san-type-body-md', '--san-type-body-md-tracking', '--san-light', '--san-umbra-key'].map((name) => [
       name,
       style.getPropertyValue(name).trim(),
     ]);
@@ -89,4 +89,40 @@ test('the page loads without console errors or failed requests', async ({ page }
   page.on('response', (response) => response.status() >= 400 && problems.push(`${response.status()} ${response.url()}`));
   await page.goto('/', { waitUntil: 'networkidle' });
   expect(problems).toEqual([]);
+});
+
+test.describe('with reduced motion', () => {
+  test.use({ reducedMotion: 'reduce' });
+
+  // The core drops every duration to 0ms; the lectern reads the procession
+  // duration to time the theme change, so it must follow.
+  test('every core duration is 0ms', async ({ page }) => {
+    await page.goto('/');
+    const durations = await page.evaluate(() => {
+      const style = getComputedStyle(document.documentElement);
+      return ['instant', 'fast', 'base', 'slow', 'slower', 'procession'].map((name) => style.getPropertyValue(`--san-duration-${name}`).trim());
+    });
+    // The build's minifier may write 0ms as 0s, so compare the time, not the text.
+    expect(durations.map((value) => parseFloat(value) * (value.endsWith('ms') ? 1 : 1000))).toEqual(Array(6).fill(0));
+  });
+});
+
+// White light and shade come from the core (--san-light, --san-umbra-key), not
+// from literals: changing the token changes what the page paints.
+test('the rose and the lancets take their light and shade from the core', async ({ page }) => {
+  await page.goto('/');
+  const paint = () =>
+    page.evaluate(() => ({
+      stops: [...document.querySelectorAll('#rose-sun stop')].map((stop) => getComputedStyle(stop).stopColor),
+      sheen: getComputedStyle(document.querySelector('.glass')!).backgroundImage,
+    }));
+  const before = await paint();
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty('--san-light', 'rgb(255, 0, 0)');
+    document.documentElement.style.setProperty('--san-umbra-key', 'rgb(0, 0, 255)');
+  });
+  const after = await paint();
+  expect(after.stops).toHaveLength(3);
+  for (const index of [0, 1, 2]) expect(after.stops[index], `stop ${index}`).not.toBe(before.stops[index]);
+  expect(after.sheen).not.toBe(before.sheen);
 });
