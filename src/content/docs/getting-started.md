@@ -42,7 +42,7 @@ Four attributes set the look. Put them on `<html>` for the whole page:
 | `data-san-flavor` | `lauds` (dawn, light), `vespers` (dusk), `compline` (night, default), `matins` (deep night) | Stone, ink, lead and shadow. Every pigment is re-toned to stay legible. |
 | `data-san-accent` | `ruby` `ember` `amber` `gilt` `verdure` `viridian` `azure` `cobalt` `indigo` `amethyst` `murrey` `rose` | Which pigment does the precise work: actions, focus, selection. Without it, each flavor uses its own. |
 | `data-san-glazing` | `pot-metal` (solid, default), `flashed` (translucent, glowing), `grisaille` (line only) | How the accent is rendered on a filled element. |
-| `data-san-window` | `mono` (default), `harmonic` | The light that is cast: gradients, glows, heroes. `mono` uses the accent alone; `harmonic` leads it with its two neighbours on the hue wheel. |
+| `data-san-window` | `mono` (default), `harmonic` | The light that is cast: gradients, glows, heroes. `mono` uses the accent alone; `harmonic` leads it with its two neighbors on the hue wheel. |
 
 Any element can carry these attributes, so a card can sit in another flavor or accent than its page. To compare looks before you choose, try them in the [playground](/playground).
 
@@ -68,7 +68,7 @@ Change any attribute and the button follows, with no change to your CSS.
 
 ## The palette as data
 
-The resolved colours are also available as JSON, for scripts and build steps:
+The resolved colors are also available as JSON, for scripts and build steps:
 
 ```js
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
@@ -78,4 +78,4 @@ The DTCG files under `tokens/` in the package serve design tools and token pipel
 
 ## Fonts
 
-Sanctuary names its fonts but does not ship them. Each family keeps its own licence; load them from your own host or a font service.
+Sanctuary names its fonts but does not ship them. Each family keeps its own license; load them from your own host or a font service.

@@ -73,3 +73,17 @@ test.describe('getting started', () => {
     }
   });
 });
+
+test.describe('philosophy', () => {
+  // The materials table names tokens by hand; each must exist in the core.
+  test('every token in the materials table is defined by the stylesheet', async ({ page }) => {
+    await page.goto('/docs/philosophy');
+    const names = (await page.locator('table', { hasText: 'Material' }).locator('td:last-child code').allTextContents()).filter((name) => !name.endsWith('-'));
+    expect(names.length).toBeGreaterThan(10);
+    const missing = await page.evaluate(
+      (tokens) => tokens.filter((token) => getComputedStyle(document.documentElement).getPropertyValue(`--san-${token}`) === ''),
+      names,
+    );
+    expect(missing).toEqual([]);
+  });
+});

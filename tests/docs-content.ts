@@ -19,7 +19,9 @@ const frontMatter = (text: string) =>
     text
       .match(/^---\n([\s\S]*?)\n---/)![1]
       .split('\n')
-      .map((line) => line.match(/^(\w+):\s*(.*)$/)!.slice(1)),
+      .map((line) => line.match(/^(\w+):\s*(.*)$/)!.slice(1))
+      // A value with a colon of its own is quoted in YAML.
+      .map(([key, value]) => [key, value.replace(/^"(.*)"$/, '$1')]),
   );
 
 export const docFiles: DocFile[] = readdirSync(ROOT, { recursive: true, encoding: 'utf8' })
