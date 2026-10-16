@@ -1,0 +1,14 @@
+# Keeps the GitHub Actions in .github/workflows up to date. They are pinned to commit SHAs;
+# Dependabot updates both the SHA and the version comment beside it.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    # One pull request per week for all actions, instead of one per action.
+    groups:
+      actions:
+        patterns: ['*']
+    commit-message:
+      prefix: ci
