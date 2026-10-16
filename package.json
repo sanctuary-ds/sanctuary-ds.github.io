@@ -29,6 +29,7 @@
     "astro": "7.3.5"
   },
   "devDependencies": {
-    "@playwright/test": "1.63.0"
+    "@playwright/test": "1.63.0",
+    "pagefind": "1.5.2"
   }
 }

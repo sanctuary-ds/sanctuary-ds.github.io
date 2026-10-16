@@ -21,7 +21,7 @@ const notes = (groups: string[]) => Object.entries(groupNotes).filter(([prefix])
 const foldNote = (groups: string[], key: string) => groups.map((group) => groupNotes[`--san-${group}-${key}`]).find(Boolean);
 ---
 
-<nav aria-label="Token groups">
+<nav aria-label="Token groups" data-pagefind-ignore>
   <ul class="groups">
     {sections.map(({ id, title }) => <li><a href={`#${id}`}>{title}</a></li>)}
     <li><a href="#css-only">CSS only</a></li>

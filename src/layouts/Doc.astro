@@ -21,7 +21,7 @@ const current = (href: string) => (href === here ? 'page' : undefined);
 
 <Base title={`${title} · Sanctuary docs`} description={description}>
   <div class="docs">
-    <main class="docs__main">
+    <main class="docs__main" data-pagefind-body>
       <header class="docs__head">
         <Inscription>{inscription}</Inscription>
         <h1>{title}</h1>
