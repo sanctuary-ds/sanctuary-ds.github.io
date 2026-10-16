@@ -58,12 +58,12 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
   },
   { horizon: 'available', product: 'tokens', text: 'DTCG design tokens and a plain palette.json for tools without a token pipeline.' },
   { horizon: 'available', product: 'tokens', text: 'WCAG AA contrast, checked by tests in every flavor; reduced motion respected.' },
+  { horizon: 'available', product: 'tokens', text: 'Install the tokens from npm: @sanctuary-ds/tokens 0.1.0.' },
   { horizon: 'available', product: 'site', text: 'This site: the home page, the playground and this roadmap.' },
 
   { horizon: 'in-progress', product: 'site', text: 'Documentation: getting started, philosophy, foundations and a generated token reference.' },
   { horizon: 'in-progress', product: 'site', text: 'Search across the site.' },
 
-  { horizon: 'next', product: 'tokens', text: 'Install the tokens from npm (@sanctuary-ds/tokens 0.1.0).' },
   { horizon: 'next', product: 'ports', text: 'Ports for desktop applications such as mangowm, Waybar and foot, each with install steps and a screenshot.' },
   { horizon: 'next', product: 'site', text: 'A ports gallery on this site.' },
   { horizon: 'next', product: 'site', text: 'Documentation in Spanish.' },
