@@ -87,7 +87,9 @@ const current = (href: string) => (href === here ? 'page' : undefined);
 
   /* The text comes from Markdown, so its elements are reached through :global.
      Lists the page builds itself carry a class and keep their own layout. */
-  .prose { max-width: var(--san-size-measure); }
+  /* Running text keeps the reading measure; generated tables, which carry a
+     class, may use the whole column. */
+  .prose :global(:is(p, ul, ol, pre, h2, h3, table:not([class]))) { max-width: var(--san-size-measure); }
   .prose :global(:is(h2, h3)) { margin: var(--san-space-12) 0 var(--san-space-4); }
   .prose :global(h2) { font: var(--san-type-headline-sm); letter-spacing: var(--san-type-headline-sm-tracking); }
   .prose :global(h3) { font: var(--san-type-title-lg); }
@@ -106,7 +108,8 @@ const current = (href: string) => (href === here ? 'page' : undefined);
     border-radius: var(--san-radius-sm);
     background: var(--san-surface-sunken);
   }
-  .prose :global(table) { display: block; overflow-x: auto; border-collapse: collapse; }
+  .prose :global(table) { border-collapse: collapse; }
+  .prose :global(table:not([class])) { display: block; overflow-x: auto; }
   .prose :global(:is(th, td)) { padding: var(--san-space-2) var(--san-space-4); border-bottom: var(--san-border-width-hairline) solid var(--san-lead-soft); text-align: left; vertical-align: top; }
   .prose :global(th) { font: var(--san-type-label-lg); }
   .prose :global(td:first-child code) { white-space: nowrap; }

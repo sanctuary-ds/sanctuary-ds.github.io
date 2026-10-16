@@ -1,0 +1,16 @@
+---
+title: Tokens
+description: Every token of the core, generated from its DTCG files.
+section: reference
+order: 1
+---
+
+import TokenReference from '../../components/docs/TokenReference.astro';
+
+Every token is a custom property prefixed `--san-`. Its name is the DTCG path joined with hyphens, and a group's `$root` token takes the group's own name: `accent.$root` is `--san-accent`. A typography token also has a `-tracking` property, its letter spacing.
+
+This page is generated from the DTCG files in the package, through their resolver document, each time the site is built. Colors that change with the flavor show one column per flavor. A value that names another token is an alias, shown without the `--san-` prefix: the stylesheet reads that token, so it follows the theme.
+
+The accent tokens show each flavor's own accent. Setting `data-san-accent` points them at another pigment's glass.
+
+<TokenReference />
