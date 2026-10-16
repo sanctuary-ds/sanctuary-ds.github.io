@@ -17,11 +17,19 @@ const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 // tone) and only shows on hover, so it is left out of the audit.
 const EXCLUDED = ['.tone > span'];
 
+// A page opened with ?flavor=matins restores the look before the first paint,
+// then the lectern marks the chosen flavor, and its buttons fade between states.
+// axe audits the page at rest: it waits for running CSS transitions (not the
+// endless ambient animations) to finish, so it never measures a color halfway.
+const settle = (page: import('@playwright/test').Page) =>
+  page.waitForFunction(() => document.getAnimations().every((animation) => !(animation instanceof CSSTransition) || animation.playState !== 'running'));
+
 for (const flavor of Object.keys(palette.flavors)) {
   test.describe(`accessibility in ${flavor}`, () => {
     for (const path of pages) {
       test(`${path} has no violations`, async ({ page }) => {
         await page.goto(`${path}?flavor=${flavor}`);
+        await settle(page);
         const { violations } = await new AxeBuilder({ page }).withTags(WCAG).exclude(EXCLUDED).analyze();
         expect(violations.map(({ id, nodes }) => `${id}: ${nodes.map((node) => node.target.join(' ')).join(', ')}`)).toEqual([]);
       });
@@ -33,6 +41,7 @@ for (const flavor of Object.keys(palette.flavors)) {
       await page.getByRole('button', { name: 'Search' }).click();
       await page.getByLabel('Search the site').fill('accent');
       await expect(page.locator('.search__result').first()).toBeVisible();
+      await settle(page);
       const { violations } = await new AxeBuilder({ page }).withTags(WCAG).include('dialog.search').analyze();
       expect(violations.map(({ id, nodes }) => `${id}: ${nodes.map((node) => node.target.join(' ')).join(', ')}`)).toEqual([]);
     });
