@@ -1,0 +1,52 @@
+---
+title: Light
+description: "Elevation as illumination: Lumen for hierarchy, Cast for state, Halo for focus."
+section: foundations
+order: 4
+---
+
+import TokenTable from '../../../components/docs/TokenTable.astro';
+
+Material Design models elevation as distance from a light above. Sanctuary models it as illumination: in a dark room, what is closer to you is better lit. Use Lumen for hierarchy and Cast for state; a surface should rarely need both at full strength. See both in the [playground](/playground#light).
+
+## Lumen
+
+Each level pairs a lighter stone (`surface-raised-n`) with a deeper umbra (`elevation-n`). The stone stops at level 4, where Lauds already reaches white, so level 5, for modals and the most prominent floating surfaces, pairs `surface-raised-4` with the deepest umbra. In Lauds the shadow does most of the work.
+
+```css
+.card {
+  background: var(--san-surface-raised-2);
+  box-shadow: var(--san-elevation-2);
+}
+```
+
+<TokenTable groups={['elevation']} />
+
+The shadows are drawn in `umbra-key` and `umbra-ambient`, which each flavor sets; see the [token reference](/docs/tokens#stone).
+
+## Cast
+
+Cast is the colored glow that glass throws on its surroundings: `--san-cast-sm`, `--san-cast-md` and `--san-cast-lg`. It signals energy: hover, selection, an active window. Cast follows the accent, so it exists only in the stylesheet, computed from it.
+
+## Halo
+
+`--san-halo` is the focus ring: a band of stone and then a ring of the accent, which clears the 3:1 contrast that WCAG asks of focus indicators.
+
+```css
+.button:focus-visible {
+  outline: none;
+  box-shadow: var(--san-halo);
+}
+```
+
+## State layers
+
+Hover, focus and pressed are layers of the content color laid over a control. The stylesheet computes `--san-state-hover`, `--san-state-focus` and `--san-state-pressed` from `currentColor`, so they follow whatever color the content has. The token files hold their opacities, with those for disabled content and containers:
+
+<TokenTable groups={['state']} />
+
+## Blur
+
+For glass surfaces, such as flashed glazing over an image:
+
+<TokenTable groups={['blur']} />

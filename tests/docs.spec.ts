@@ -41,7 +41,8 @@ test.describe('docs', () => {
     test(`every token in the code of ${doc.path} is defined by the stylesheet`, async ({ page }) => {
       await page.goto(doc.path);
       const code = (await page.locator('.prose code').allTextContents()).join('\n');
-      const tokens = [...new Set(code.match(/--san-[a-z0-9][a-z0-9-]*/g) ?? [])];
+      // A name cut short by a pattern (--san-duration-*, --san-font-family-<role>) ends in a hyphen; it names a family, not a token.
+      const tokens = [...new Set(code.match(/--san-[a-z0-9][a-z0-9-]*/g) ?? [])].filter((name) => !name.endsWith('-'));
       const missing = await page.evaluate(
         (names) => names.filter((name) => getComputedStyle(document.documentElement).getPropertyValue(name) === ''),
         tokens,

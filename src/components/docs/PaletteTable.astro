@@ -1,0 +1,36 @@
+---
+// One of the foundations tables (src/data/foundations.ts), built from the core's
+// palette. It may use the whole column, and scrolls inside its own box when it
+// is wider than that.
+import { tables, type TableName } from '../../data/foundations';
+
+interface Props {
+  of: TableName;
+}
+
+const { headers, rows, ids } = tables[Astro.props.of];
+---
+
+<div class="scroll">
+  <table class="data">
+    <thead>
+      <tr>{headers.map((header) => <th scope="col">{header}</th>)}</tr>
+    </thead>
+    <tbody>
+      {
+        rows.map(([first, ...rest]) => (
+          <tr>
+            <th scope="row">{ids ? <code>{first}</code> : first}</th>
+            {rest.map((cell) => <td>{cell}</td>)}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .scroll { overflow-x: auto; margin: 0 0 var(--san-space-4); }
+  .data { width: 100%; margin: 0; }
+  .data th[scope='row'] { font: inherit; white-space: nowrap; }
+</style>

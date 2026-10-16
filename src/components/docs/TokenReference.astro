@@ -3,10 +3,9 @@
 // Tokens that change with the flavor show one column per flavor. Glass and the
 // pigment ramps fold by pigment, so the page stays readable; folded rows are
 // still in the page, for search.
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
-import { cssOnly, flavors, groupNotes, sections, tokensOf, type Token } from '../../data/tokens';
+import TokenTable from './TokenTable.astro';
+import { cssOnly, groupNotes, sections, tokensOf } from '../../data/tokens';
 
-const flavorName = (id: string) => (palette.flavors as Record<string, { name: string }>)[id].name;
 const folded = new Set(['glass', 'pigment']);
 
 // Splits a section's tokens into folds by subgroup (one per pigment), or one
@@ -20,7 +19,6 @@ const blocks = (groups: string[]) => {
 
 const notes = (groups: string[]) => Object.entries(groupNotes).filter(([prefix]) => groups.some((group) => prefix === `--san-${group}`));
 const foldNote = (groups: string[], key: string) => groups.map((group) => groupNotes[`--san-${group}-${key}`]).find(Boolean);
-const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
 ---
 
 <nav aria-label="Token groups">
@@ -36,35 +34,7 @@ const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'st
       <h2 id={id}>{title}</h2>
       {notes(groups).map(([, note]) => <p>{note}</p>)}
       {blocks(groups).map(({ key, tokens }) => {
-        const byFlavor = tokens.some((token) => token.byFlavor);
-        const table = (
-          <div class="scroll">
-          <table class:list={['tokens', byFlavor && 'tokens--flavors']}>
-            <thead>
-              <tr>
-                <th scope="col">Token</th>
-                {byFlavor ? flavors.map((flavor) => <th scope="col">{flavorName(flavor)}</th>) : <th scope="col">Value</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {tokens.map((token) => (
-                <tr>
-                  <th scope="row"><code>{token.name}</code>{token.description && <span class="note">{token.description}</span>}</th>
-                  {(byFlavor ? flavors : [undefined]).map((flavor) => {
-                    const swatch = swatchOf(token, flavor);
-                    return (
-                      <td>
-                        {swatch && <span class="swatch" style={`background: ${swatch}`} aria-hidden="true" />}
-                        <code>{flavor ? token.byFlavor![flavor] : token.value}</code>
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          </div>
-        );
+        const table = <TokenTable tokens={tokens} />;
         return key ? (
           <details>
             <summary>
@@ -87,55 +57,18 @@ const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'st
     The DTCG format has no color functions and no clip paths, so these tokens exist only in the stylesheet. They are computed from the flavor, accent,
     glazing and window, and the value shown is the stylesheet's first declaration.
   </p>
-  <div class="scroll">
-  <table class="tokens">
-    <thead>
-      <tr><th scope="col">Token</th><th scope="col">Declaration</th></tr>
-    </thead>
-    <tbody>
-      {
-        cssOnly.map((token) => (
-          <tr>
-            <th scope="row"><code>{token.name}</code></th>
-            <td><code>{token.value}</code></td>
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
-  </div>
+  <TokenTable tokens={cssOnly} value="Declaration" />
 </section>
 
 <style>
   .groups { display: flex; flex-wrap: wrap; gap: var(--san-space-2) var(--san-space-4); padding: 0; list-style: none; }
   .groups li { margin: 0; }
 
-  /* Wide tables scroll inside their own box, never the page. */
-  .scroll { overflow-x: auto; margin: 0 0 var(--san-space-4); }
-  .tokens { width: 100%; margin: 0; }
-  /* The name column hugs its names, so values sit close to them. */
-  .tokens th[scope='row'] { width: 1%; font: inherit; }
-  .tokens :is(th, td) { padding: var(--san-space-2) var(--san-space-3); }
-  .tokens code { font: var(--san-type-code-sm); }
-  .tokens td code { overflow-wrap: anywhere; }
-  .tokens--flavors td { white-space: nowrap; }
-  .tokens--flavors :is(th, td) { padding-inline: var(--san-space-2); }
-  .tokens th[scope='row'] code { white-space: nowrap; }
   .note { display: block; margin-top: var(--san-space-1); font: var(--san-type-body-sm); color: var(--san-text-muted); }
-  .swatch {
-    display: inline-block;
-    width: 0.875rem;
-    height: 0.875rem;
-    margin-right: var(--san-space-2);
-    vertical-align: -0.125rem;
-    border: var(--san-border-width-hairline) solid var(--san-lead);
-    rotate: 45deg;
-    scale: 0.8;
-  }
 
   details { margin: 0 0 var(--san-space-3); border: var(--san-border-width-hairline) solid var(--san-lead-soft); border-radius: var(--san-radius-sm); }
   summary { padding: var(--san-space-3) var(--san-space-4); cursor: pointer; }
   summary .note { display: inline; margin: 0 0 0 var(--san-space-3); }
   summary:focus-visible { outline: none; border-radius: var(--san-radius-sm); box-shadow: var(--san-halo); }
-  details .scroll { margin: 0; }
+  details :global(.scroll) { margin: 0; }
 </style>
