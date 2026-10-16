@@ -88,6 +88,15 @@ test.describe('getting started', () => {
   });
 });
 
+test.describe('getting started glosses', () => {
+  // A few words on what each glazing looks like, as the hand-written table had.
+  test('each glazing says how it looks', async ({ page }) => {
+    await page.goto('/docs/getting-started');
+    const row = page.locator('tr', { has: page.locator('td:first-child code', { hasText: 'data-san-glazing' }) });
+    await expect(row.locator('td:nth-child(2)')).toHaveText('pot-metal (solid, default), flashed (translucent, glowing), grisaille (line only)');
+  });
+});
+
 test.describe('philosophy', () => {
   // The materials table names tokens by hand; each must exist in the core.
   test('every token in the materials table is defined by the stylesheet', async ({ page }) => {

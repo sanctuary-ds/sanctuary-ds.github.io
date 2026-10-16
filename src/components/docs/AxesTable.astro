@@ -15,6 +15,14 @@ const glossed = (id: string, ...words: (string | false)[]) => {
   return { id, gloss: gloss ? `(${gloss})` : undefined };
 };
 
+// How each glazing looks, in a few words. The palette's notes are sentences, too
+// long for this table; a glazing the core adds later shows without a gloss.
+const glazingLooks: Record<string, string> = {
+  'pot-metal': 'solid',
+  flashed: 'translucent, glowing',
+  grisaille: 'line only',
+};
+
 const rows: { attribute: string; values: Value[]; changes: string }[] = [
   {
     attribute: 'data-san-flavor',
@@ -30,7 +38,7 @@ const rows: { attribute: string; values: Value[]; changes: string }[] = [
   },
   {
     attribute: 'data-san-glazing',
-    values: Object.keys(palette.glazings).map((id) => glossed(id, id === palette.defaultGlazing && 'default')),
+    values: Object.keys(palette.glazings).map((id) => glossed(id, glazingLooks[id], id === palette.defaultGlazing && 'default')),
     changes: 'How the accent is rendered on a filled element.',
   },
   {
