@@ -23,6 +23,7 @@
     "test": "astro build && playwright test"
   },
   "dependencies": {
+    "@astrojs/sitemap": "3.7.4",
     "@sanctuary-ds/tokens": "github:sanctuary-ds/sanctuary#50d8fc38302695e8ef3c56c23647a6ef019f74d9",
     "astro": "7.3.5"
   },

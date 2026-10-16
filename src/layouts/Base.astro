@@ -16,6 +16,9 @@ interface Props {
 
 const { title, description } = Astro.props;
 const lang = Astro.currentLocale;
+// One URL per page for search engines: a theme preview (?flavor=lauds) is the
+// same page, so the canonical URL drops the query.
+const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!doctype html>
@@ -57,6 +60,7 @@ const lang = Astro.currentLocale;
     <style is:inline set:html={fontBridge + schemeStyles}></style>
     <title>{title}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
   </head>
   <body>
     <Lectern />
