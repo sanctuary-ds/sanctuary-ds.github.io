@@ -7,8 +7,8 @@ This document is the brief for whoever builds the site. Read it before changing 
 ## Principles
 
 - **Ship only what exists.** No page appears before what it documents is real. Planned parts of the ecosystem may be listed, disabled, and point to `/roadmap`, which says honestly what is planned.
-- **Generate, do not copy.** Anything derived from the core (token tables, colour swatches, contrast pairs) is generated at build time from the core package, never written by hand.
-- **The core owns the design.** The site consumes tokens; it never defines colours, contrast or token names of its own. A missing token is requested in the core, not patched here.
+- **Generate, do not copy.** Anything derived from the core (token tables, color swatches, contrast pairs) is generated at build time from the core package, never written by hand.
+- **The core owns the design.** The site consumes tokens; it never defines colors, contrast or token names of its own. A missing token is requested in the core, not patched here.
 - **Small, reviewable steps.** Each phase lands as one pull request made of small Conventional Commits.
 
 ## Stack
@@ -17,6 +17,7 @@ This document is the brief for whoever builds the site. Read it before changing 
 |-------|--------|--------|
 | Generator | [Astro](https://astro.build/), static output | No server; content in Markdown and MDX |
 | Search | [Pagefind](https://pagefind.app/), indexed at build time | Static, no external service |
+| Tests | [Playwright](https://playwright.dev/), with [axe](https://github.com/dequelabs/axe-core) auditing every page in every flavor | The built site is tested as visitors get it; WCAG rules run in CI |
 | UI | Astro components styled with the Sanctuary stylesheet | No UI framework until Sanctuary Web Components exist; then the site uses them |
 | Deploy | GitHub Pages through `withastro/action` | Official action, no extra hosting |
 | Package manager | pnpm | Same as the core |
@@ -63,7 +64,7 @@ The showcase moves from the core into this repository: it becomes `/playground`,
 /roadmap               What exists and what is planned
 /docs/getting-started  Install and first use
 /docs/philosophy       The design language
-/docs/foundations/*    Colour, type, shape, light, motion
+/docs/foundations/*    Color, type, shape, light, motion
 /docs/tokens           Generated token reference
 /docs/accessibility    Contrast and motion guarantees
 /docs/guides/*         Theming an app, writing a port
@@ -100,10 +101,10 @@ Each phase is deployable on its own.
 
 ### Phase 3: Documentation
 
-- [ ] Getting started, philosophy, foundations, accessibility, guides.
-- [ ] Token reference generated from the DTCG files.
-- [ ] Pagefind search.
-- [ ] Automated accessibility check in CI.
+- [x] Getting started, philosophy, foundations, accessibility, guides.
+- [x] Token reference generated from the DTCG files.
+- [x] Pagefind search.
+- [x] Automated accessibility check in CI.
 - [x] Switch to `@sanctuary-ds/tokens` from npm once `0.1.0` is published.
 
 ### Phase 4: Spanish

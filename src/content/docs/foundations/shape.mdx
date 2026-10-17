@@ -1,0 +1,41 @@
+---
+title: Shape
+description: Small radii for cut stone, pointed arches, and lead lines between panes.
+section: foundations
+order: 3
+---
+
+import TokenTable from '../../../components/docs/TokenTable.astro';
+
+Stone is cut, so radii are small. Roundness is spent on two signature shapes, the pointed arches, and on nothing else. See every shape in the [playground](/playground#foundations).
+
+## Radius
+
+<TokenTable groups={['radius']} />
+
+`radius-full` makes a pill or a circle; everything else stays close to square.
+
+## Arches
+
+Two pointed arches are generated as percentage polygons, for `clip-path`. They exist only in the stylesheet, because the DTCG format has no clip paths.
+
+- `--san-shape-lancet`: an arch on a rectangular body, for media, cards and window previews.
+- `--san-shape-ogive`: the arch alone, for avatars and badges.
+
+```css
+.cover {
+  aspect-ratio: 3 / 4;
+  clip-path: var(--san-shape-lancet);
+  background: var(--san-window);
+}
+```
+
+## The quarry
+
+The diamond, a square turned 45°, is the small-scale motif: bullets, status dots, the accent picker. It is the quarry, the plain diamond pane of ordinary glazing. It needs no token, only `rotate: 45deg`.
+
+## Lead
+
+Borders are lead: dark, definite lines between panes, structure rather than decoration. `came` is the line between two panes; the colors are `lead-soft`, `lead`, `lead-strong` and `lead-came`, described on the [color page](/docs/foundations/color#stone-ink-and-lead).
+
+<TokenTable groups={['border']} />

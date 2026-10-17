@@ -1,0 +1,33 @@
+---
+title: Motion
+description: Two speeds, fast for controls and slow for light, and none when asked.
+section: foundations
+order: 5
+---
+
+import TokenTable from '../../../components/docs/TokenTable.astro';
+
+Motion has two speeds. Controls respond fast. Light moves slowly: changes of flavor, accent or glow take the time of a cloud passing a window. Try both in the [playground](/playground#foundations).
+
+## Durations
+
+<TokenTable groups={['duration']} />
+
+Use `fast` and `base` for controls, and `procession` for light.
+
+## Easing
+
+<TokenTable groups={['ease']} />
+
+```css
+.panel {
+  transition: background-color var(--san-duration-base) var(--san-ease-standard);
+}
+```
+
+## Reduced motion
+
+When the visitor asks for reduced motion (`prefers-reduced-motion: reduce`), the stylesheet sets every `--san-duration-*` token to `0ms`, so anything timed with the tokens changes instantly.
+
+- A zero-length transition does not start, so it fires no `transitionend` event. Code that waits for one should check the duration first.
+- Animations and durations written without the tokens are not covered: time them with the tokens, or stop them yourself under the same media query.

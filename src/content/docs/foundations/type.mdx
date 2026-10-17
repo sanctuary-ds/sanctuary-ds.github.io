@@ -1,0 +1,44 @@
+---
+title: Type
+description: Four families, each with one job, and a scale of type roles.
+section: foundations
+order: 2
+---
+
+import PaletteTable from '../../../components/docs/PaletteTable.astro';
+import TokenTable from '../../../components/docs/TokenTable.astro';
+
+Sanctuary sets type with four families, each with one job. Blackletter is deliberately absent: the system is about the atmosphere of the building, not medieval costume. See the scale set live in the [playground](/playground#foundations).
+
+## Families
+
+<PaletteTable of="fonts" />
+
+Sanctuary names its fonts but does not load them. Load the families and weights listed above with whatever your site uses: Google Fonts, Fontsource or your own files. Each role is a custom property, `--san-font-family-<role>`, and the weights the scale uses are tokens too:
+
+<TokenTable groups={['font']} />
+
+If your font is published under another family name, for example `Cormorant Garamond Variable`, override the role on the root element:
+
+```css
+:root {
+  --san-font-family-display: "Cormorant Garamond Variable", "Cormorant Garamond", Georgia, serif;
+}
+```
+
+Override on `:root` (or `html`), not on a descendant. The type roles below are declared on `:root` and resolve the family there, so an override on a nested element changes only the declarations that read the family directly.
+
+## The type scale
+
+Each role is a `font` shorthand (weight, size, line height and family) with its letter spacing beside it:
+
+```css
+.title {
+  font: var(--san-type-title-lg);
+  letter-spacing: var(--san-type-title-lg-tracking);
+}
+```
+
+<TokenTable groups={['type']} />
+
+Display and headline roles use the display family; title, body and label use the text family; code uses the mono family, and the inscription its own family.

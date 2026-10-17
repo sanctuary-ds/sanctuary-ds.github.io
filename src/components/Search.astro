@@ -1,0 +1,195 @@
+---
+// Site search: a button in the header opens a dialog that queries the Pagefind
+// index written at build time (astro.config.mjs). The button stays hidden until
+// the script runs, since search needs JavaScript; in `astro dev` there is no
+// index, and the dialog says so.
+---
+
+<button class="search__open" type="button" aria-haspopup="dialog" aria-label="Search" title="Search the site" hidden>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="10.5" cy="10.5" r="6" />
+    <path d="M15 15l5 5" />
+  </svg>
+</button>
+
+<dialog class="search" aria-labelledby="search-title">
+  <form class="search__form" role="search">
+    <h2 class="search__title" id="search-title">Search</h2>
+    <label class="search__label" for="search-query">Search the site</label>
+    <input class="search__input" id="search-query" type="search" autocomplete="off" spellcheck="false" />
+    <button class="search__close" type="button">Close</button>
+  </form>
+  <p class="search__status" role="status"></p>
+  <ul class="search__results"></ul>
+</dialog>
+
+<!--
+  Pagefind's script exists only in the built site. The bundler rewrites any
+  import() in a processed script, even one marked @vite-ignore, and that breaks
+  at run time; this inline script is left as written.
+-->
+<script is:inline>
+  window.loadPagefind = () => import('/pagefind/pagefind.js');
+</script>
+
+<script>
+  // The Pagefind API, loaded through window.loadPagefind (above).
+  type Result = { url: string; excerpt: string; meta: { title?: string } };
+  type Pagefind = {
+    init(): Promise<void>;
+    debouncedSearch(query: string, options?: object, wait?: number): Promise<{ results: { data(): Promise<Result> }[] } | null>;
+  };
+
+  const LIMIT = 8;
+  const open = document.querySelector<HTMLButtonElement>('.search__open')!;
+  const dialog = document.querySelector<HTMLDialogElement>('dialog.search')!;
+  const input = dialog.querySelector<HTMLInputElement>('.search__input')!;
+  const status = dialog.querySelector<HTMLElement>('.search__status')!;
+  const list = dialog.querySelector<HTMLUListElement>('.search__results')!;
+
+  let pagefind: Promise<Pagefind | null> | undefined;
+  const load = () =>
+    (pagefind ??= (window as unknown as { loadPagefind(): Promise<Pagefind> })
+      .loadPagefind()
+      .then(async (module) => {
+        await module.init();
+        return module;
+      })
+      .catch(() => null));
+
+  open.hidden = false;
+  open.addEventListener('click', () => {
+    dialog.showModal();
+    input.select();
+    void load();
+  });
+
+  // The form has no submit button, so Enter in the field submits it with no
+  // submitter: open the first result instead of reloading the page.
+  dialog.querySelector('form')!.addEventListener('submit', (event) => {
+    event.preventDefault();
+    list.querySelector('a')?.click();
+  });
+  dialog.querySelector('.search__close')!.addEventListener('click', () => dialog.close());
+
+  // A click on the backdrop lands on the dialog itself, not on its content.
+  dialog.addEventListener('click', (event) => {
+    if (event.target === dialog) dialog.close();
+  });
+
+  const render = (query: string, results: Result[], total: number) => {
+    list.replaceChildren(
+      ...results.map((result) => {
+        const item = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = result.url;
+        link.className = 'search__result';
+        const title = document.createElement('span');
+        title.className = 'search__result-title';
+        title.textContent = result.meta.title ?? result.url;
+        // Pagefind escapes the page text and marks the matches with <mark>.
+        const excerpt = document.createElement('span');
+        excerpt.className = 'search__excerpt';
+        excerpt.innerHTML = result.excerpt;
+        link.append(title, excerpt);
+        item.append(link);
+        return item;
+      }),
+    );
+    status.textContent =
+      total === 0 ? `No results for “${query}”.` : total > results.length ? `${total} results; showing the first ${results.length}.` : `${total} ${total === 1 ? 'result' : 'results'}.`;
+  };
+
+  input.addEventListener('input', async () => {
+    const query = input.value.trim();
+    if (!query) {
+      list.replaceChildren();
+      status.textContent = '';
+      return;
+    }
+    const module = await load();
+    if (!module) {
+      status.textContent = 'Search is available in the built site.';
+      return;
+    }
+    const search = await module.debouncedSearch(query, {}, 200);
+    // null means a newer query replaced this one.
+    if (!search || input.value.trim() !== query) return;
+    const results = await Promise.all(search.results.slice(0, LIMIT).map((result) => result.data()));
+    render(query, results, search.results.length);
+  });
+</script>
+
+<style>
+  .search__open {
+    display: grid;
+    place-items: center;
+    width: var(--san-size-control-sm);
+    height: var(--san-size-control-sm);
+    padding: 0;
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-full);
+    background: transparent;
+    color: var(--san-text-muted);
+    cursor: pointer;
+  }
+  .search__open[hidden] { display: none; }
+  .search__open:hover { color: var(--san-text); border-color: var(--san-accent); box-shadow: var(--san-cast-sm); }
+  .search__open:focus-visible { outline: none; box-shadow: var(--san-halo); }
+  .search__open svg { width: var(--san-size-icon-sm); height: var(--san-size-icon-sm); fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
+
+  .search {
+    width: min(40rem, calc(100vw - 2 * var(--san-space-4)));
+    max-height: min(36rem, calc(100dvh - 2 * var(--san-space-8)));
+    margin-top: var(--san-space-16);
+    padding: var(--san-space-6);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-lg);
+    background: var(--san-surface-raised-3);
+    color: var(--san-text);
+    box-shadow: var(--san-elevation-5);
+  }
+  .search::backdrop { background: var(--san-scrim); }
+
+  .search__form { display: grid; grid-template-columns: 1fr auto; gap: var(--san-space-2) var(--san-space-3); align-items: center; }
+  .search__title { grid-column: 1 / -1; margin: 0; font: var(--san-type-title-lg); }
+  .search__label { grid-column: 1 / -1; font: var(--san-type-label-md); color: var(--san-text-muted); }
+  .search__input {
+    height: var(--san-size-control-md);
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead-strong);
+    border-radius: var(--san-radius-sm);
+    background: var(--san-surface-sunken);
+    color: var(--san-text);
+    font: var(--san-type-body-md);
+  }
+  .search__input:focus-visible { outline: none; border-color: var(--san-accent); box-shadow: var(--san-halo); }
+  .search__close {
+    height: var(--san-size-control-md);
+    padding: 0 var(--san-space-3);
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    border-radius: var(--san-radius-sm);
+    background: transparent;
+    color: var(--san-text-muted);
+    font: var(--san-type-label-md);
+    cursor: pointer;
+  }
+  .search__close:focus-visible { outline: none; box-shadow: var(--san-halo); }
+
+  .search__status { margin: var(--san-space-4) 0 var(--san-space-2); font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  .search__status:empty { display: none; }
+  .search__results { display: grid; gap: var(--san-space-1); margin: 0; padding: 0; list-style: none; }
+  .search__results :global(.search__result) {
+    display: grid;
+    gap: var(--san-space-1);
+    padding: var(--san-space-3);
+    border-radius: var(--san-radius-sm);
+    color: var(--san-text);
+    text-decoration: none;
+  }
+  .search__results :global(.search__result:hover) { background: var(--san-surface-raised-4); }
+  .search__results :global(.search__result:focus-visible) { outline: none; box-shadow: var(--san-halo); }
+  .search__results :global(.search__result-title) { font: var(--san-type-title-sm); color: var(--san-accent-ink); }
+  .search__results :global(.search__excerpt) { font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  .search__results :global(mark) { background: var(--san-accent-pane); color: var(--san-accent-on-pane); }
+</style>

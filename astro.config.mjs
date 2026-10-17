@@ -1,4 +1,6 @@
+import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import { fileURLToPath } from 'node:url';
 import { defineConfig, fontProviders } from 'astro/config';
 import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
 
@@ -20,6 +22,27 @@ const fonts = Object.entries(palette.fonts).map(([role, font]) => ({
   fallbacks: [...font.fallbacks, font.generic],
 }));
 
+// Search: once Astro has written the site, Pagefind indexes the main content of
+// every page (marked data-pagefind-body) into dist/pagefind, which the search
+// dialog in the header loads. A failure stops the build rather than shipping a
+// site whose search is broken.
+const search = {
+  name: 'pagefind',
+  hooks: {
+    'astro:build:done': async ({ dir, logger }) => {
+      const pagefind = await import('pagefind');
+      const { index, errors } = await pagefind.createIndex();
+      if (!index) throw new Error(`Pagefind could not start: ${errors.join('; ')}`);
+      const added = await index.addDirectory({ path: fileURLToPath(dir) });
+      if (added.errors.length) throw new Error(`Pagefind could not index the site: ${added.errors.join('; ')}`);
+      const written = await index.writeFiles({ outputPath: fileURLToPath(new URL('pagefind/', dir)) });
+      if (written.errors.length) throw new Error(`Pagefind could not write its index: ${written.errors.join('; ')}`);
+      await pagefind.close();
+      logger.info(`Indexed ${added.page_count} pages for search.`);
+    },
+  },
+};
+
 // Static output is Astro's default. The site is a user site
 // (sanctuary-ds.github.io), so it is served from the root and needs no `base`.
 export default defineConfig({
@@ -34,6 +57,12 @@ export default defineConfig({
     },
   },
   fonts,
-  // Lists every page for search engines, from `site`; robots.txt points to it.
-  integrations: [sitemap()],
+  // Code blocks stay plain text styled with the tokens (src/layouts/Doc.astro): a
+  // fixed highlighting theme would ignore the flavor and could fail its contrast.
+  markdown: { syntaxHighlight: false },
+  // MDX lets a docs page place components among its Markdown, so tables derived
+  // from the core are generated from its palette instead of copied by hand. It
+  // inherits the markdown settings above. The sitemap lists every page for
+  // search engines, from `site`; robots.txt points to it.
+  integrations: [mdx(), sitemap(), search],
 });

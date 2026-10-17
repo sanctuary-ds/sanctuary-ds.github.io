@@ -7,7 +7,7 @@ const type = [
   ['display-sm', 'Light through glass'],
   ['headline-md', 'The nave at dusk'],
   ['title-lg', 'Title large, for cards and dialogs'],
-  ['body-lg', 'Body large. Stone is quiet so that colour can speak.'],
+  ['body-lg', 'Body large. Stone is quiet so that color can speak.'],
   ['body-md', 'Body medium, the default running text of the system.'],
   ['label-lg', 'Label large · buttons and tabs'],
   ['inscription', 'Inscription · carved overlines'],
@@ -16,9 +16,9 @@ const type = [
 const radii = ['none', 'xs', 'sm', 'md', 'lg', 'xl', 'full'];
 const arches = ['lancet', 'ogive'];
 const leads = [
-  { width: 'hairline', colour: 'lead' },
-  { width: 'came', colour: 'lead-strong' },
-  { width: 'heavy', colour: 'lead-came' },
+  { width: 'hairline', color: 'lead' },
+  { width: 'came', color: 'lead-strong' },
+  { width: 'heavy', color: 'lead-came' },
 ];
 const spaces = ['1', '2', '3', '4', '6', '8', '12', '16'];
 const motions = [
@@ -54,7 +54,7 @@ const motions = [
     </div>
     <h3 class="panel__title">Lead</h3>
     <div class="leads">
-      {leads.map(({ width, colour }) => <div style={`border-top: var(--san-border-width-${width}) solid var(--san-${colour})`}><span>{width}</span></div>)}
+      {leads.map(({ width, color }) => <div style={`border-top: var(--san-border-width-${width}) solid var(--san-${color})`}><span>{width}</span></div>)}
     </div>
   </article>
 

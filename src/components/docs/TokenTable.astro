@@ -1,0 +1,82 @@
+---
+// A table of tokens: each custom property with its value, or with one value per
+// flavor when it changes with the flavor. Used by the token reference and by
+// the foundations pages, from the data in src/data/tokens.ts.
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
+import { flavors, tokensOf, type Token } from '../../data/tokens';
+
+interface Props {
+  /** The tokens to show, or the DTCG groups to take them from. */
+  tokens?: Token[];
+  groups?: string[];
+  /** The heading of the value column. */
+  value?: string;
+  /** What the table holds, for its scrolling region; by default its groups. */
+  label?: string;
+}
+
+const { groups = [], value = 'Value' } = Astro.props;
+const label = Astro.props.label ?? `Tokens: ${groups.join(', ')}`;
+const tokens = Astro.props.tokens ?? tokensOf(groups);
+if (tokens.length === 0) throw new Error(`No tokens to show for the group(s) ${groups.join(', ')}.`);
+
+const flavorName = (id: string) => (palette.flavors as Record<string, { name: string }>)[id].name;
+const byFlavor = tokens.some((token) => token.byFlavor);
+const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
+---
+
+<ScrollBox label={label}>
+  <table class:list={['tokens', byFlavor && 'tokens--flavors']}>
+    <thead>
+      <tr>
+        <th scope="col">Token</th>
+        {byFlavor ? flavors.map((flavor) => <th scope="col">{flavorName(flavor)}</th>) : <th scope="col">{value}</th>}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        tokens.map((token) => (
+          <tr>
+            <th scope="row">
+              <code>{token.name}</code>
+              {token.description && <span class="note">{token.description}</span>}
+            </th>
+            {(byFlavor ? flavors : [undefined]).map((flavor) => {
+              const swatch = swatchOf(token, flavor);
+              return (
+                <td>
+                  {swatch && <span class="swatch" style={`background: ${swatch}`} aria-hidden="true" />}
+                  <code>{flavor ? token.byFlavor![flavor] : token.value}</code>
+                </td>
+              );
+            })}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</ScrollBox>
+
+<style>
+  .tokens { width: 100%; margin: 0; }
+  /* The name column hugs its names, so values sit close to them. */
+  .tokens th[scope='row'] { width: 1%; font: inherit; }
+  .tokens :is(th, td) { padding: var(--san-space-2) var(--san-space-3); }
+  .tokens code { font: var(--san-type-code-sm); }
+  .tokens td code { overflow-wrap: anywhere; }
+  .tokens--flavors td { white-space: nowrap; }
+  .tokens--flavors :is(th, td) { padding-inline: var(--san-space-2); }
+  .tokens th[scope='row'] code { white-space: nowrap; }
+  .note { display: block; margin-top: var(--san-space-1); font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  .swatch {
+    display: inline-block;
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-right: var(--san-space-2);
+    vertical-align: -0.125rem;
+    border: var(--san-border-width-hairline) solid var(--san-lead);
+    rotate: 45deg;
+    scale: 0.8;
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+title: Color
+description: Stone, glass and the light between them, in four flavors and twelve pigments.
+section: foundations
+order: 1
+---
+
+import PaletteTable from '../../../components/docs/PaletteTable.astro';
+import TokenTable from '../../../components/docs/TokenTable.astro';
+
+Color in Sanctuary is light coming through glass into a dark building. Stone, ink and lead stay quiet; glass carries the color, and is spent where it means something. The tables on this page are generated from the core's palette. To see every color live, open the [playground](/playground#flavors).
+
+## Flavors: the canonical hours
+
+A flavor is the hour at which you stand in the nave. The building is the same; the light is not. Each flavor sets the stone, ink, lead and shadow, and re-tones every pigment so it stays legible.
+
+<PaletteTable of="flavors" />
+
+Matins plays each glass one tone deeper than the other dark flavors, so color stays jewel-like against black instead of pastel.
+
+## Stone, ink and lead
+
+Stone is the surface, from the sunken floor to the most raised panel. Ink is the text, tinted against the stone on purpose: warm text on cool stone is what candlelight looks like, and it keeps long reading comfortable. Lead is the line between panes, a border that is structure, not decoration.
+
+<TokenTable groups={['surface', 'text', 'lead']} />
+
+## Pigments
+
+Twelve hues, named for the glazier's bench. The names that carry a chemical claim follow published analyses of medieval glass: blue from cobalt, red from copper, purple from manganese, yellow from silver stain applied to the surface. The rest are descriptive.
+
+<PaletteTable of="pigments" />
+
+Each pigment is a ramp of eleven tones, from `50` to `950`. Lightness is fixed per tone across all hues, so swapping the accent never changes contrast. The raw ramps are for illustration and data; interfaces use the glass roles below. Every tone is listed in the [token reference](/docs/tokens#pigments).
+
+## Glass roles
+
+A flavor chooses which tone of a pigment plays each role. `<p>` stands for any pigment, so `glass-cobalt-ink` is the ink role of cobalt. The tones below are read from the palette.
+
+<PaletteTable of="glass-roles" />
+
+The accent is one pigment's glass under another name: `accent`, `accent-lume`, `accent-ink` and so on follow `data-san-accent`, or the flavor's own accent when it is not set. The status colors work the same way, each with the same six roles:
+
+<TokenTable groups={['danger', 'warning', 'success', 'info']} />
+
+The [accessibility page](/docs/accessibility) computes every guarantee; in short: `ink` is safe for text on every stone, `on` on the glass and `on-pane` on the pane. `lume` carries no text guarantee: it is light, so use it for glows, hover and gradients, never for words.
+
+## Glazing
+
+Glazing is how an accent is held, independent of which accent it is. It is set with `data-san-glazing`.
+
+<PaletteTable of="glazings" />
+
+Pot-metal gives the clearest hierarchy. Flashed suits interfaces over imagery or wallpapers. Grisaille suits dense tools where color must be rare. Compare them in the [playground](/playground#glazing).
+
+## Windows
+
+The window is the light that is cast: hero backgrounds, progress fills, glows, illustration. It never replaces the accent on a control, and it always follows the accent, so cast light and controls tell one color story. It is set with `data-san-window`.
+
+<PaletteTable of="window-modes" />
+
+### Named windows
+
+Five fixed gradients exist for a single place, such as a cover or an illustration (`background: var(--san-window-rosace)`). They do not follow the accent and are not a theme switch.
+
+<PaletteTable of="named-windows" />

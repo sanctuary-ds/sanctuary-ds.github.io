@@ -50,7 +50,7 @@ const classes = ['btn', `btn--${variant}`, size !== 'md' && `btn--${size}`, clas
       translate var(--san-duration-fast) var(--san-ease-standard);
   }
 
-  /* State layer: the content colour laid over the control. */
+  /* State layer: the content color laid over the control. */
   .btn::after { content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; transition: background-color var(--san-duration-fast); }
   .btn:hover::after { background: var(--san-state-hover); }
   .btn:active::after { background: var(--san-state-pressed); }

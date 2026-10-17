@@ -1,10 +1,11 @@
 import { expect, test } from '@playwright/test';
+import { docFiles } from './docs-content';
 
 // What search engines read: the Search Console verification file, robots.txt,
 // the sitemap and one canonical URL per page.
 
 const SITE = 'https://sanctuary-ds.github.io';
-const PAGES = ['/', '/playground/', '/roadmap/'];
+const PAGES = ['/', '/playground/', '/roadmap/', '/docs/', ...docFiles.map((doc) => `${doc.path}/`)];
 
 test.describe('search engines', () => {
   // Google checks this file again from time to time; it must stay byte for byte.

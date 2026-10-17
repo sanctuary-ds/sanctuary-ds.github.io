@@ -1,0 +1,82 @@
+---
+// The theme attributes and their values, generated from the core's palette so
+// a new flavor, pigment, glazing or window mode appears here on its own. Only
+// the last column, which explains each axis, is written by hand.
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
+
+interface Value {
+  id: string;
+  /** A short gloss after the value, such as "(dawn, light)". */
+  gloss?: string;
+}
+
+const glossed = (id: string, ...words: (string | false)[]) => {
+  const gloss = words.filter(Boolean).join(', ');
+  return { id, gloss: gloss ? `(${gloss})` : undefined };
+};
+
+// How each glazing looks, in a few words. The palette's notes are sentences, too
+// long for this table; a glazing the core adds later shows without a gloss.
+const glazingLooks: Record<string, string> = {
+  'pot-metal': 'solid',
+  flashed: 'translucent, glowing',
+  grisaille: 'line only',
+};
+
+const rows: { attribute: string; values: Value[]; changes: string }[] = [
+  {
+    attribute: 'data-san-flavor',
+    values: Object.entries(palette.flavors).map(([id, flavor]) =>
+      glossed(id, flavor.hour.toLowerCase(), flavor.scheme === 'light' && 'light', id === palette.defaultFlavor && 'default'),
+    ),
+    changes: 'Stone, ink, lead and shadow. Every pigment is re-toned to stay legible.',
+  },
+  {
+    attribute: 'data-san-accent',
+    values: Object.keys(palette.pigments).map((id) => ({ id })),
+    changes: 'Which pigment does the precise work: actions, focus, selection. Without it, each flavor uses its own.',
+  },
+  {
+    attribute: 'data-san-glazing',
+    values: Object.keys(palette.glazings).map((id) => glossed(id, glazingLooks[id], id === palette.defaultGlazing && 'default')),
+    changes: 'How the accent is rendered on a filled element.',
+  },
+  {
+    attribute: 'data-san-window',
+    values: Object.entries(palette.windowModes).map(([id, mode]) => glossed(id, mode.source, id === palette.defaultWindow && 'default')),
+    changes: 'The light that is cast: gradients, glows, heroes. It always follows the accent.',
+  },
+];
+---
+
+<ScrollBox label="Theme attributes">
+<table class="data">
+  <thead>
+    <tr><th>Attribute</th><th>Values</th><th>What it changes</th></tr>
+  </thead>
+  <tbody>
+    {
+      rows.map(({ attribute, values, changes }) => (
+        <tr>
+          <td><code>{attribute}</code></td>
+          <td>
+            {values.map(({ id, gloss }, index) => (
+              <>
+                {index > 0 && ', '}
+                <code>{id}</code>
+                {gloss && ` ${gloss}`}
+              </>
+            ))}
+          </td>
+          <td>{changes}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
+</ScrollBox>
+
+<style>
+  .data { width: 100%; margin: 0; }
+</style>

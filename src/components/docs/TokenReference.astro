@@ -1,0 +1,74 @@
+---
+// The token reference, generated from the core's DTCG files (src/data/tokens.ts).
+// Tokens that change with the flavor show one column per flavor. Glass and the
+// pigment ramps fold by pigment, so the page stays readable; folded rows are
+// still in the page, for search.
+import TokenTable from './TokenTable.astro';
+import { cssOnly, groupNotes, sections, tokensOf } from '../../data/tokens';
+
+const folded = new Set(['glass', 'pigment']);
+
+// Splits a section's tokens into folds by subgroup (one per pigment), or one
+// unfolded block.
+const blocks = (groups: string[]) => {
+  const list = tokensOf(groups);
+  if (!groups.some((group) => folded.has(group))) return [{ key: '', tokens: list }];
+  const keys = [...new Set(list.map(({ subgroup }) => subgroup!))];
+  return keys.map((key) => ({ key, tokens: list.filter(({ subgroup }) => subgroup === key) }));
+};
+
+const notes = (groups: string[]) => Object.entries(groupNotes).filter(([prefix]) => groups.some((group) => prefix === `--san-${group}`));
+const foldNote = (groups: string[], key: string) => groups.map((group) => groupNotes[`--san-${group}-${key}`]).find(Boolean);
+---
+
+<nav aria-label="Token groups" data-pagefind-ignore>
+  <ul class="groups">
+    {sections.map(({ id, title }) => <li><a href={`#${id}`}>{title}</a></li>)}
+    <li><a href="#css-only">CSS only</a></li>
+  </ul>
+</nav>
+
+{
+  sections.map(({ id, title, groups }) => (
+    <section aria-labelledby={id}>
+      <h2 id={id}>{title}</h2>
+      {notes(groups).map(([, note]) => <p>{note}</p>)}
+      {blocks(groups).map(({ key, tokens }) => {
+        const table = <TokenTable tokens={tokens} label={key ? `${title}: ${key}` : title} />;
+        return key ? (
+          <details>
+            <summary>
+              <code>{key}</code>
+              {foldNote(groups, key) && <span class="note">{foldNote(groups, key)}</span>}
+            </summary>
+            {table}
+          </details>
+        ) : (
+          table
+        );
+      })}
+    </section>
+  ))
+}
+
+<section aria-labelledby="css-only">
+  <h2 id="css-only">CSS only</h2>
+  <p>
+    The DTCG format has no color functions and no clip paths, so these tokens exist only in the stylesheet. They are computed from the flavor, accent,
+    glazing and window, and the value shown is the stylesheet's first declaration.
+  </p>
+  <TokenTable tokens={cssOnly} value="Declaration" label="CSS only" />
+</section>
+
+<style>
+  .groups { display: flex; flex-wrap: wrap; gap: var(--san-space-2) var(--san-space-4); padding: 0; list-style: none; }
+  .groups li { margin: 0; }
+
+  .note { display: block; margin-top: var(--san-space-1); font: var(--san-type-body-sm); color: var(--san-text-muted); }
+
+  details { margin: 0 0 var(--san-space-3); border: var(--san-border-width-hairline) solid var(--san-lead-soft); border-radius: var(--san-radius-sm); }
+  summary { padding: var(--san-space-3) var(--san-space-4); cursor: pointer; }
+  summary .note { display: inline; margin: 0 0 0 var(--san-space-3); }
+  summary:focus-visible { outline: none; border-radius: var(--san-radius-sm); box-shadow: var(--san-halo); }
+  details :global(.scroll) { margin: 0; }
+</style>

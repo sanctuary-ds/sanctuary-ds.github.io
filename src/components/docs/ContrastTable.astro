@@ -1,0 +1,51 @@
+---
+// The contrast guarantees, computed from the palette at build time: for each
+// pairing the core tests, the lowest ratio in each flavor and the pair that
+// gives it (src/data/accessibility.ts).
+import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import ScrollBox from './ScrollBox.astro';
+import { lowest, pairings, ratioText } from '../../data/accessibility';
+
+const flavors = Object.entries(palette.flavors as Record<string, { name: string }>);
+---
+
+<ScrollBox label="Contrast guarantees">
+  <table class="data contrast">
+    <thead>
+      <tr>
+        <th scope="col">Pairing</th>
+        <th scope="col">Minimum</th>
+        {flavors.map(([, { name }]) => <th scope="col">{name}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        pairings.map((pairing) => (
+          <tr>
+            <th scope="row">{pairing.text}</th>
+            <td>{ratioText(pairing.minimum)}</td>
+            {flavors.map(([id]) => {
+              const { fg, bg, ratio } = lowest(pairing, id);
+              return (
+                <td>
+                  <span class="ratio">{ratioText(ratio)}</span>
+                  <span class="pair"><span class="name">{fg}</span> on <span class="name">{bg}</span></span>
+                </td>
+              );
+            })}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</ScrollBox>
+
+<style>
+  .data { width: 100%; margin: 0; }
+  .data th[scope='row'] { font: inherit; min-width: 10rem; }
+  .data th[scope='col'] { white-space: nowrap; }
+  .ratio { display: block; font: var(--san-type-code-md); white-space: nowrap; }
+  .pair { display: block; font: var(--san-type-body-sm); color: var(--san-text-muted); }
+  /* A token name never breaks at its hyphens; the line breaks around "on". */
+  .name { white-space: nowrap; }
+</style>

@@ -25,7 +25,7 @@ test('the core tokens the site reads are defined', async ({ page }) => {
 
 test('the body is painted with the core surface and text', async ({ page }) => {
   await page.goto('/');
-  const colours = await page.evaluate(() => {
+  const colors = await page.evaluate(() => {
     const probe = document.createElement('div');
     probe.style.background = 'var(--san-surface)';
     probe.style.color = 'var(--san-text)';
@@ -34,7 +34,7 @@ test('the body is painted with the core surface and text', async ({ page }) => {
     const body = getComputedStyle(document.body);
     return { body: [body.backgroundColor, body.color], tokens: [expected.backgroundColor, expected.color] };
   });
-  expect(colours.body).toEqual(colours.tokens);
+  expect(colors.body).toEqual(colors.tokens);
 });
 
 test('the fonts are hosted by the site and used by the core tokens', async ({ page }) => {
