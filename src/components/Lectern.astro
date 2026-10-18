@@ -5,6 +5,7 @@
 import { chapels } from '../data/chapels';
 import Search from './Search.astro';
 import { axes, defaultTheme } from '../data/theme';
+import { SHORTCUTS_KEY } from '../data/theme-storage';
 
 const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axis] === id);
 ---
@@ -119,6 +120,25 @@ const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axi
       </div>
     </div>
   </div>
+  <!--
+    The controls are built with the default look, and the module script below
+    runs only once the page is parsed: on a real network the browser often paints
+    first, and the default choice would flash before the saved one. This inline
+    script runs as soon as the controls exist, so they show the look the head
+    script restored, and the saved shortcut setting, before the first paint.
+  -->
+  <script is:inline define:vars={{ SHORTCUTS_KEY }}>
+    const root = document.documentElement;
+    for (const button of document.querySelectorAll('.lectern [data-set]')) {
+      const [axis, value] = button.dataset.set.split(':');
+      button.setAttribute('aria-pressed', String(root.getAttribute(`data-san-${axis}`) === value));
+    }
+    try {
+      if (localStorage.getItem(SHORTCUTS_KEY) === 'off') document.querySelector('.lectern__keys')?.setAttribute('aria-checked', 'false');
+    } catch {
+      // Storage is unavailable: the shortcuts stay on, as rendered.
+    }
+  </script>
 </header>
 
 <script>

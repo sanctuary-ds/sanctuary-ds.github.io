@@ -375,3 +375,26 @@ test.describe('shortcut switch (WCAG 2.1.4: single-key shortcuts can be turned o
     await expect(page.locator('html')).not.toHaveAttribute('data-san-glazing', before!);
   });
 });
+
+// The lectern's module script runs after the document is parsed, and a browser
+// on a real network often paints before that. The controls must already show
+// the restored look by then, or the default choice flashes before the saved
+// one. The page is served here without its module scripts, so the controls
+// show what the page paints before those scripts run.
+test.describe('the lectern before its scripts run', () => {
+  test('marks the saved look and the saved shortcut setting', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem('sanctuary:theme', JSON.stringify({ flavor: 'vespers', accent: 'ruby', glazing: 'flashed', window: 'harmonic' }));
+      localStorage.setItem('sanctuary:shortcuts', 'off');
+    });
+    await page.route('**/roadmap*', async (route) => {
+      const response = await route.fetch();
+      const html = (await response.text()).replace(/<script type="module"[\s\S]*?<\/script>/g, '');
+      await route.fulfill({ response, body: html });
+    });
+    await page.goto('/roadmap');
+    const pressed = await page.locator('.lectern [data-set][aria-pressed="true"]').evaluateAll((buttons) => buttons.map((button) => (button as HTMLElement).dataset.set));
+    expect(pressed).toEqual(['flavor:vespers', 'accent:ruby', 'glazing:flashed', 'window:harmonic']);
+    await expect(page.locator('.lectern__keys')).toHaveAttribute('aria-checked', 'false');
+  });
+});
