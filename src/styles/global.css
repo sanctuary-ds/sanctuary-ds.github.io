@@ -39,3 +39,21 @@ body {
   font: var(--san-type-body-md);
   letter-spacing: var(--san-type-body-md-tracking);
 }
+
+/* Moving between pages cross-fades the content while the lectern stays put,
+   where the browser supports cross-document view transitions; elsewhere pages
+   change as before. Visitors who ask for less motion get no transition. */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+
+  .lectern {
+    view-transition-name: lectern;
+  }
+
+  ::view-transition-group(root) {
+    animation-duration: var(--san-duration-slow);
+    animation-timing-function: var(--san-ease-standard);
+  }
+}
