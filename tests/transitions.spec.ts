@@ -7,7 +7,13 @@ import { expect, test, type Page } from '@playwright/test';
 const record = (page: Page) =>
   page.addInitScript(() => {
     addEventListener('pagereveal', (event) => {
-      (window as unknown as { transitioned: boolean }).transitioned = Boolean((event as Event & { viewTransition?: unknown }).viewTransition);
+      const transition = (event as Event & { viewTransition?: { ready: Promise<void> } }).viewTransition;
+      (window as unknown as { transitioned: boolean }).transitioned = Boolean(transition);
+      // The duration the page's cross-fade actually runs with, once it starts.
+      transition?.ready.then(() => {
+        const fade = document.getAnimations().find((animation) => (animation.effect as KeyframeEffect).pseudoElement === '::view-transition-group(root)');
+        (window as unknown as { fadeMs: unknown }).fadeMs = fade?.effect?.getTiming().duration;
+      });
     });
   });
 
@@ -26,6 +32,14 @@ test.describe('page transitions', () => {
     await record(page);
     expect(await navigate(page)).toBe(true);
     await expect(page.locator('.lectern')).toHaveCSS('view-transition-name', 'lectern');
+    // Timed with the core's slow duration, not the browser's default.
+    // The minifier may write the token in seconds (.36s), so convert by unit.
+    const slow = await page.evaluate(() => {
+      const value = getComputedStyle(document.documentElement).getPropertyValue('--san-duration-slow').trim();
+      return parseFloat(value) * (value.endsWith('ms') ? 1 : 1000);
+    });
+    expect(slow).toBeGreaterThan(0);
+    await expect.poll(() => page.evaluate(() => (window as unknown as { fadeMs?: number }).fadeMs)).toBe(slow);
   });
 
   test('no transition runs when the visitor asks for less motion', async ({ page }) => {
