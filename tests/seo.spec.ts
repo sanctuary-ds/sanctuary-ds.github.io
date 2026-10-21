@@ -39,6 +39,36 @@ test.describe('search engines', () => {
   }
 });
 
+// What LinkedIn, Slack and other link previews read: Open Graph and the Twitter card.
+test.describe('link previews', () => {
+  for (const path of PAGES) {
+    test(`${path} describes itself for link previews`, async ({ page }) => {
+      await page.goto(path);
+      const meta = (key: string) => page.locator(`meta[property="${key}"], meta[name="${key}"]`);
+      await expect(meta('og:title')).toHaveAttribute('content', await page.title());
+      await expect(meta('og:description')).toHaveAttribute(
+        'content',
+        (await page.locator('meta[name="description"]').getAttribute('content'))!,
+      );
+      await expect(meta('og:url')).toHaveAttribute('content', `${SITE}${path}`);
+      await expect(meta('og:type')).toHaveAttribute('content', 'website');
+      await expect(meta('og:site_name')).toHaveAttribute('content', 'Sanctuary');
+      await expect(meta('og:image')).toHaveAttribute('content', `${SITE}/og-image.png`);
+      await expect(meta('og:image:alt')).toHaveAttribute('content', /rose window/);
+      await expect(meta('twitter:card')).toHaveAttribute('content', 'summary_large_image');
+    });
+  }
+
+  test('the social image is served as a 1200 × 630 PNG', async ({ request }) => {
+    const response = await request.get('/og-image.png');
+    expect(response.ok()).toBe(true);
+    expect(response.headers()['content-type']).toContain('image/png');
+    const png = await response.body();
+    // The IHDR chunk stores the width and height as big-endian integers at bytes 16 and 20.
+    expect([png.readUInt32BE(16), png.readUInt32BE(20)]).toEqual([1200, 630]);
+  });
+});
+
 // The brand rose, the organization's profile picture, as the site's icon.
 test.describe('icons', () => {
   test('the page links its SVG favicon and its touch icon, and both are served', async ({ page, request }) => {
