@@ -3,6 +3,9 @@
 // search engines read can never drift apart.
 
 export const author = {
+  // The identifier the author's own website gives this person. Using the same
+  // one here tells search engines both sites describe one person, not two.
+  id: 'https://anthonyportugal.github.io/#person',
   name: 'Anthony Portugal',
   // The author's own website, which the footer credit links to.
   url: 'https://anthonyportugal.github.io',
@@ -11,11 +14,11 @@ export const author = {
   sameAs: ['https://anthonyportugal.github.io', 'https://github.com/anthonyportugal'],
 };
 
-// One graph for the whole site: the person is described once under an @id, and
-// the website and the design system point to it rather than repeating it.
+// One graph for the whole site: the person is described once under their @id,
+// and the website and the design system point to it rather than repeating it.
 export function structuredData(site: URL) {
   const home = new URL('/', site).href;
-  const person = { '@id': `${home}#author` };
+  const person = { '@id': author.id };
   return {
     '@context': 'https://schema.org',
     '@graph': [
