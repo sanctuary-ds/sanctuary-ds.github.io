@@ -69,6 +69,49 @@ test.describe('link previews', () => {
   });
 });
 
+// Who made Sanctuary, said twice and kept in step: in the visible footer, and in
+// schema.org JSON-LD that links the author to their profiles (sameAs), so search
+// engines and AI agents can attribute the design system to the same person.
+test.describe('authorship', () => {
+  const AUTHOR = 'Anthony Portugal';
+  const WEBSITE = 'https://anthonyportugal.github.io';
+  const GITHUB = 'https://github.com/anthonyportugal';
+
+  for (const path of PAGES) {
+    test(`${path} credits its author in the footer and in structured data`, async ({ page }) => {
+      await page.goto(path);
+      await expect(page.locator('meta[name="author"]')).toHaveAttribute('content', AUTHOR);
+
+      const credit = page.getByRole('contentinfo').getByRole('link', { name: AUTHOR });
+      await expect(credit).toHaveAttribute('href', WEBSITE);
+      await expect(credit).toHaveAttribute('rel', /\bauthor\b/);
+
+      const scripts = page.locator('script[type="application/ld+json"]');
+      await expect(scripts).toHaveCount(1);
+      const { '@context': context, '@graph': graph } = JSON.parse((await scripts.textContent())!);
+      expect(context).toBe('https://schema.org');
+      const byType = (type: string) => graph.find((node: { '@type': string }) => node['@type'] === type);
+
+      const person = byType('Person');
+      expect(person).toMatchObject({ name: AUTHOR, url: WEBSITE });
+      expect(person.sameAs).toEqual(expect.arrayContaining([WEBSITE, GITHUB]));
+
+      const site = byType('WebSite');
+      expect(site).toMatchObject({ name: 'Sanctuary', url: `${SITE}/`, author: { '@id': person['@id'] } });
+
+      const work = byType('SoftwareSourceCode');
+      expect(work).toMatchObject({
+        name: 'Sanctuary',
+        url: `${SITE}/`,
+        codeRepository: 'https://github.com/sanctuary-ds/tokens',
+        license: 'https://opensource.org/licenses/MIT',
+        author: { '@id': person['@id'] },
+        creator: { '@id': person['@id'] },
+      });
+    });
+  }
+});
+
 // The brand rose, the organization's profile picture, as the site's icon.
 test.describe('icons', () => {
   test('the page links its SVG favicon and its touch icon, and both are served', async ({ page, request }) => {
