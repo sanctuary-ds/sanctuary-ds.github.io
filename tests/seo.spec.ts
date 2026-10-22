@@ -93,7 +93,8 @@ test.describe('authorship', () => {
       const byType = (type: string) => graph.find((node: { '@type': string }) => node['@type'] === type);
 
       const person = byType('Person');
-      expect(person).toMatchObject({ name: AUTHOR, url: WEBSITE });
+      // The same @id the author's own website declares, so both sites describe one person.
+      expect(person).toMatchObject({ '@id': `${WEBSITE}/#person`, name: AUTHOR, url: WEBSITE });
       expect(person.sameAs).toEqual(expect.arrayContaining([WEBSITE, GITHUB]));
 
       const site = byType('WebSite');
