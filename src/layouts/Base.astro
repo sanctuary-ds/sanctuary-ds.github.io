@@ -7,6 +7,8 @@ import { Font } from 'astro:assets';
 import { fontBridge, fontRoles } from '../data/fonts';
 import { schemeStyles } from '../data/schemes';
 import Lectern from '../components/Lectern.astro';
+import Colophon from '../components/Colophon.astro';
+import { author, structuredData } from '../data/authorship';
 import { STORAGE_KEY, defaultTheme, flavorAccents, options } from '../data/theme';
 
 interface Props {
@@ -23,6 +25,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
 const socialImage = new URL('/og-image.png', Astro.site);
 const socialImageAlt =
   'The Sanctuary rose window, twelve pigments of stained glass, beside the words: a design system of stone, glass and light';
+// Escaping < keeps any value from closing the script element early.
+const jsonLd = JSON.stringify(structuredData(Astro.site!)).replace(/</g, '\\u003c');
 ---
 
 <!doctype html>
@@ -65,6 +69,8 @@ const socialImageAlt =
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    <meta name="author" content={author.name} />
+    <script type="application/ld+json" is:inline set:html={jsonLd} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Sanctuary" />
     <meta property="og:title" content={title} />
@@ -84,5 +90,6 @@ const socialImageAlt =
   <body>
     <Lectern />
     <slot />
+    <Colophon />
   </body>
 </html>

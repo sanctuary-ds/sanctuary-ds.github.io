@@ -1,0 +1,27 @@
+---
+// The site footer: who made Sanctuary. rel="author" tells search engines the
+// link leads to the author, and the same name and profile appear in the
+// structured data in Base.astro, as Google asks of anything it reads there.
+import { author } from '../data/authorship';
+---
+
+<footer class="colophon">
+  <p>
+    Designed and built by
+    <a href={author.url} rel="author me noopener noreferrer" target="_blank">{author.name}</a>.
+    Released under the MIT License.
+  </p>
+</footer>
+
+<style>
+  .colophon {
+    margin-top: var(--san-space-16);
+    padding: var(--san-space-6) clamp(var(--san-space-4), 4vw, var(--san-space-12));
+    border-top: var(--san-border-width-came) solid var(--san-lead-came);
+    color: var(--san-text-muted);
+    font: var(--san-type-label-lg);
+    text-align: center;
+  }
+
+  .colophon a { color: var(--san-accent-ink); }
+</style>
