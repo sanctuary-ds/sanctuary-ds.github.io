@@ -30,7 +30,7 @@ pnpm add @sanctuary-ds/tokens
 ```
 
 ```js
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 ```
 
 `palette.flavors` holds each flavor with its `name`, its `hour`, its `scheme` (`light` or `dark`) and its `colors`: every color token, named as in CSS without the `--san-` prefix, each with its `hex`. Among them are the sixteen terminal colors, `ansi-black` to `ansi-bright-white`, chosen for each flavor. `accent` is the flavor's own accent; `palette.pigments` lists the twelve pigments, for a port that lets its user pick another.
@@ -42,7 +42,7 @@ This script writes a kitty theme for each flavor:
 ```js
 // build.js: writes themes/sanctuary-<flavor>.conf from the Sanctuary palette.
 import { mkdirSync, writeFileSync } from 'node:fs';
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'];
 

@@ -1,13 +1,11 @@
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
-import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The guides publish code people will copy; the port script is run as the page
 // shows it.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 test.describe('guides', () => {
   test('the port script in "Writing a port" runs and writes a theme per flavor from the palette', async ({ page }, testInfo) => {

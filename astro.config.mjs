@@ -2,7 +2,7 @@ import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import { fileURLToPath } from 'node:url';
 import { defineConfig, fontProviders } from 'astro/config';
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The core publishes, for each type role (display, text, mono, inscription), the
 // family, weights, styles and fallbacks it is designed with. Astro downloads them

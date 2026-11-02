@@ -2,7 +2,7 @@
 // One stage per glazing, each scoped to its own glazing, so the same accent is
 // shown held three ways. The stages are pictures, not controls; the "Use"
 // buttons are the real ones (data-set, handled by the lectern script).
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
 
 const glazings = Object.entries(palette.glazings);

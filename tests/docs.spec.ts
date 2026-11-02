@@ -1,13 +1,11 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel } from '../src/data/chapels';
 import { sections } from '../src/data/doc-sections';
 import { docFiles } from './docs-content';
 
 // The documentation: an index of every page by section, and each page with its
 // title and the same index beside it.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 const ordered = sections.flatMap(({ id }) => docFiles.filter((doc) => doc.section === id).sort((a, b) => a.order - b.order));
 

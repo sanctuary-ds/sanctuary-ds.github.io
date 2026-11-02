@@ -1,10 +1,8 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The foundations pages generate their tables from the core's palette; these
 // tests read the palette on their own and compare.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 const firstColumn = (page: import('@playwright/test').Page, header: string) =>
   page.locator('table', { has: page.locator('thead th', { hasText: new RegExp(`^${header}$`) }) }).first().locator('tbody th code').allTextContents();

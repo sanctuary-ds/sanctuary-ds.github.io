@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The accessibility page computes its guarantees from the core; these tests
 // recompute them on their own, from the palette and the stylesheet.
 
 const require = createRequire(import.meta.url);
-const palette = require('@sanctuary-ds/tokens/palette');
 const stylesheet = readFileSync(require.resolve('@sanctuary-ds/tokens/css'), 'utf8');
 
 // WCAG 2 contrast, written again here so the test does not trust the page's code.

@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The token reference: generated from the DTCG files, it must list every custom
 // property the stylesheet defines, with the values the core resolves.
 
 const require = createRequire(import.meta.url);
-const palette = require('@sanctuary-ds/tokens/palette');
 const stylesheet = readFileSync(require.resolve('@sanctuary-ds/tokens/css'), 'utf8');
 const defined = [...new Set(stylesheet.match(/--san-[a-z0-9-]+(?=:)/g))];
 

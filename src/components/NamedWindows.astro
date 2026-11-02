@@ -1,7 +1,7 @@
 ---
 // The core's named windows: fixed gradients for a single place, such as a cover.
 // They do not follow the accent, so each lancet sets --san-window to its own.
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import Lancet from './Lancet.astro';
 
 const windows = Object.entries(palette.windows);

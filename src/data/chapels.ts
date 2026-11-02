@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The chapels: one per part of the ecosystem. This one list builds both the
 // gallery on the home page and the header navigation, so the two never drift.

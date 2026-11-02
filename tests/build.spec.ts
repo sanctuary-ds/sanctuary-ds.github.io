@@ -1,7 +1,5 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The page is built in English, and the core stylesheet it depends on is loaded:
 // a renamed token after bumping the core pin fails here instead of silently.

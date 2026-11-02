@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The playground's pigment ramps and the flavor roles, from the core palette.
 // Which tone a flavor uses as each glass, and which hex a role has, depend on the

@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The public roadmap: what people can use today and what they can use later,
 // by horizon and with no dates, as decided in the core (docs/ecosystem.md).

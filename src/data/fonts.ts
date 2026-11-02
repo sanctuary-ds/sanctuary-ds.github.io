@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // One entry per type role the core publishes. astro.config.mjs registers each
 // role's fonts under --font-<role>; Base.astro outputs them with <Font> and the

@@ -1,11 +1,9 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { toRoman } from '../src/data/numerals';
 
 // The playground through what a visitor sees: its index and its sections, each
 // checked against the core palette.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 test.describe('playground', () => {
   test('the index lists every section on the page, in order, and nothing else', async ({ page }) => {

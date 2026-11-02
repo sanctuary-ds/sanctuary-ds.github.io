@@ -1,12 +1,10 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel, chapels } from '../src/data/chapels';
 import { toRoman } from '../src/data/numerals';
 
 // The home page through what a visitor sees: the facade, its rose window and
 // its facts, which are counted from the core palette.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 test.describe('facade', () => {
   test('the facts are counted from the palette', async ({ page }) => {
