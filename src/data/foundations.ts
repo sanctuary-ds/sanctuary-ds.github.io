@@ -1,4 +1,4 @@
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The tables of the foundations pages, built from the core's palette so they
 // follow it. Each table is headers and rows of text; the first column names

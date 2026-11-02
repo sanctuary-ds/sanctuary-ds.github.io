@@ -1,7 +1,7 @@
 ---
 // One lancet per window mode, each scoped to its own mode so it previews it.
 // Clicking one makes it the page's window (data-set, handled by the lectern).
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
 import Lancet from './Lancet.astro';
 

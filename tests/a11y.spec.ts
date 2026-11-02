@@ -1,13 +1,12 @@
-import { createRequire } from 'node:module';
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { docFiles } from './docs-content';
 
 // An automated accessibility check: axe audits every page in every flavor
 // against WCAG 2.2 A and AA. It catches what rules can (contrast, names, roles,
 // structure), not everything a person would.
 
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 const pages = ['/', '/playground', '/roadmap', '/docs', ...docFiles.map((doc) => doc.path)];
 const WCAG = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'];
 

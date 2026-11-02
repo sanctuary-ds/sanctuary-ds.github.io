@@ -26,7 +26,7 @@ import '@sanctuary-ds/tokens/css';
 Without a build step, link it from a CDN that serves npm packages:
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.1/dist/css/sanctuary.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.2/dist/css/sanctuary.css">
 ```
 
 The stylesheet only defines custom properties. It styles no elements, so nothing on your page changes until you use a token.
@@ -65,11 +65,13 @@ Change any attribute and the button follows, with no change to your CSS.
 
 ## The palette as data
 
-The resolved colors are also available as JSON, for scripts and build steps:
+The resolved colors are also available as a typed module, for scripts and build steps:
 
 ```js
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 ```
+
+Tools in other languages can read the same data from `@sanctuary-ds/tokens/palette.json`.
 
 The DTCG files under `tokens/` in the package serve design tools and token pipelines.
 

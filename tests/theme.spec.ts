@@ -1,8 +1,6 @@
-import { createRequire } from 'node:module';
 import { expect, test, type Page } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { STORAGE_KEY } from '../src/data/theme-storage';
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 // The theme switcher through its public interface: the lectern buttons, the
 // attributes on <html>, the query string and the visitor's saved choice.

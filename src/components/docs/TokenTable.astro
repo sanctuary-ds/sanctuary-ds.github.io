@@ -2,7 +2,7 @@
 // A table of tokens: each custom property with its value, or with one value per
 // flavor when it changes with the flavor. Used by the token reference and by
 // the foundations pages, from the data in src/data/tokens.ts.
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import ScrollBox from './ScrollBox.astro';
 import { flavors, tokensOf, type Token } from '../../data/tokens';
 

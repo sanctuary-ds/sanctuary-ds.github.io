@@ -2,7 +2,7 @@
 // The contrast guarantees, computed from the palette at build time: for each
 // pairing the core tests, the lowest ratio in each flavor and the pair that
 // gives it (src/data/accessibility.ts).
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import ScrollBox from './ScrollBox.astro';
 import { lowest, pairings, ratioText } from '../../data/accessibility';
 

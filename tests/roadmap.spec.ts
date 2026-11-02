@@ -1,12 +1,10 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel } from '../src/data/chapels';
 import { horizons, items, products } from '../src/data/roadmap';
 
 // The public roadmap: what people can use today and what comes after, by
 // horizon, with no dates.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 test.describe('roadmap', () => {
   test('the products are shown, each with its horizon', async ({ page }) => {

@@ -2,7 +2,7 @@
 // A desktop rice in Sanctuary: a status bar and a terminal, read from the ANSI
 // tokens the core emits for its ports. A picture, not a control. The clock shows
 // the current flavor and follows it (the lectern script updates [data-clock]).
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
 
 interface Props {

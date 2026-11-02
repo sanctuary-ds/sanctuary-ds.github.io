@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import palette from '@sanctuary-ds/tokens/palette' with { type: 'json' };
+import * as palette from '@sanctuary-ds/tokens/palette';
 
 // The guarantees of the accessibility page, computed from the core at build
 // time: the contrast of every pairing the core tests, in every flavor, and the

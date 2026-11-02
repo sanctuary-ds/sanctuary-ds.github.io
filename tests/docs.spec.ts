@@ -1,13 +1,11 @@
-import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel } from '../src/data/chapels';
 import { sections } from '../src/data/doc-sections';
 import { docFiles } from './docs-content';
 
 // The documentation: an index of every page by section, and each page with its
 // title and the same index beside it.
-
-const palette = createRequire(import.meta.url)('@sanctuary-ds/tokens/palette');
 
 const ordered = sections.flatMap(({ id }) => docFiles.filter((doc) => doc.section === id).sort((a, b) => a.order - b.order));
 
@@ -70,7 +68,7 @@ test.describe('getting started', () => {
     const code = await page.locator('pre code').allTextContents();
     expect(code).toContain('pnpm add @sanctuary-ds/tokens\n');
     expect(code).toContain("import '@sanctuary-ds/tokens/css';\n");
-    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.1/dist/css/sanctuary.css">\n');
+    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.2/dist/css/sanctuary.css">\n');
   });
 
   // The table is written by hand; this keeps it in step with the core.
