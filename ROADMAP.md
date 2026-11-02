@@ -38,7 +38,7 @@ The core lives in [`sanctuary-ds/tokens`](https://github.com/sanctuary-ds/tokens
 
 Rules:
 
-- Depend on the core from npm, pinned to an exact version: `"@sanctuary-ds/tokens": "0.1.0"`. The core published `0.1.0` when this site reached phase 3, because the token reference fixes token names as public API.
+- Depend on the core from npm, pinned to an exact version: `"@sanctuary-ds/tokens": "0.2.0"`. The core published `0.1.0` when this site reached phase 3, because the token reference fixes token names as public API.
 - Updating the core version is its own commit, reviewed for visual changes.
 - Theming uses the core's attributes on `<html>`: `data-san-flavor`, `data-san-accent`, `data-san-glazing` and `data-san-window`. The site never invents its own theme attributes.
 - Token names are the core's public API. See its [versioning rules](https://github.com/sanctuary-ds/tokens/blob/main/docs/ecosystem.md#versioning).

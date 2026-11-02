@@ -68,7 +68,7 @@ test.describe('getting started', () => {
     const code = await page.locator('pre code').allTextContents();
     expect(code).toContain('pnpm add @sanctuary-ds/tokens\n');
     expect(code).toContain("import '@sanctuary-ds/tokens/css';\n");
-    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.1/dist/css/sanctuary.css">\n');
+    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.2/dist/css/sanctuary.css">\n');
   });
 
   // The table is written by hand; this keeps it in step with the core.
