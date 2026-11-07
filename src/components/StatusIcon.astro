@@ -1,0 +1,48 @@
+---
+// The shape of each status, so a status is never told by color alone (WCAG
+// 1.4.1): a circled i, a check, a warning triangle and a cross. Decorative: the
+// status name is always given as text beside it. It draws in currentColor, so it
+// keeps the contrast of the text it sits with.
+interface Props {
+  status: 'info' | 'success' | 'warning' | 'danger';
+}
+
+const { status } = Astro.props;
+---
+
+<svg class="status-icon" viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  {
+    status === 'info' && (
+      <>
+        <circle cx="8" cy="8" r="6.25" />
+        <path d="M8 7.25v4" />
+        <circle class="dot" cx="8" cy="4.9" r="0.6" />
+      </>
+    )
+  }
+  {status === 'success' && <path d="M3.25 8.5l3 3 6.5-7" />}
+  {
+    status === 'warning' && (
+      <>
+        <path d="M8 1.9 14.6 13.6H1.4Z" />
+        <path d="M8 6.25v3.5" />
+        <circle class="dot" cx="8" cy="11.6" r="0.6" />
+      </>
+    )
+  }
+  {status === 'danger' && <path d="M4 4l8 8M12 4l-8 8" />}
+</svg>
+
+<style>
+  .status-icon {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.75;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .dot { fill: currentColor; }
+</style>

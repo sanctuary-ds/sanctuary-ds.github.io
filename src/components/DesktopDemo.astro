@@ -103,7 +103,9 @@ const ansi = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'whi
 
   .ws { display: grid; place-items: center; min-width: 1.75rem; height: 1.5rem; padding: 0 var(--san-space-1); border-radius: var(--san-radius-xs); color: var(--san-text-subtle); font-family: var(--san-font-family-inscription); }
   .ws--active { background: var(--san-glaze-sheen), var(--san-glaze-bg); color: var(--san-glaze-fg); box-shadow: inset 0 0 0 1px var(--san-glaze-border), var(--san-glaze-glow); }
-  .ws--urgent { color: var(--san-danger); }
+  /* Urgent is told by a bar under the numeral as well as by its color. */
+  .ws--urgent { position: relative; color: var(--san-danger); }
+  .ws--urgent::after { content: ''; position: absolute; inset: auto 25% 2px; height: 2px; border-radius: var(--san-radius-full); background: currentColor; }
   .mod { padding: 0 var(--san-space-2); color: var(--c); border-bottom: var(--san-border-width-came) solid var(--c); }
   .mod--clock { --c: var(--san-text); }
 
