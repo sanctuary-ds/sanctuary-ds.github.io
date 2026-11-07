@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf, keysOf, lookup } from '../src/data/objects';
 
 // The foundations pages generate their tables from the core's palette; these
 // tests read the palette on their own and compare.
@@ -24,15 +25,19 @@ test.describe('foundations', () => {
     await page.goto('/docs/foundations/color');
     const table = page.locator('table', { has: page.locator('thead th', { hasText: /^Role$/ }) });
     const headers = await table.locator('thead th').allTextContents();
-    const flavorIds = Object.keys(palette.flavors);
+    const flavorIds = keysOf(palette.flavors);
     expect(headers.slice(2)).toEqual(flavorIds.map((id) => palette.flavors[id].name));
     const rows = await table.locator('tbody tr').evaluateAll((trs) => trs.map((tr) => [...tr.children].map((cell) => cell.textContent!.trim())));
     expect(rows).toHaveLength(6);
     for (const [role, , ...tones] of rows) {
       const suffix = role === 'glass-<p>' ? '' : role;
       for (const [index, flavor] of flavorIds.entries()) {
-        for (const [pigment, { tones: ramp }] of Object.entries<{ tones: Record<string, string> }>(palette.pigments)) {
-          expect(palette.flavors[flavor].colors[`glass-${pigment}${suffix}`].hex, `glass-${pigment}${suffix} in ${flavor}`).toBe(ramp[tones[index]]);
+        for (const [pigment, { tones: ramp }] of entriesOf(palette.pigments)) {
+          // Both sides must exist: two missing values would otherwise compare equal.
+          const name = `glass-${pigment}${suffix} in ${flavor}`;
+          const hex = lookup(palette.flavors[flavor].colors, `glass-${pigment}${suffix}`)?.hex;
+          expect(hex, name).toBeDefined();
+          expect(hex, name).toBe(lookup(ramp, tones[index]));
         }
       }
     }
@@ -42,6 +47,6 @@ test.describe('foundations', () => {
     await page.goto('/docs/foundations/type');
     const table = page.locator('table', { has: page.locator('thead th', { hasText: /^Family$/ }) });
     const rows = await table.locator('tbody tr').evaluateAll((trs) => trs.map((tr) => [...tr.children].slice(0, 2).map((cell) => cell.textContent!.trim())));
-    expect(rows).toEqual(Object.entries(palette.fonts).map(([role, font]: [string, any]) => [role, font.family]));
+    expect(rows).toEqual(entriesOf(palette.fonts).map(([role, font]) => [role, font.family]));
   });
 });

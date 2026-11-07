@@ -26,6 +26,11 @@ jobs:
       - uses: pnpm/setup@fa36a5ef7dcdefc3a7cb25655c122e00cf6e636e # v3.1.2
         with:
           require-lockfile: true
+      # Type-checks the site, its config and its tests (astro check, strict). Astro
+      # strips types when it builds without checking them, so this is the only step
+      # that does.
+      - name: Type-check
+        run: pnpm check
       # Builds the site, then runs the end-to-end tests on the Chrome preinstalled
       # on the runner (see playwright.config.ts), so no browser is downloaded.
       - run: pnpm test

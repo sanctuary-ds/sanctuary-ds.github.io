@@ -3,6 +3,7 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf } from '../src/data/objects';
 
 // The guides publish code people will copy; the port script is run as the page
 // shows it.
@@ -15,7 +16,7 @@ test.describe('guides', () => {
     const dir = testInfo.outputPath();
     writeFileSync(join(dir, 'build.mjs'), script!);
     execFileSync(process.execPath, ['build.mjs'], { cwd: dir });
-    for (const [id, flavor] of Object.entries<any>(palette.flavors)) {
+    for (const [id, flavor] of entriesOf(palette.flavors)) {
       const theme = readFileSync(join(dir, 'themes', `sanctuary-${id}.conf`), 'utf8');
       expect(theme).toContain(`background ${flavor.colors.surface.hex}\n`);
       expect(theme).toContain(`cursor ${flavor.colors.accent.hex}\n`);

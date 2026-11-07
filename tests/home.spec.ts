@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel, chapels } from '../src/data/chapels';
 import { toRoman } from '../src/data/numerals';
+import { entriesOf } from '../src/data/objects';
 
 // The home page through what a visitor sees: the facade, its rose window and
 // its facts, which are counted from the core palette.
@@ -9,8 +10,8 @@ import { toRoman } from '../src/data/numerals';
 test.describe('facade', () => {
   test('the facts are counted from the palette', async ({ page }) => {
     await page.goto('/');
-    const pigments = Object.values(palette.pigments) as { tones: Record<string, string> }[];
-    const modes = Object.values(palette.windowModes as Record<string, { name: string }>).map((mode) => mode.name.toLowerCase());
+    const pigments = Object.values(palette.pigments);
+    const modes = Object.values(palette.windowModes).map((mode) => mode.name.toLowerCase());
     const facts = await page.locator('.facade__facts > div').evaluateAll((items) =>
       items.map((item) => [item.querySelector('dt')!.textContent!.trim(), item.querySelector('dd')!.textContent!.trim()]),
     );
@@ -42,7 +43,7 @@ test.describe('facade', () => {
   });
 
   test('the beams and the cast light dark flavors and shade light ones', async ({ page }) => {
-    for (const [flavor, { scheme }] of Object.entries(palette.flavors as Record<string, { scheme: string }>)) {
+    for (const [flavor, { scheme }] of entriesOf(palette.flavors)) {
       await page.goto(`/?flavor=${flavor}`);
       const blend = await page.evaluate(() => [
         getComputedStyle(document.querySelector('.facade__beams')!).mixBlendMode,
@@ -159,7 +160,7 @@ test.describe('nave', () => {
 
   test('each flavor card shows its hour and themes the page when picked', async ({ page }) => {
     await page.goto('/');
-    const flavors = Object.entries(palette.flavors as Record<string, { name: string; hour: string; blurb: string }>);
+    const flavors = entriesOf(palette.flavors);
     const cards = page.locator('.flavors .flavor');
     await expect(cards).toHaveCount(flavors.length);
     for (const [index, [id, flavor]] of flavors.entries()) {
@@ -187,7 +188,7 @@ test.describe('nave', () => {
 
   test('each glazing has its own stage and a button that applies it', async ({ page }) => {
     await page.goto('/');
-    const glazings = Object.entries(palette.glazings as Record<string, { name: string; note: string }>);
+    const glazings = entriesOf(palette.glazings);
     const items = page.locator('.glazings .glazing');
     await expect(items).toHaveCount(glazings.length);
     for (const [index, [id, glazing]] of glazings.entries()) {
@@ -203,7 +204,7 @@ test.describe('nave', () => {
 
   test('each window mode previews itself and can be picked', async ({ page }) => {
     await page.goto('/');
-    const modes = Object.entries(palette.windowModes as Record<string, { name: string; source: string; note: string }>);
+    const modes = entriesOf(palette.windowModes);
     const buttons = page.locator('.windows .window');
     await expect(buttons).toHaveCount(modes.length);
     for (const [index, [id, mode]] of modes.entries()) {

@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { toRoman } from '../src/data/numerals';
+import { entriesOf, keysOf, lookup } from '../src/data/objects';
 
 // The playground through what a visitor sees: its index and its sections, each
 // checked against the core palette.
@@ -33,7 +34,7 @@ test.describe('playground', () => {
 
   test('the named windows are the palette\'s, each with its own fixed gradient', async ({ page }) => {
     await page.goto('/playground');
-    const windows = Object.entries(palette.windows as Record<string, { name: string; stops: string[]; note: string }>);
+    const windows = entriesOf(palette.windows);
     const figures = page.locator('.named-window');
     await expect(figures).toHaveCount(windows.length);
     for (const [index, [id, window]] of windows.entries()) {
@@ -56,7 +57,7 @@ test.describe('playground', () => {
 
   test('every pigment ramp follows the palette, and its name sets the accent', async ({ page }) => {
     await page.goto('/playground');
-    const pigments = Object.entries(palette.pigments as Record<string, { tones: Record<string, string> }>);
+    const pigments = entriesOf(palette.pigments);
     const ramps = page.locator('#pigments .ramp');
     await expect(ramps).toHaveCount(pigments.length);
     for (const [index, [id, pigment]] of pigments.entries()) {
@@ -70,9 +71,9 @@ test.describe('playground', () => {
 
   test('in every flavor, each ramp marks the one tone that flavor uses as its glass', async ({ page }) => {
     await page.goto('/playground');
-    for (const [flavor, { colors }] of Object.entries(palette.flavors as Record<string, { colors: Record<string, { hex: string }> }>)) {
+    for (const [flavor, { colors }] of entriesOf(palette.flavors)) {
       await page.locator(`.lectern [data-set="flavor:${flavor}"]`).click();
-      for (const id of Object.keys(palette.pigments)) {
+      for (const id of keysOf(palette.pigments)) {
         const marked = await page
           .locator(`#pigments .ramp[data-pigment="${id}"] .tone`)
           .evaluateAll((els) => els.filter((el) => getComputedStyle(el).outlineStyle !== 'none').map((el) => (el as HTMLElement).dataset.copy));
@@ -85,11 +86,13 @@ test.describe('playground', () => {
     await page.goto('/playground');
     const roles = page.locator('#pigments .role');
     expect(await roles.count()).toBeGreaterThan(0);
-    for (const [flavor, { colors }] of Object.entries(palette.flavors as Record<string, { colors: Record<string, { hex: string }> }>)) {
+    for (const [flavor, { colors }] of entriesOf(palette.flavors)) {
       await page.locator(`.lectern [data-set="flavor:${flavor}"]`).click();
       for (const role of await roles.all()) {
-        const name = await role.locator('b').textContent();
-        await expect(role.locator('code:visible')).toHaveText(colors[name!].hex);
+        const name = (await role.locator('b').textContent()) ?? '';
+        const hex = lookup(colors, name)?.hex;
+        expect(hex, name).toBeDefined();
+        await expect(role.locator('code:visible')).toHaveText(hex!);
         // The core writes colors in OKLCH; a canvas turns any of them into sRGB
         // bytes, compared with the hex allowing one step of rounding per channel.
         // Polled, because the theme change is animated.
@@ -102,7 +105,7 @@ test.describe('playground', () => {
                 context.fillRect(0, 0, 1, 1);
                 const shown = context.getImageData(0, 0, 1, 1).data;
                 return Math.max(...[0, 1, 2].map((i) => Math.abs(shown[i] - parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16))));
-              }, colors[name!].hex),
+              }, hex!),
             { message: `${flavor} ${name}` },
           )
           .toBeLessThanOrEqual(1);
@@ -123,7 +126,8 @@ test.describe('playground', () => {
     await page.locator('.lectern [data-set="flavor:lauds"]').click();
     const role = page.locator('#pigments .role').first();
     const name = (await role.locator('b').textContent())!;
-    const roleHex = palette.flavors.lauds.colors[name].hex;
+    const roleHex = lookup(palette.flavors.lauds.colors, name)?.hex;
+    expect(roleHex, name).toBeDefined();
     await role.click();
     await expect(toast).toHaveText(`Copied ${roleHex}`);
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(roleHex);

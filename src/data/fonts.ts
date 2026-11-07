@@ -1,6 +1,7 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf } from './objects';
 
-// One entry per type role the core publishes. astro.config.mjs registers each
+// One entry per type role the core publishes. astro.config.ts registers each
 // role's fonts under --font-<role>; Base.astro outputs them with <Font> and the
 // bridge below.
 
@@ -8,7 +9,7 @@ import * as palette from '@sanctuary-ds/tokens/palette';
 const PRELOADED_ROLE = 'text';
 const PRELOADED_WEIGHT = 400;
 
-export const fontRoles = Object.entries(palette.fonts).map(([role, font]) => ({
+export const fontRoles = entriesOf(palette.fonts).map(([role, font]) => ({
   cssVariable: `--font-${role}` as const,
   preload:
     role === PRELOADED_ROLE && font.weights.includes(PRELOADED_WEIGHT)

@@ -4,6 +4,7 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
 import Lancet from './Lancet.astro';
+import { ariaBoolean } from '../data/aria';
 
 const modes = Object.entries(palette.windowModes);
 ---
@@ -11,7 +12,7 @@ const modes = Object.entries(palette.windowModes);
 <div class="windows">
   {
     modes.map(([id, mode]) => (
-      <button class="window" type="button" data-set={`window:${id}`} data-san-window={id} aria-pressed={String(defaultTheme.window === id)}>
+      <button class="window" type="button" data-set={`window:${id}`} data-san-window={id} aria-pressed={ariaBoolean(defaultTheme.window === id)}>
         <span class="window__lead">
           <Lancet />
         </span>

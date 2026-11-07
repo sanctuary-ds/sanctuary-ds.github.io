@@ -5,6 +5,7 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
 import ScrollBox from './ScrollBox.astro';
 import { flavors, tokensOf, type Token } from '../../data/tokens';
+import { lookup } from '../../data/objects';
 
 interface Props {
   /** The tokens to show, or the DTCG groups to take them from. */
@@ -21,7 +22,13 @@ const label = Astro.props.label ?? `Tokens: ${groups.join(', ')}`;
 const tokens = Astro.props.tokens ?? tokensOf(groups);
 if (tokens.length === 0) throw new Error(`No tokens to show for the group(s) ${groups.join(', ')}.`);
 
-const flavorName = (id: string) => (palette.flavors as Record<string, { name: string }>)[id].name;
+// The token files and the palette must agree on the flavors: a column the
+// palette cannot name fails the build rather than show a bare id.
+const flavorName = (id: string) => {
+  const flavor = lookup(palette.flavors, id);
+  if (!flavor) throw new Error(`The token files list the flavor "${id}", which the core palette does not have.`);
+  return flavor.name;
+};
 const byFlavor = tokens.some((token) => token.byFlavor);
 const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
 ---

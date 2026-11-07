@@ -131,7 +131,7 @@ const hexOf = (value: unknown, flavor?: string): string | undefined => {
 for (const leaf of shared) {
   // A shared alias can land on a flavor's glass (danger is glass-ruby): it gets
   // a swatch only when it shows the same color in every flavor.
-  const hexes = leaf.type === 'color' ? new Set(flavors.map((flavor) => hexOf(leaf.value, flavor))) : new Set();
+  const hexes = leaf.type === 'color' ? new Set(flavors.map((flavor) => hexOf(leaf.value, flavor))) : new Set<string | undefined>();
   add(leaf, { value: format(leaf.type, leaf.value), swatch: hexes.size === 1 ? [...hexes][0] : undefined });
   if (leaf.type === 'typography') {
     tokens.push({ name: `${nameOf(leaf.path)}-tracking`, property: true, group: leaf.path[0], type: 'dimension', value: dimension(leaf.value.letterSpacing) });

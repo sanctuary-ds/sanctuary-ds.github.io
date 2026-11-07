@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { keysOf, lookup } from '../src/data/objects';
 
 // The token reference: generated from the DTCG files, it must list every custom
 // property the stylesheet defines, with the values the core resolves.
@@ -35,17 +36,20 @@ test.describe('token reference', () => {
   // tone of a pigment ramp.
   test('shows each flavor its own color, as the palette resolves it', async ({ page }) => {
     await page.goto('/docs/tokens');
-    const flavorIds = Object.keys(palette.flavors);
+    const flavorIds = keysOf(palette.flavors);
     const headers = await page.locator('section:has(> #stone) thead th').allTextContents();
     expect(headers.slice(1)).toEqual(flavorIds.map((id) => palette.flavors[id].name));
     const text = (color: { hex: string; alpha?: number }) => (color.alpha === undefined ? color.hex : `${color.hex} at ${Math.round(color.alpha * 100)}%`);
     // An alias is shown as the name it reads, without the --san- prefix; a
     // pigment tone, which is not a custom property, by its path.
-    const resolve = (cell: string, id: string): string | undefined => {
+    const resolve = (cell: string, id: palette.FlavorId): string | undefined => {
       if (cell.startsWith('#')) return cell;
       const tone = cell.match(/^pigment\.([a-z]+)\.(\d+)$/);
-      if (tone) return palette.pigments[tone[1]].tones[tone[2]];
-      const color = palette.flavors[id].colors[cell];
+      if (tone) {
+        const pigment = lookup(palette.pigments, tone[1]);
+        return pigment && lookup(pigment.tones, tone[2]);
+      }
+      const color = lookup(palette.flavors[id].colors, cell);
       return color && text(color);
     };
     const rows = await page.locator('.tokens tbody tr').evaluateAll((trs) =>
@@ -55,7 +59,7 @@ test.describe('token reference', () => {
     for (const [name, cells] of rows) {
       if (cells.length !== flavorIds.length) continue;
       for (const [index, id] of flavorIds.entries()) {
-        const color = palette.flavors[id].colors[name.replace('--san-', '')];
+        const color = lookup(palette.flavors[id].colors, name.replace('--san-', ''));
         if (!color) continue;
         expect(resolve(cells[index], id), `${name} in ${id}`).toBe(text(color));
         checked += 1;

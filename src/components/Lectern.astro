@@ -6,8 +6,9 @@ import { chapels } from '../data/chapels';
 import Search from './Search.astro';
 import { axes, defaultTheme } from '../data/theme';
 import { SHORTCUTS_KEY } from '../data/theme-storage';
+import { ariaBoolean } from '../data/aria';
 
-const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axis] === id);
+const pressed = (axis: keyof typeof axes, id: string) => ariaBoolean(defaultTheme[axis] === id);
 ---
 
 <header class="lectern">

@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf } from '../src/data/objects';
 
 // The page is built in English, and the core stylesheet it depends on is loaded:
 // a renamed token after bumping the core pin fails here instead of silently.
@@ -53,7 +54,7 @@ test('the fonts are hosted by the site and used by the core tokens', async ({ pa
   // values name the bare family, so a missing bridge (src/data/fonts.ts) fails here.
   const hosted = (name: string) => new RegExp(`${name}-[0-9a-f]+`);
   // Every role the core publishes, whatever it is called, must reach its token.
-  const roles = Object.entries(palette.fonts as Record<string, { family: string }>);
+  const roles = entriesOf(palette.fonts);
   expect(roles.length).toBeGreaterThan(0);
   for (const [role, { family }] of roles) {
     const token = `--san-font-family-${role}`;
@@ -66,7 +67,7 @@ test('the fonts are hosted by the site and used by the core tokens', async ({ pa
 });
 
 test('the page declares exactly the font faces the core publishes', async ({ page }) => {
-  const expected = Object.values(palette.fonts as Record<string, { family: string; weights: number[]; styles: string[] }>)
+  const expected = Object.values(palette.fonts)
     .flatMap(({ family, weights, styles }) => weights.flatMap((weight) => styles.map((style) => `${family} ${weight} ${style}`)))
     .sort();
   await page.goto('/');

@@ -1,4 +1,5 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf, keysOf, lookup } from './objects';
 
 // The tables of the foundations pages, built from the core's palette so they
 // follow it. Each table is headers and rows of text; the first column names
@@ -14,16 +15,12 @@ export interface Table {
   ids?: boolean;
 }
 
-type Flavor = { name: string; hour: string; scheme: string; blurb: string; accent: string; colors: Record<string, { hex: string }> };
-type Pigment = { hue: number; note: string; tones: Record<string, string> };
-
-const flavors = palette.flavors as Record<string, Flavor>;
-const pigments = palette.pigments as Record<string, Pigment>;
+const { flavors, pigments } = palette;
 
 const flavorsTable: Table = {
   label: 'Flavors',
   headers: ['Flavor', 'Hour', 'Scheme', 'Default accent', 'Character'],
-  rows: Object.entries(flavors).map(([id, flavor]) => [
+  rows: entriesOf(flavors).map(([id, flavor]) => [
     id,
     flavor.hour,
     flavor.scheme,
@@ -36,7 +33,7 @@ const flavorsTable: Table = {
 const pigmentsTable: Table = {
   label: 'Pigments',
   headers: ['Pigment', 'Hue', 'Note'],
-  rows: Object.entries(pigments).map(([id, pigment]) => [id, `${pigment.hue}°`, pigment.note]),
+  rows: entriesOf(pigments).map(([id, pigment]) => [id, `${pigment.hue}°`, pigment.note]),
   ids: true,
 };
 
@@ -53,11 +50,11 @@ const roles = [
 
 // The tone of the ramp a flavor plays for a role, the same for every pigment;
 // the build fails if one pigment disagrees, since the table would then lie.
-const toneOf = (flavorId: string, suffix: string) => {
+const toneOf = (flavorId: palette.FlavorId, suffix: string) => {
   const found = new Set(
-    Object.entries(pigments).map(([id, pigment]) => {
-      const hex = flavors[flavorId].colors[`glass-${id}${suffix}`].hex;
-      const tone = Object.entries(pigment.tones).find(([, value]) => value === hex)?.[0];
+    entriesOf(pigments).map(([id, pigment]) => {
+      const hex = lookup(flavors[flavorId].colors, `glass-${id}${suffix}`)?.hex;
+      const tone = entriesOf(pigment.tones).find(([, value]) => value === hex)?.[0];
       if (!tone) throw new Error(`glass-${id}${suffix} in ${flavorId} is not a tone of the ${id} ramp.`);
       return tone;
     }),
@@ -69,15 +66,14 @@ const toneOf = (flavorId: string, suffix: string) => {
 const glassRolesTable: Table = {
   label: 'Glass roles',
   headers: ['Role', 'Purpose', ...Object.values(flavors).map(({ name }) => name)],
-  rows: roles.map(({ suffix, role, purpose }) => [role, purpose, ...Object.keys(flavors).map((id) => toneOf(id, suffix))]),
+  rows: roles.map(({ suffix, role, purpose }) => [role, purpose, ...keysOf(flavors).map((id) => toneOf(id, suffix))]),
   ids: true,
 };
 
-type Named = { name: string; note: string };
 const glazingsTable: Table = {
   label: 'Glazings',
   headers: ['Glazing', 'Name', 'Technique and rendering'],
-  rows: Object.entries(palette.glazings as Record<string, Named>).map(([id, { name, note }]) => [
+  rows: entriesOf(palette.glazings).map(([id, { name, note }]) => [
     id,
     name + (id === palette.defaultGlazing ? ' (default)' : ''),
     note,
@@ -88,7 +84,7 @@ const glazingsTable: Table = {
 const windowModesTable: Table = {
   label: 'Window modes',
   headers: ['Window', 'Name', 'Light from', 'Note'],
-  rows: Object.entries(palette.windowModes as Record<string, Named & { source: string }>).map(([id, { name, source, note }]) => [
+  rows: entriesOf(palette.windowModes).map(([id, { name, source, note }]) => [
     id,
     name + (id === palette.defaultWindow ? ' (default)' : ''),
     source,
@@ -100,7 +96,7 @@ const windowModesTable: Table = {
 const namedWindowsTable: Table = {
   label: 'Named windows',
   headers: ['Window', 'Name', 'Pigments', 'Character'],
-  rows: Object.entries(palette.windows as Record<string, Named & { stops: string[] }>).map(([id, { name, stops, note }]) => [
+  rows: entriesOf(palette.windows).map(([id, { name, stops, note }]) => [
     `window-${id}`,
     name,
     stops.join(', '),
@@ -110,23 +106,22 @@ const namedWindowsTable: Table = {
 };
 
 // Why each family plays its role: design prose, keyed by the palette's roles.
-const fontReasons: Record<string, string> = {
+const fontReasons: Record<palette.FontRole, string> = {
   display: 'A high-contrast old-style serif: thin strokes read as light on dark stone. Display and headline type.',
   text: 'A plain, legible sans, so the serif stays special. Titles, body and labels.',
   mono: 'Shared with the terminal ports. Code.',
   inscription: 'Roman capitals, wide-tracked, for overlines only.',
 };
 
-type Font = { family: string; fallbacks: string[]; generic: string; weights: number[] };
 const fontsTable: Table = {
   label: 'Font families',
   headers: ['Role', 'Family', 'Fallbacks', 'Weights', 'Why'],
-  rows: Object.entries(palette.fonts as Record<string, Font>).map(([role, font]) => [
+  rows: entriesOf(palette.fonts).map(([role, font]) => [
     role,
     font.family,
     [...font.fallbacks, font.generic].join(', '),
     font.weights.join(', '),
-    fontReasons[role] ?? '',
+    fontReasons[role],
   ]),
   ids: true,
 };

@@ -5,8 +5,9 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
 import ScrollBox from './ScrollBox.astro';
 import { lowest, pairings, ratioText } from '../../data/accessibility';
+import { entriesOf } from '../../data/objects';
 
-const flavors = Object.entries(palette.flavors as Record<string, { name: string }>);
+const flavors = entriesOf(palette.flavors);
 ---
 
 <ScrollBox label="Contrast guarantees">

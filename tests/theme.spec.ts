@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { STORAGE_KEY } from '../src/data/theme-storage';
+import { entriesOf } from '../src/data/objects';
 
 // The theme switcher through its public interface: the lectern buttons, the
 // attributes on <html>, the query string and the visitor's saved choice.
@@ -104,7 +105,7 @@ test.describe('light and dark flavors', () => {
 
   test('each flavor gets the blend its scheme in the palette calls for', async ({ page }) => {
     await page.goto('/');
-    for (const [flavor, { scheme }] of Object.entries(palette.flavors as Record<string, { scheme: string }>)) {
+    for (const [flavor, { scheme }] of entriesOf(palette.flavors)) {
       expect(await schemeOf(page, flavor), flavor).toEqual(scheme === 'light' ? ['multiply', '0.5'] : ['screen', '0.6']);
     }
   });

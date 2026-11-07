@@ -7,6 +7,7 @@ import Button from './Button.astro';
 import Inscription from './Inscription.astro';
 import Lancet from './Lancet.astro';
 import StatusIcon from './StatusIcon.astro';
+import { ariaBoolean } from '../data/aria';
 
 const places = [
   { id: 'nave', name: 'Nave', text: 'Where the people stand, under the clerestory.' },
@@ -17,14 +18,15 @@ const places = [
 // The status name a screen reader reads before a chip's label, which alone does
 // not say the status.
 const statusNames = { info: 'Information', success: 'Success', warning: 'Warning', danger: 'Error' } as const;
+type Status = keyof typeof statusNames;
 
-const statuses = [
+const statuses: { status: Status; label: string; alert: string }[] = [
   { status: 'info', label: 'Notice', alert: 'Vespers begins at dusk.' },
   { status: 'success', label: 'Done', alert: 'The window was leaded and set.' },
   { status: 'warning', label: 'Careful', alert: 'Silver stain darkens when over-fired.' },
   { status: 'danger', label: 'Failed', alert: 'A pane cracked in the kiln.' },
 ];
-const chips = [
+const chips: { status: Status; label: string }[] = [
   { status: 'success', label: 'Consecrated' },
   { status: 'warning', label: 'Vigil' },
   { status: 'danger', label: 'Profaned' },
@@ -95,7 +97,7 @@ const chips = [
     <div class="tabs" role="tablist" aria-label="Parts of the church">
       {
         places.map(({ id, name }, index) => (
-          <button class="tab" type="button" role="tab" id={`tab-${id}`} aria-controls={`tabpanel-${id}`} aria-selected={String(index === 0)} tabindex={index === 0 ? 0 : -1}>
+          <button class="tab" type="button" role="tab" id={`tab-${id}`} aria-controls={`tabpanel-${id}`} aria-selected={ariaBoolean(index === 0)} tabindex={index === 0 ? 0 : -1}>
             {name}
           </button>
         ))
