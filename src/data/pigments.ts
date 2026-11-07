@@ -1,4 +1,5 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { entriesOf, keysOf } from './objects';
 
 // The playground's pigment ramps and the flavor roles, from the core palette.
 // Which tone a flavor uses as each glass, and which hex a role has, depend on the
@@ -6,26 +7,25 @@ import * as palette from '@sanctuary-ds/tokens/palette';
 // lists the flavors it belongs to, and one CSS rule per flavor picks them out.
 // The page is right from the first paint and costs nothing at run time.
 
-const flavors = Object.keys(palette.flavors);
-const colors = (flavor: string) => palette.flavors[flavor as keyof typeof palette.flavors].colors as Record<string, { hex: string }>;
+const flavors = keysOf(palette.flavors);
 
 const title = (id: string) => id[0].toUpperCase() + id.slice(1);
 
-export const ramps = Object.entries(palette.pigments).map(([id, pigment]) => ({
+export const ramps = entriesOf(palette.pigments).map(([id, pigment]) => ({
   id,
   name: title(id),
   note: pigment.note,
-  tones: Object.entries(pigment.tones).map(([tone, hex]) => ({
+  tones: entriesOf(pigment.tones).map(([tone, hex]) => ({
     tone,
     hex,
     // The flavors that use this tone as the pigment's glass.
-    glassIn: flavors.filter((flavor) => colors(flavor)[`glass-${id}`]?.hex === hex).join(' '),
+    glassIn: flavors.filter((flavor) => palette.flavors[flavor].colors[`glass-${id}`].hex === hex).join(' '),
   })),
 }));
 
 // Stone, lead and ink: the roles every flavor re-tones, from the deepest surface
 // to the strongest text.
-const ROLE_NAMES = [
+const ROLE_NAMES: palette.ColorName[] = [
   'surface-sunken', 'surface', 'surface-raised-1', 'surface-raised-2', 'surface-raised-3', 'surface-raised-4',
   'lead-soft', 'lead', 'lead-strong', 'lead-came', 'text-disabled', 'text-subtle', 'text-muted', 'text',
 ];
@@ -33,7 +33,7 @@ const ROLE_NAMES = [
 export const roles = ROLE_NAMES.map((role) => ({
   role,
   hexes: flavors.map((flavor) => {
-    const hex = colors(flavor)[role]?.hex;
+    const hex = palette.flavors[flavor].colors[role]?.hex;
     // A role the core renamed or dropped would otherwise show an empty swatch.
     if (!hex) throw new Error(`Flavor "${flavor}" has no color "${role}" in the core palette.`);
     return { flavor, hex };

@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { keysOf, lookup } from '../src/data/objects';
 
 // The accessibility page computes its guarantees from the core; these tests
 // recompute them on their own, from the palette and the stylesheet.
@@ -22,7 +23,7 @@ const contrast = (a: string, b: string) => {
 test.describe('accessibility', () => {
   test('every pairing meets its minimum in every flavor, and the pair shown gives the ratio shown', async ({ page }) => {
     await page.goto('/docs/accessibility');
-    const flavorIds = Object.keys(palette.flavors);
+    const flavorIds = keysOf(palette.flavors);
     const rows = await page.locator('table.contrast tbody tr').evaluateAll((trs) =>
       trs.map((tr) => ({
         minimum: tr.querySelector('td')!.textContent!,
@@ -35,7 +36,10 @@ test.describe('accessibility', () => {
       for (const [index, [ratio, pair]] of cells.entries()) {
         const [fg, bg] = pair.split(' on ');
         const colors = palette.flavors[flavorIds[index]].colors;
-        const actual = contrast(colors[fg].hex, colors[bg].hex);
+        const [fgColor, bgColor] = [lookup(colors, fg), lookup(colors, bg)];
+        expect(fgColor, fg).toBeDefined();
+        expect(bgColor, bg).toBeDefined();
+        const actual = contrast(fgColor!.hex, bgColor!.hex);
         expect(ratio).toBe(`${(Math.floor(actual * 100) / 100).toFixed(2)}:1`);
         expect(actual).toBeGreaterThanOrEqual(parseFloat(minimum));
       }

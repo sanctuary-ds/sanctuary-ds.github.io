@@ -5,6 +5,7 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
 import ScrollBox from './ScrollBox.astro';
 import { flavors, tokensOf, type Token } from '../../data/tokens';
+import { lookup } from '../../data/objects';
 
 interface Props {
   /** The tokens to show, or the DTCG groups to take them from. */
@@ -21,7 +22,7 @@ const label = Astro.props.label ?? `Tokens: ${groups.join(', ')}`;
 const tokens = Astro.props.tokens ?? tokensOf(groups);
 if (tokens.length === 0) throw new Error(`No tokens to show for the group(s) ${groups.join(', ')}.`);
 
-const flavorName = (id: string) => (palette.flavors as Record<string, { name: string }>)[id].name;
+const flavorName = (id: string) => lookup(palette.flavors, id)?.name ?? id;
 const byFlavor = tokens.some((token) => token.byFlavor);
 const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
 ---
