@@ -62,6 +62,7 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
   { horizon: 'available', product: 'site', text: 'This site: the home page, the playground and this roadmap.' },
   { horizon: 'available', product: 'site', text: 'Documentation: getting started, philosophy, foundations, accessibility, guides and a token reference generated from the DTCG files.' },
   { horizon: 'available', product: 'site', text: 'Search across the site.' },
+  { horizon: 'available', product: 'site', text: 'A changelog for every release of the core.' },
 
   { horizon: 'next', product: 'ports', text: 'Ports for desktop applications such as mangowm, Waybar and foot, each with install steps and a screenshot.' },
   { horizon: 'next', product: 'site', text: 'A ports gallery on this site.' },
@@ -69,7 +70,6 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
 
   { horizon: 'later', product: 'web-components', text: 'Sanctuary Web Components, starting with buttons and form controls.' },
   { horizon: 'later', product: 'ports', text: 'A port generator so anyone can bring Sanctuary to a new app.' },
-  { horizon: 'later', product: 'site', text: 'A changelog for every release.' },
 
   { horizon: 'exploring', product: 'tokens', text: 'Wide-gamut (Display P3) colors.' },
   { horizon: 'exploring', product: 'tokens', text: 'Integrations with other ecosystems, such as a Tailwind preset.' },

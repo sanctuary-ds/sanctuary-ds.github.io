@@ -1,5 +1,6 @@
 import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
+import { chapel } from '../src/data/chapels';
 
 // The changelog of the core, read at build time from the tag of the installed
 // version: it opens on that version, lists every release newest first, and marks
@@ -16,6 +17,17 @@ const compare = (a: string, b: string) => {
 };
 
 test.describe('changelog', () => {
+  test('the Changelog chapel leads to the changelog, from the header and the home page', async ({ page }) => {
+    expect(chapel('changelog').available).toBe(true);
+    expect(chapel('changelog').href).toBe('/docs/changelog');
+    await page.goto('/');
+    await expect(page.locator('.lectern a', { hasText: /^Changelog$/ })).toHaveAttribute('href', '/docs/changelog');
+    const card = page.locator('.chapel', { has: page.locator('.inscription', { hasText: /^[IVXLC]+ · Changelog$/ }) });
+    await expect(card.locator('.chapel__link')).toHaveAttribute('href', '/docs/changelog');
+    await card.locator('.chapel__link').click();
+    await expect(page.locator('h1')).toHaveText('Changelog');
+  });
+
   test('opens on the installed version of the core', async ({ page }) => {
     await page.goto('/docs/changelog');
     await expect(page.locator('h1')).toHaveText('Changelog');

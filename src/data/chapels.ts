@@ -73,10 +73,10 @@ export const chapels: Chapel[] = [
     name: 'Changelog',
     title: 'Every version',
     text: 'What changed in each release of the core, and why.',
-    href: '/changelog',
+    href: '/docs/changelog',
     cta: 'Read the changelog',
     accent: 'azure',
-    available: false,
+    available: true,
   },
 ];
 
