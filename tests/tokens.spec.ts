@@ -14,7 +14,20 @@ test.describe('token reference', () => {
   test('lists every custom property of the stylesheet exactly once', async ({ page }) => {
     await page.goto('/docs/tokens');
     const listed = await page.locator('.tokens th[scope="row"] code').allTextContents();
-    expect([...listed].sort()).toEqual([...defined].sort());
+    expect(listed.filter((name) => name.startsWith('--san-')).sort()).toEqual([...defined].sort());
+  });
+
+  // Pigment tones are private to the stylesheet and breakpoints are not custom
+  // properties at all: the reference names them by their DTCG path, never by a
+  // custom property a reader could copy and find undefined.
+  test('names the tokens the stylesheet does not declare by their DTCG path', async ({ page }) => {
+    await page.goto('/docs/tokens');
+    const listed = await page.locator('.tokens th[scope="row"] code').allTextContents();
+    const paths = listed.filter((name) => !name.startsWith('--san-'));
+    expect(paths).toContain('pigment.ruby.600');
+    expect(paths).toContain('breakpoint.md');
+    for (const path of paths) expect(path, path).toMatch(/^(pigment|breakpoint)(\.[a-z0-9-]+)+$/);
+    expect(stylesheet).not.toMatch(/--san-(pigment|breakpoint)-/);
   });
 
   // Checked against the palette, which the core resolves on its own. An alias
@@ -26,10 +39,11 @@ test.describe('token reference', () => {
     const headers = await page.locator('section:has(> #stone) thead th').allTextContents();
     expect(headers.slice(1)).toEqual(flavorIds.map((id) => palette.flavors[id].name));
     const text = (color: { hex: string; alpha?: number }) => (color.alpha === undefined ? color.hex : `${color.hex} at ${Math.round(color.alpha * 100)}%`);
-    // An alias is shown as the name it reads, without the --san- prefix.
+    // An alias is shown as the name it reads, without the --san- prefix; a
+    // pigment tone, which is not a custom property, by its path.
     const resolve = (cell: string, id: string): string | undefined => {
       if (cell.startsWith('#')) return cell;
-      const tone = cell.match(/^pigment-([a-z]+)-(\d+)$/);
+      const tone = cell.match(/^pigment\.([a-z]+)\.(\d+)$/);
       if (tone) return palette.pigments[tone[1]].tones[tone[2]];
       const color = palette.flavors[id].colors[cell];
       return color && text(color);

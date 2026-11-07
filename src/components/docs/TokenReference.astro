@@ -17,6 +17,21 @@ const blocks = (groups: string[]) => {
   return keys.map((key) => ({ key, tokens: list.filter(({ subgroup }) => subgroup === key) }));
 };
 
+// Why a group's tokens are named by their DTCG path: the stylesheet does not
+// declare them. A group the core makes private later fails the build until it
+// is explained here.
+const notProperty: Record<string, string> = {
+  pigment:
+    'The ramps are not custom properties: the stylesheet keeps them private to build the glass. Read a tone from @sanctuary-ds/tokens/palette (pigments.<p>.tones) or from tokens/pigment.tokens.json.',
+  breakpoint:
+    'Breakpoints are not custom properties, since a media query cannot read one. Read them from tokens/foundation/layout.tokens.json and write the values into your queries.',
+};
+const unexplained = [...new Set(tokensOf(sections.flatMap(({ groups }) => groups)).filter(({ property }) => !property).map(({ group }) => group))].filter(
+  (group) => !notProperty[group],
+);
+if (unexplained.length) throw new Error(`The token reference does not explain why ${unexplained.join(', ')} are not custom properties.`);
+const privateNotes = (groups: string[]) => groups.filter((group) => tokensOf([group]).some(({ property }) => !property)).map((group) => notProperty[group]);
+
 const notes = (groups: string[]) => Object.entries(groupNotes).filter(([prefix]) => groups.some((group) => prefix === `--san-${group}`));
 const foldNote = (groups: string[], key: string) => groups.map((group) => groupNotes[`--san-${group}-${key}`]).find(Boolean);
 ---
@@ -33,6 +48,7 @@ const foldNote = (groups: string[], key: string) => groups.map((group) => groupN
     <section aria-labelledby={id}>
       <h2 id={id}>{title}</h2>
       {notes(groups).map(([, note]) => <p>{note}</p>)}
+      {privateNotes(groups).map((note) => <p>{note}</p>)}
       {blocks(groups).map(({ key, tokens }) => {
         const table = <TokenTable tokens={tokens} label={key ? `${title}: ${key}` : title} />;
         return key ? (

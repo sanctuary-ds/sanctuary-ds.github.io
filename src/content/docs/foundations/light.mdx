@@ -41,9 +41,9 @@ Cast is the colored glow that glass throws on its surroundings: `--san-cast-sm`,
 
 ## State layers
 
-Hover, focus and pressed are layers of the content color laid over a control. The stylesheet computes `--san-state-hover`, `--san-state-focus` and `--san-state-pressed` from `currentColor`, so they follow whatever color the content has. The token files hold their opacities, with those for disabled content and containers:
+Hover, focus and pressed are layers of the content color laid over a control. The stylesheet computes `--san-state-layer-hover`, `--san-state-layer-focus` and `--san-state-layer-pressed` from `currentColor` at the matching `--san-opacity-<state>`, so they follow whatever color the content has. The token files hold those opacities, with the ones for disabled content and containers:
 
-<TokenTable groups={['state']} />
+<TokenTable groups={['opacity']} />
 
 ## Blur
 
