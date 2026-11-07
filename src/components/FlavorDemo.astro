@@ -4,6 +4,7 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
 import Inscription from './Inscription.astro';
+import { ariaBoolean } from '../data/aria';
 
 interface Props {
   /** `pairs` lays the four flavors two by two (beside text); `row` fills the width. */
@@ -17,7 +18,7 @@ const flavors = Object.entries(palette.flavors);
 <div class:list={['flavors', `flavors--${layout}`]}>
   {
     flavors.map(([id, flavor]) => (
-      <button class="flavor" type="button" data-set={`flavor:${id}`} data-san-flavor={id} aria-pressed={String(defaultTheme.flavor === id)}>
+      <button class="flavor" type="button" data-set={`flavor:${id}`} data-san-flavor={id} aria-pressed={ariaBoolean(defaultTheme.flavor === id)}>
         <span class="flavor__sky" aria-hidden="true">
           <span class="flavor__glass" />
         </span>

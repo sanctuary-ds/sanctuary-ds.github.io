@@ -4,6 +4,7 @@
 // buttons are the real ones (data-set, handled by the lectern script).
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { defaultTheme } from '../data/theme';
+import { ariaBoolean } from '../data/aria';
 
 const glazings = Object.entries(palette.glazings);
 ---
@@ -20,7 +21,7 @@ const glazings = Object.entries(palette.glazings);
         </div>
         <h3>{glazing.name}</h3>
         <p>{glazing.note}</p>
-        <button class="use" type="button" data-set={`glazing:${id}`} aria-pressed={String(defaultTheme.glazing === id)}>
+        <button class="use" type="button" data-set={`glazing:${id}`} aria-pressed={ariaBoolean(defaultTheme.glazing === id)}>
           Use {glazing.name}
         </button>
       </article>
