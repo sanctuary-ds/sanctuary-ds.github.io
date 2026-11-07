@@ -22,7 +22,13 @@ const label = Astro.props.label ?? `Tokens: ${groups.join(', ')}`;
 const tokens = Astro.props.tokens ?? tokensOf(groups);
 if (tokens.length === 0) throw new Error(`No tokens to show for the group(s) ${groups.join(', ')}.`);
 
-const flavorName = (id: string) => lookup(palette.flavors, id)?.name ?? id;
+// The token files and the palette must agree on the flavors: a column the
+// palette cannot name fails the build rather than show a bare id.
+const flavorName = (id: string) => {
+  const flavor = lookup(palette.flavors, id);
+  if (!flavor) throw new Error(`The token files list the flavor "${id}", which the core palette does not have.`);
+  return flavor.name;
+};
 const byFlavor = tokens.some((token) => token.byFlavor);
 const swatchOf = (token: Token, flavor?: string) => (typeof token.swatch === 'string' ? token.swatch : flavor ? token.swatch?.[flavor] : undefined);
 ---

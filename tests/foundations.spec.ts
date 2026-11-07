@@ -33,7 +33,11 @@ test.describe('foundations', () => {
       const suffix = role === 'glass-<p>' ? '' : role;
       for (const [index, flavor] of flavorIds.entries()) {
         for (const [pigment, { tones: ramp }] of entriesOf(palette.pigments)) {
-          expect(lookup(palette.flavors[flavor].colors, `glass-${pigment}${suffix}`)?.hex, `glass-${pigment}${suffix} in ${flavor}`).toBe(lookup(ramp, tones[index]));
+          // Both sides must exist: two missing values would otherwise compare equal.
+          const name = `glass-${pigment}${suffix} in ${flavor}`;
+          const hex = lookup(palette.flavors[flavor].colors, `glass-${pigment}${suffix}`)?.hex;
+          expect(hex, name).toBeDefined();
+          expect(hex, name).toBe(lookup(ramp, tones[index]));
         }
       }
     }

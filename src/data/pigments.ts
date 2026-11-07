@@ -1,5 +1,5 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
-import { entriesOf, keysOf } from './objects';
+import { entriesOf, keysOf, lookup } from './objects';
 
 // The playground's pigment ramps and the flavor roles, from the core palette.
 // Which tone a flavor uses as each glass, and which hex a role has, depend on the
@@ -8,6 +8,14 @@ import { entriesOf, keysOf } from './objects';
 // The page is right from the first paint and costs nothing at run time.
 
 const flavors = keysOf(palette.flavors);
+
+// The hex a flavor shows as a pigment's glass. A pigment the core leaves without
+// glass in some flavor fails the build by name, not with a bare TypeError.
+const glassHex = (flavor: palette.FlavorId, pigment: palette.PigmentId) => {
+  const glass = lookup(palette.flavors[flavor].colors, `glass-${pigment}`);
+  if (!glass) throw new Error(`Flavor "${flavor}" has no color "glass-${pigment}" in the core palette.`);
+  return glass.hex;
+};
 
 const title = (id: string) => id[0].toUpperCase() + id.slice(1);
 
@@ -19,7 +27,7 @@ export const ramps = entriesOf(palette.pigments).map(([id, pigment]) => ({
     tone,
     hex,
     // The flavors that use this tone as the pigment's glass.
-    glassIn: flavors.filter((flavor) => palette.flavors[flavor].colors[`glass-${id}`].hex === hex).join(' '),
+    glassIn: flavors.filter((flavor) => glassHex(flavor, id) === hex).join(' '),
   })),
 }));
 
