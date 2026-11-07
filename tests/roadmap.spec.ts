@@ -1,3 +1,4 @@
+import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel } from '../src/data/chapels';
@@ -57,6 +58,12 @@ test.describe('roadmap', () => {
       expect(horizonIds).toContain(item.horizon);
       if (item.product) expect(productIds).toContain(item.product);
     }
+  });
+
+  test('the install item names the installed version of the core', async ({ page }) => {
+    const { version } = createRequire(import.meta.url)('@sanctuary-ds/tokens/package.json') as { version: string };
+    await page.goto('/roadmap');
+    await expect(page.locator('.item__text', { hasText: 'Install the tokens from npm' })).toHaveText(`Install the tokens from npm: @sanctuary-ds/tokens ${version}.`);
   });
 
   test('the roadmap chapel is open', () => {
