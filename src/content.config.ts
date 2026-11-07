@@ -23,6 +23,7 @@ const docs = defineCollection({
 // installed version and rendered with Astro's own Markdown pipeline. A failed
 // download, or a changelog that does not open on the installed version, fails
 // the build: the site never ships an empty or mismatched changelog.
+const DOWNLOAD_TIMEOUT_MS = 30_000;
 const changelog = defineCollection({
   loader: {
     name: 'core-changelog',
@@ -30,7 +31,8 @@ const changelog = defineCollection({
       const url = changelogUrl(coreVersion);
       let text: string;
       try {
-        const response = await fetch(url);
+        // A stalled connection fails the build too, instead of hanging it.
+        const response = await fetch(url, { signal: AbortSignal.timeout(DOWNLOAD_TIMEOUT_MS) });
         if (!response.ok) throw new Error(`HTTP ${response.status} ${response.statusText}`);
         text = await response.text();
       } catch (error) {
