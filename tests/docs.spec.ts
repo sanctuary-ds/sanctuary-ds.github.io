@@ -34,8 +34,10 @@ test.describe('docs', () => {
     });
   }
 
-  // Code samples name tokens by hand; each must exist in the core.
-  for (const doc of docFiles) {
+  // Code samples name tokens by hand; each must exist in the core. The changelog
+  // is the exception: it is the core's own history, and names the tokens a
+  // release removed or renamed precisely because they no longer exist.
+  for (const doc of docFiles.filter(({ path }) => path !== '/docs/changelog')) {
     test(`every token in the code of ${doc.path} is defined by the stylesheet`, async ({ page }) => {
       await page.goto(doc.path);
       const code = (await page.locator('.prose code').allTextContents()).join('\n');

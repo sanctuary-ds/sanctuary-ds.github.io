@@ -1,0 +1,82 @@
+---
+// The core's changelog, newest release first (src/content.config.ts reads it
+// from the tag of the installed version). Each release has an anchor (#v0.3.0);
+// its breaking changes lead it, marked by a label and an icon, never by color
+// alone. The entries are release-please's Markdown from the core's own
+// repository, rendered by Astro.
+import { getEntry } from 'astro:content';
+import StatusIcon from '../StatusIcon.astro';
+
+const changelog = await getEntry('changelog', 'core');
+if (!changelog) throw new Error('The changelog collection has no entry: the loader did not run.');
+const { note, releases } = changelog.data;
+---
+
+{note && <div class="changelog__note" set:html={note} />}
+
+{
+  releases.map(({ version, date, compareUrl, sections }) => (
+    <section class="release" aria-labelledby={`v${version}`}>
+      <header class="release__head">
+        <h2 id={`v${version}`}>{version}</h2>
+        <p class="release__meta">
+          <time datetime={date}>{date}</time>
+          {compareUrl && (
+            <>
+              {' · '}
+              <a href={compareUrl}>Compare changes</a>
+            </>
+          )}
+        </p>
+      </header>
+      <div class="release__body">
+        {sections.map(({ title, breaking, html }) => (
+          <section class:list={['release__section', { release__breaking: breaking }]}>
+            <h3>
+              {breaking && <StatusIcon status="warning" />}
+              {title}
+            </h3>
+            <Fragment set:html={html} />
+          </section>
+        ))}
+      </div>
+    </section>
+  ))
+}
+
+<style>
+  .changelog__note { color: var(--san-text-muted); }
+
+  /* A release opens under a lead line, its number set large; its sections hang
+     from a came on the left, so where a release starts and ends reads at a glance. */
+  .release { margin-top: var(--san-space-10); padding-top: var(--san-space-6); border-top: var(--san-border-width-hairline) solid var(--san-lead-soft); }
+  .release__head { display: flex; flex-wrap: wrap; gap: var(--san-space-1) var(--san-space-4); align-items: baseline; justify-content: space-between; }
+  .release h2 { margin: 0; font: var(--san-type-headline-md); letter-spacing: var(--san-type-headline-md-tracking); scroll-margin-top: var(--san-space-8); }
+  .release__meta { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+  .release__body { margin-top: var(--san-space-4); padding-left: var(--san-space-5); border-left: var(--san-border-width-came) solid var(--san-lead); }
+  .release__section + .release__section { margin-top: var(--san-space-5); }
+  .release__section :global(ul) { margin: var(--san-space-2) 0 0; }
+
+  /* Section titles are labels of their release, one level down: the carved
+     inscription the docs use for their own sections, not a heading of their own. */
+  .release__section h3 {
+    display: flex;
+    gap: var(--san-space-2);
+    align-items: center;
+    margin: 0;
+    font: var(--san-type-inscription);
+    letter-spacing: var(--san-type-inscription-tracking);
+    text-transform: uppercase;
+    color: var(--san-text-subtle);
+  }
+
+  /* Breaking changes: the warning shape and its name, then the color. */
+  .release__breaking {
+    padding: var(--san-space-3) var(--san-space-4);
+    border: var(--san-border-width-hairline) solid color-mix(in oklch, var(--san-warning) 35%, transparent);
+    border-left: var(--san-border-width-heavy) solid var(--san-warning);
+    border-radius: var(--san-radius-sm);
+    background: color-mix(in oklch, var(--san-warning-pane) 45%, var(--san-surface-raised-1));
+  }
+  .release__breaking h3 { color: var(--san-warning-ink); }
+</style>

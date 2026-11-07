@@ -4,6 +4,7 @@
 // what was asked for; on wider screens it sits in the left column.
 import Base from './Base.astro';
 import Inscription from '../components/Inscription.astro';
+import { coreVersion } from '../data/changelog';
 import { docHref, docsBySection } from '../data/docs';
 
 interface Props {
@@ -33,6 +34,9 @@ const current = (href: string) => (href === here ? 'page' : undefined);
     </main>
 
     <nav class="docs__nav" aria-label="Documentation">
+      <p class="docs__version">
+        Documents <code>@sanctuary-ds/tokens</code> <a href={`/docs/changelog#v${coreVersion}`}>{coreVersion}</a>
+      </p>
       <a href="/docs" aria-current={current('/docs')}>Overview</a>
       {
         sections.map((section) => (
@@ -71,6 +75,9 @@ const current = (href: string) => (href === here ? 'page' : undefined);
   h1 { margin: 0; font: var(--san-type-display-sm); letter-spacing: var(--san-type-display-sm-tracking); }
   .docs__head p { margin: 0; font: var(--san-type-body-lg); color: var(--san-text-muted); }
 
+  .docs__version { margin: 0; font: var(--san-type-body-sm); color: var(--san-text-subtle); }
+  .docs__version code { color: var(--san-text-muted); }
+  .docs__nav .docs__version a { display: inline; padding: 0; border: 0; color: var(--san-accent-ink); font: inherit; font-weight: 600; text-decoration: underline; }
   .docs__nav h2 { margin: 0 0 var(--san-space-2); font: var(--san-type-inscription); letter-spacing: var(--san-type-inscription-tracking); text-transform: uppercase; color: var(--san-text-subtle); }
   .docs__nav ul { display: grid; gap: var(--san-space-1); margin: 0; padding: 0; list-style: none; }
   .docs__nav a {

@@ -1,0 +1,13 @@
+---
+title: Changelog
+description: What changed in each release of the core, newest first.
+section: reference
+order: 3
+---
+
+import Changelog from '../../components/docs/Changelog.astro';
+import { coreVersion } from '../../data/changelog';
+
+The changelog of `@sanctuary-ds/tokens` as of <strong>{coreVersion}</strong>, the version this site documents. It is read from that release of the [tokens repository](https://github.com/sanctuary-ds/tokens) each time the site is built, so it never runs ahead of the reference. Before 1.0.0, a breaking change raises the minor version.
+
+<Changelog />
