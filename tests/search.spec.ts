@@ -28,8 +28,10 @@ test.describe('search', () => {
   test('says when nothing matches', async ({ page }) => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Search' }).click();
-    await page.getByLabel('Search the site').fill('zzzqqqxxx');
-    await expect(page.getByRole('status')).toHaveText('No results for “zzzqqqxxx”.');
+    // Pagefind matches a word that is a prefix of the query, so the query starts
+    // with a letter that is no word on the site (z is one: the z token group).
+    await page.getByLabel('Search the site').fill('qqqxxxjjj');
+    await expect(page.getByRole('status')).toHaveText('No results for “qqqxxxjjj”.');
     await expect(page.locator('.search__result')).toHaveCount(0);
   });
 
