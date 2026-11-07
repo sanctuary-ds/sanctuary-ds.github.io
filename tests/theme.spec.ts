@@ -147,7 +147,7 @@ test.describe('restoring the theme', () => {
 
   test('a flavor without a saved accent brings its own accent', async ({ page }) => {
     await page.goto('/?flavor=vespers');
-    expect(await theme(page)).toBe('vespers/amber/pot-metal/mono');
+    expect(await theme(page)).toBe(`vespers/${palette.flavors.vespers.accent}/pot-metal/mono`);
   });
 
   test('corrupt storage falls back to the defaults without errors', async ({ page }) => {

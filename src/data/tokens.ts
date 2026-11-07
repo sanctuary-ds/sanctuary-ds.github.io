@@ -7,7 +7,9 @@ import { dirname, join } from 'node:path';
 // property is its path joined with hyphens; a group's `$root` token takes the
 // group's own name (accent.$root is --san-accent). Typography tokens also have a
 // `-tracking` property, from their letter spacing. The few tokens the format
-// cannot express are read from the stylesheet instead (see cssOnly).
+// cannot express are read from the stylesheet instead (see cssOnly). A token the
+// stylesheet does not declare (a pigment tone, a breakpoint) is not a custom
+// property, so it is named by its DTCG path instead (pigment.ruby.600).
 
 const require = createRequire(import.meta.url);
 const packageRoot = dirname(require.resolve('@sanctuary-ds/tokens/package.json'));
@@ -18,8 +20,10 @@ type Json = Record<string, any>;
 const readJson = (file: string): Json => JSON.parse(readFileSync(join(tokensDir, file), 'utf8'));
 
 export interface Token {
-  /** The custom property, such as --san-surface-raised-1. */
+  /** The custom property, such as --san-surface-raised-1, or the DTCG path, such as breakpoint.md, when the stylesheet declares none. */
   name: string;
+  /** Whether the stylesheet declares the token as a public custom property. */
+  property: boolean;
   /** The first segment of the DTCG path, such as surface. */
   group: string;
   /** The second segment, such as ruby in glass.ruby.lume, when there is one. */
@@ -35,9 +39,16 @@ export interface Token {
 }
 
 const nameOf = (path: string[]) => `--san-${path.filter((part) => part !== '$root').join('-')}`;
+// Every public custom property the stylesheet declares. Private ones start with
+// --_san- and do not match.
+const declarations = [...stylesheet.matchAll(/(--san-[a-z0-9-]+):\s*([^;]+);/g)];
+const declared = new Set(declarations.map(([, name]) => name));
+const isProperty = (path: string[]) => declared.has(nameOf(path));
+const displayName = (path: string[]) => (isProperty(path) ? nameOf(path) : path.filter((part) => part !== '$root').join('.'));
 // An alias shows the token it reads without the --san- prefix, which keeps the
-// per-flavor columns narrow: {pigment.ruby.600} is pigment-ruby-600.
-const aliasName = (reference: string) => nameOf(reference.slice(1, -1).split('.')).replace('--san-', '');
+// per-flavor columns narrow: {accent.lume} is accent-lume. One that reads a token
+// that is not a custom property shows its path: {pigment.ruby.600}.
+const aliasName = (reference: string) => displayName(reference.slice(1, -1).split('.')).replace('--san-', '');
 const isAlias = (value: unknown): value is string => typeof value === 'string' && /^\{.+\}$/.test(value);
 
 const dimension = ({ value, unit }: { value: number; unit: string }) => `${value}${unit}`;
@@ -78,7 +89,7 @@ interface Leaf {
 }
 
 // What a group's own $description says, by the group's custom property prefix
-// (--san-state: "Opacity of the content color..."), shown once above its tokens.
+// (--san-opacity: "Opacity of the content color..."), shown once above its tokens.
 export const groupNotes: Record<string, string> = {};
 
 // The tokens of one file, each with the type it inherits from its groups when
@@ -103,7 +114,7 @@ const perFlavor = Object.fromEntries(flavors.map((flavor) => [flavor, sources(fl
 
 const tokens: Token[] = [];
 const add = (leaf: Leaf, token: Partial<Token>) =>
-  tokens.push({ name: nameOf(leaf.path), group: leaf.path[0], subgroup: leaf.path.length > 2 ? leaf.path[1] : undefined, type: leaf.type, description: leaf.description, ...token });
+  tokens.push({ name: displayName(leaf.path), property: isProperty(leaf.path), group: leaf.path[0], subgroup: leaf.path.length > 2 ? leaf.path[1] : undefined, type: leaf.type, description: leaf.description, ...token });
 
 // The hex a color token shows in a flavor, following aliases through the
 // shared sets and that flavor's own tokens.
@@ -123,7 +134,7 @@ for (const leaf of shared) {
   const hexes = leaf.type === 'color' ? new Set(flavors.map((flavor) => hexOf(leaf.value, flavor))) : new Set();
   add(leaf, { value: format(leaf.type, leaf.value), swatch: hexes.size === 1 ? [...hexes][0] : undefined });
   if (leaf.type === 'typography') {
-    tokens.push({ name: `${nameOf(leaf.path)}-tracking`, group: leaf.path[0], type: 'dimension', value: dimension(leaf.value.letterSpacing) });
+    tokens.push({ name: `${nameOf(leaf.path)}-tracking`, property: true, group: leaf.path[0], type: 'dimension', value: dimension(leaf.value.letterSpacing) });
   }
 }
 
@@ -144,10 +155,10 @@ for (const [index, leaf] of first.entries()) {
 // computed by the stylesheet from the flavor, accent, glazing and window. The
 // value shown is the first declaration, the one before any attribute applies.
 const dtcgNames = new Set(tokens.map(({ name }) => name));
-const declarations = [...stylesheet.matchAll(/(--san-[a-z0-9-]+):\s*([^;]+);/g)];
-const cssOnlyNames = [...new Set(declarations.map(([, name]) => name))].filter((name) => !dtcgNames.has(name));
+const cssOnlyNames = [...declared].filter((name) => !dtcgNames.has(name));
 export const cssOnly: Token[] = cssOnlyNames.map((name) => ({
   name,
+  property: true,
   group: 'css',
   type: 'css',
   value: declarations.find(([, declared]) => declared === name)![2].replace(/\s+/g, ' ').trim(),
@@ -166,12 +177,13 @@ export const sections = [
   { id: 'terminal', title: 'Terminal', groups: ['ansi'] },
   { id: 'windows', title: 'Named windows', groups: ['window'] },
   { id: 'pigments', title: 'Pigments', groups: ['pigment'] },
-  { id: 'space', title: 'Space and size', groups: ['space', 'size', 'breakpoint'] },
+  { id: 'space', title: 'Space and size', groups: ['space', 'size'] },
+  { id: 'layout', title: 'Layout', groups: ['breakpoint', 'z'] },
   { id: 'shape', title: 'Shape', groups: ['radius', 'border'] },
   { id: 'type', title: 'Type', groups: ['font', 'type'] },
   { id: 'motion', title: 'Motion', groups: ['duration', 'ease'] },
-  { id: 'light', title: 'Light', groups: ['elevation', 'blur'] },
-  { id: 'state', title: 'State and layers', groups: ['state', 'layer'] },
+  { id: 'light', title: 'Light', groups: ['elevation'] },
+  { id: 'effect', title: 'Effect', groups: ['blur', 'opacity'] },
 ];
 
 const placed = new Set(sections.flatMap(({ groups }) => groups));

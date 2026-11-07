@@ -154,7 +154,7 @@ const pressed = (axis: keyof typeof axes, id: string) => String(defaultTheme[axi
   .lectern {
     position: sticky;
     top: 0;
-    z-index: var(--san-layer-sticky);
+    z-index: var(--san-z-sticky);
     padding: var(--san-space-3) clamp(var(--san-space-4), 4vw, var(--san-space-12));
     background: color-mix(in oklch, var(--san-surface-sunken) 84%, transparent);
     backdrop-filter: blur(var(--san-blur-md)) saturate(1.4);
