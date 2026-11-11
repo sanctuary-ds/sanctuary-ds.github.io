@@ -1,8 +1,11 @@
+import { createRequire } from 'node:module';
 import { expect, test } from '@playwright/test';
 import * as palette from '@sanctuary-ds/tokens/palette';
 import { chapel } from '../src/data/chapels';
 import { sections } from '../src/data/doc-sections';
 import { docFiles } from './docs-content';
+
+const { version: installed } = createRequire(import.meta.url)('@sanctuary-ds/tokens/package.json') as { version: string };
 
 // The documentation: an index of every page by section, and each page with its
 // title and the same index beside it.
@@ -70,7 +73,10 @@ test.describe('getting started', () => {
     const code = await page.locator('pre code').allTextContents();
     expect(code).toContain('pnpm add @sanctuary-ds/tokens\n');
     expect(code).toContain("import '@sanctuary-ds/tokens/css';\n");
-    expect(code).toContain('<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.3/dist/css/sanctuary.css">\n');
+    // The CDN range follows the installed version: its minor before 1.0.0.
+    const [major, minor] = installed.split('.');
+    const range = major === '0' ? `0.${minor}` : major;
+    expect(code).toContain(`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@${range}/dist/css/sanctuary.css">\n`);
   });
 
   // The table is written by hand; this keeps it in step with the core.

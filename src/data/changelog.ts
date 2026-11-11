@@ -15,6 +15,16 @@ if (!(manifest && typeof manifest === 'object' && 'version' in manifest && typeo
 /** The installed version of the core, the one this site documents. */
 export const coreVersion = manifest.version;
 
+/**
+ * The range a CDN link should name to follow the installed version without
+ * breaking: before 1.0.0 a breaking change raises the minor (0.3), after it the
+ * major (1).
+ */
+export const cdnRange = (version: string) => {
+  const [major, minor] = version.split('.');
+  return major === '0' ? `0.${minor}` : major;
+};
+
 /** Where the changelog of a released version lives. */
 export const changelogUrl = (version: string) => `https://raw.githubusercontent.com/sanctuary-ds/tokens/v${version}/CHANGELOG.md`;
 

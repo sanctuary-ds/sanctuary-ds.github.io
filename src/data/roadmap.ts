@@ -1,4 +1,5 @@
 import * as palette from '@sanctuary-ds/tokens/palette';
+import { coreVersion } from './changelog';
 
 // The public roadmap: what people can use today and what they can use later,
 // by horizon and with no dates, as decided in the core (docs/ecosystem.md).
@@ -58,7 +59,7 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
   },
   { horizon: 'available', product: 'tokens', text: 'DTCG design tokens and a plain palette.json for tools without a token pipeline.' },
   { horizon: 'available', product: 'tokens', text: 'WCAG AA contrast, checked by tests in every flavor; reduced motion respected.' },
-  { horizon: 'available', product: 'tokens', text: 'Install the tokens from npm: @sanctuary-ds/tokens 0.3.0.' },
+  { horizon: 'available', product: 'tokens', text: `Install the tokens from npm: @sanctuary-ds/tokens ${coreVersion}.` },
   { horizon: 'available', product: 'site', text: 'This site: the home page, the playground and this roadmap.' },
   { horizon: 'available', product: 'site', text: 'Documentation: getting started, philosophy, foundations, accessibility, guides and a token reference generated from the DTCG files.' },
   { horizon: 'available', product: 'site', text: 'Search across the site.' },

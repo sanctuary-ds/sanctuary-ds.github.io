@@ -6,6 +6,7 @@ order: 1
 ---
 
 import AxesTable from '../../components/docs/AxesTable.astro';
+import { cdnRange, coreVersion } from '../../data/changelog';
 
 Sanctuary ships as design tokens: CSS custom properties, the same values as JSON, and DTCG files for design tools. This page takes you from nothing to a themed page.
 
@@ -25,9 +26,7 @@ import '@sanctuary-ds/tokens/css';
 
 Without a build step, link it from a CDN that serves npm packages:
 
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@0.3/dist/css/sanctuary.css">
-```
+<pre><code class="language-html">{`<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@sanctuary-ds/tokens@${cdnRange(coreVersion)}/dist/css/sanctuary.css">\n`}</code></pre>
 
 The stylesheet only defines custom properties. It styles no elements, so nothing on your page changes until you use a token.
 
