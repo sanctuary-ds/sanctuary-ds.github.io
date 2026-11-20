@@ -30,13 +30,13 @@ export const products = [
     id: 'web-components',
     name: 'Sanctuary Web Components',
     text: 'A Lit library of components that read the same tokens and work in any framework, or none.',
-    horizon: 'later',
+    horizon: 'next',
   },
   {
     id: 'ports',
     name: 'Desktop ports',
     text: 'Sanctuary on the Linux desktop: one repository per application, and a generator for new ones.',
-    horizon: 'next',
+    horizon: 'later',
   },
   {
     id: 'site',
@@ -65,11 +65,11 @@ export const items: { horizon: Horizon; product?: Product; text: string }[] = [
   { horizon: 'available', product: 'site', text: 'Search across the site.' },
   { horizon: 'available', product: 'site', text: 'A changelog for every release of the core.' },
 
-  { horizon: 'next', product: 'ports', text: 'Ports for desktop applications such as mangowm, Waybar and foot, each with install steps and a screenshot.' },
-  { horizon: 'next', product: 'site', text: 'A ports gallery on this site.' },
+  { horizon: 'next', product: 'web-components', text: 'Sanctuary Web Components, starting with buttons and form controls.' },
   { horizon: 'next', product: 'site', text: 'Documentation in Spanish.' },
 
-  { horizon: 'later', product: 'web-components', text: 'Sanctuary Web Components, starting with buttons and form controls.' },
+  { horizon: 'later', product: 'ports', text: 'Ports for desktop applications such as mangowm, Waybar and foot, each with install steps and a screenshot.' },
+  { horizon: 'later', product: 'site', text: 'A ports gallery on this site.' },
   { horizon: 'later', product: 'ports', text: 'A port generator so anyone can bring Sanctuary to a new app.' },
 
   { horizon: 'exploring', product: 'tokens', text: 'Wide-gamut (Display P3) colors.' },

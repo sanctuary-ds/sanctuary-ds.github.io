@@ -84,4 +84,4 @@ Pin the exact version of `@sanctuary-ds/tokens` that a port was built from, and 
 
 ## Where ports live
 
-Each port will live in its own repository under the [sanctuary-ds organization](https://github.com/sanctuary-ds), as the site's [roadmap](/roadmap) plans. Until then, the core drafts ports for kitty, Ghostty, Alacritty, base16, GTK CSS and Hyprland in its [`ports/` directory](https://github.com/sanctuary-ds/tokens/tree/main/ports); they have not yet been checked on a real desktop.
+The ports of applications configured by a file live in the [`ports` repository](https://github.com/sanctuary-ds/ports), one template per application. An application installed from a git URL, such as a Neovim or tmux plugin, gets a repository of its own, named after it. No port is published yet: the site's [roadmap](/roadmap) says when they come.
