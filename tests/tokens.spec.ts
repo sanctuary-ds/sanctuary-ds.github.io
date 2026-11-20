@@ -57,11 +57,14 @@ test.describe('token reference', () => {
     );
     let checked = 0;
     for (const [name, cells] of rows) {
-      if (cells.length !== flavorIds.length) continue;
+      // A token either has a column per flavor or one value for all of them: an
+      // alias such as danger (glass-ruby) is written once and lands on a
+      // different color in each flavor, so the palette still resolves it per flavor.
+      if (cells.length !== flavorIds.length && cells.length !== 1) continue;
       for (const [index, id] of flavorIds.entries()) {
         const color = lookup(palette.flavors[id].colors, name.replace('--san-', ''));
         if (!color) continue;
-        expect(resolve(cells[index], id), `${name} in ${id}`).toBe(text(color));
+        expect(resolve(cells.length === 1 ? cells[0] : cells[index], id), `${name} in ${id}`).toBe(text(color));
         checked += 1;
       }
     }
