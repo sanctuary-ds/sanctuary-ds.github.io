@@ -173,8 +173,8 @@ importers:
         specifier: 3.7.4
         version: 3.7.4
       '@sanctuary-ds/tokens':
-        specifier: 0.3.2
-        version: 0.3.2
+        specifier: 0.4.0
+        version: 0.4.0
       astro:
         specifier: 7.3.5
         version: 7.3.5(@types/node@24.19.2)(yaml@2.9.1)
@@ -930,8 +930,8 @@ packages:
   '@rolldown/pluginutils@1.0.1':
     resolution: {integrity: sha512-2j9bGt5Jh8hj+vPtgzPtl72j0yRxHAyumoo6TNfAjsLB04UtpSvPbPcDcBMxz7n+9CYB0c1GxQFxYRg2jimqGw==}
 
-  '@sanctuary-ds/tokens@0.3.2':
-    resolution: {integrity: sha512-cdDJ2yfIpnvyuAAzX+zEwhu53By2EjLNAti5jDgWGE0brA6RCOmpIQn2MFu9ccg9Pv7iI24uSucAo3CDVAOVkQ==}
+  '@sanctuary-ds/tokens@0.4.0':
+    resolution: {integrity: sha512-FDba+s9mYjmL+VBYS6B2qlS1Lebe8JRniC9pgE3d0DbuqVQfbHkRcw18ylWrKSmmm/Mf5JQKwFWI2+qaZUE2Xw==}
 
   '@shikijs/core@4.5.0':
     resolution: {integrity: sha512-6CIgwq+bt2JZ3OSjb/nBkkwEf/CfpHcbam+Mg5Pllco7HAGRQ2/EFhZrrJtbyNTgKwknfVS+llsXGygiDGwJWw==}
@@ -2698,7 +2698,7 @@ snapshots:
 
   '@rolldown/pluginutils@1.0.1': {}
 
-  '@sanctuary-ds/tokens@0.3.2': {}
+  '@sanctuary-ds/tokens@0.4.0': {}
 
   '@shikijs/core@4.5.0':
     dependencies:
